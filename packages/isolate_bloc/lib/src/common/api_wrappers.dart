@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/mock_isolate_manager.dart';
 import 'isolate/bloc_manager.dart';
 import 'bloc/isolate_bloc_wrapper.dart';
 import 'bloc/isolate_bloc.dart';
+import 'isolate/isolate_manager/isolate/isolate_manager.dart'
+    if (dart.library.html) 'isolate/isolate_manager/web/isolate_manager.dart';
+import 'isolate/isolate_manager/mock/mock_isolate_manager.dart';
 import 'isolate/isolated_bloc_manager.dart';
 
 /// Register [IsolateBloc].

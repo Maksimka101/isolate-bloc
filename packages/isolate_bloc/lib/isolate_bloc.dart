@@ -1,7 +1,7 @@
 library isolate_bloc;
 
-export 'src/common/bloc/isolate_bloc.dart';
 export 'src/common/api_wrappers.dart';
+export 'src/common/bloc/isolate_bloc.dart';
 export 'src/common/bloc/isolate_bloc_observer.dart';
 export 'src/common/bloc/isolate_bloc_wrapper.dart';
 export 'src/common/bloc/transition.dart';

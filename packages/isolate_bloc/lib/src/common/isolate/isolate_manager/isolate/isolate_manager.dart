@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:isolate';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate_wrapper_impl.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate_wrapper.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_wrapper.dart';
 
-import '../bloc_manager.dart';
-import 'isolate_messenger.dart';
+import '../../bloc_manager.dart';
+import '../isolate_messenger.dart';
+import 'isolate_wrapper_impl.dart';
 
 /// Create and initialize [Isolate] and [IsolateMessenger].
 class IsolateManagerImpl extends IsolateManager {
@@ -16,6 +16,11 @@ class IsolateManagerImpl extends IsolateManager {
   /// with [IsolateMessenger] and user's [Initializer] func
   static Future<IsolateManagerImpl> createIsolate(
       IsolateRun run, Initializer initializer) async {
+    assert(
+      '$initializer'.contains(' static'),
+      '$Initializer must be a static or global function',
+    );
+
     final fromIsolate = ReceivePort();
     final toIsolateCompleter = Completer<SendPort>();
     final isolate = await Isolate.spawn<_IsolateSetup>(

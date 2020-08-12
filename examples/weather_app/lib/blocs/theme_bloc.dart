@@ -6,7 +6,7 @@ import 'package:weather_app/blocs/weather_bloc.dart';
 import 'package:weather_app/models/models.dart';
 
 class ThemeBloc extends IsolateBloc<WeatherState, ThemeState> {
-  final WrapperInjector weatherBlocInjector;
+  final BlocInjector weatherBlocInjector;
   StreamSubscription<WeatherState> _weatherStateSubscription;
 
   ThemeBloc({

@@ -105,12 +105,10 @@ packages:
   isolate_bloc:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "984e336e329fc4dfd609384aedb447e99130ccc2"
-      url: "https://github.com/Maksimka101/isolate_bloc.git"
-    source: git
-    version: "0.1.1"
+      path: "../../packages/isolate_bloc"
+      relative: true
+    source: path
+    version: "0.2.0"
   matcher:
     dependency: transitive
     description:
@@ -152,7 +150,7 @@ packages:
       name: provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.3.1"
+    version: "4.3.2"
   sky_engine:
     dependency: transitive
     description: flutter

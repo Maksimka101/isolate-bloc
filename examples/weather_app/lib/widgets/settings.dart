@@ -21,7 +21,8 @@ class Settings extends StatelessWidget {
                 trailing: Switch(
                   value: state.temperatureUnits == TemperatureUnits.celsius,
                   onChanged: (_) =>
-                      IsolateBlocProvider.of<SettingsBloc, SettingsState>(context)
+                      IsolateBlocProvider.of<SettingsBloc, SettingsState>(
+                              context)
                           .add(TemperatureUnitsToggled()),
                 ),
               );

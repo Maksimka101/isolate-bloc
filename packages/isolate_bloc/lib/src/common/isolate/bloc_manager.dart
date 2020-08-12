@@ -35,11 +35,6 @@ class BlocManager {
   /// If already initialized kill previous [Isolate] and reinitialize everything.
   static Future<void> initialize(
       Initializer initializer, IsolateManagerCreator createIsolate) async {
-    assert(
-      '$initializer'.contains(' static'),
-      '$Initializer must be a static or global function',
-    );
-
     if (instance != null) {
       await instance.dispose();
     }
@@ -48,10 +43,9 @@ class BlocManager {
         await createIsolate(_isolatedBlocRunner, initializer);
 
     final isolateConnector = IsolateConnector(
-      isolateManager.messenger.sendMessage,
+      isolateManager.messenger.add,
       Stream.castFrom<Object, ServiceEvent>(
-        isolateManager.messenger.receiveMessages
-            .where((event) => event is ServiceEvent),
+        isolateManager.messenger.where((event) => event is ServiceEvent),
       ),
     );
 
@@ -96,9 +90,9 @@ class BlocManager {
   ) async {
     var isolateBlocManager = IsolatedBlocManager.initialize(
       IsolatedConnector(
-        messenger.sendMessage,
+        messenger.add,
         Stream.castFrom<Object, ServiceEvent>(
-            messenger.receiveMessages.where((event) => event is ServiceEvent)),
+            messenger.where((event) => event is ServiceEvent)),
       ),
     );
 

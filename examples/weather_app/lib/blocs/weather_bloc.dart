@@ -26,6 +26,7 @@ class WeatherBloc extends IsolateBloc<WeatherEvent, WeatherState> {
       final Weather weather = await weatherRepository.getWeather(event.city);
       emit(WeatherLoadSuccess(weather: weather));
     } catch (e) {
+      print(e);
       emit(WeatherLoadFailure());
     }
   }
@@ -34,7 +35,9 @@ class WeatherBloc extends IsolateBloc<WeatherEvent, WeatherState> {
     try {
       final Weather weather = await weatherRepository.getWeather(event.city);
       emit(WeatherLoadSuccess(weather: weather));
-    } catch (_) {}
+    } catch (e) {
+      print(e);
+    }
   }
 }
 

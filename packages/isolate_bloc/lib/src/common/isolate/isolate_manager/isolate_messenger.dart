@@ -1,13 +1,38 @@
+import 'dart:async';
+
 /// Class that help communicate between [Isolate]s.
-class IsolateMessenger {
+class IsolateMessenger extends Stream<Object> implements Sink {
   final Stream<Object> _fromIsolateStream;
   final void Function(Object message) _toIsolate;
+  Object _lastMessage;
 
-  IsolateMessenger(this._fromIsolateStream, this._toIsolate);
-
-  /// Receive messages from [Isolate]
-  Stream<Object> get receiveMessages => _fromIsolateStream;
+  IsolateMessenger(this._fromIsolateStream, this._toIsolate) {
+    _fromIsolateStream.listen((message) => _lastMessage = message);
+  }
 
   /// Send messages to the [Isolate]
-  void sendMessage(Object message) => _toIsolate(message);
+  @override
+  void add(message) => _toIsolate(message);
+
+  /// Receive messages from [Isolate]
+  @override
+  StreamSubscription<Object> listen(void Function(Object event) onData,
+      {Function onError, void Function() onDone, bool cancelOnError}) {
+    return _behaviourSubject.listen(
+      onData,
+      onDone: onDone,
+      onError: onError,
+      cancelOnError: cancelOnError,
+    );
+  }
+
+  Stream<Object> get _behaviourSubject async* {
+    if (_lastMessage != null) {
+      yield _lastMessage;
+    }
+    yield* _fromIsolateStream;
+  }
+
+  @override
+  void close() {}
 }

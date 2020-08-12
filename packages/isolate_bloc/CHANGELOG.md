@@ -1,3 +1,7 @@
+## [0.3.0]
+ - Add flutter web support.
+ - Update readme.
+
 ## [0.2.0]
  - Add `initializeMock` function for testing.
  - Delete `getBloc` function and rename `getBlocWrapper` to `getBloc`. 
