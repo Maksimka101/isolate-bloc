@@ -12,7 +12,7 @@
 A dart package that helps implement the BLoC pattern.
 
 # Overview 
-The goal of this package is to make it easy to work `BLoC` and `Isolate`.
+The goal of this package is to make it easy to work with `BLoC` and `Isolate`.
 
 The main difference from another BLoC pattern implementations is what blocs work in [Isolate](https://medium.com/dartlang/dart-asynchronous-programming-isolates-and-event-loops-bffc3e296a6a) and don't slow down UI.
 
