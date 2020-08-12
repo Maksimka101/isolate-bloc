@@ -1,10 +1,22 @@
+<p align="center">
+<img src="https://github.com/Maksimka101/isolate-bloc/blob/master/docs/assets/isolate_bloc_logo.svg?raw=true" height="200" alt="Bloc" />
+</p>
+
+<p align="center">
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-purple.svg" alt="License: MIT"></a>
+<a href="https://pub.dev/packages/isolate_bloc"><img src="https://img.shields.io/pub/v/isolate_bloc.svg" alt="Pub"></a>
+</p>
+
+---
+
 A dart package that helps implement the BLoC pattern.
 
 # Overview 
-
-You can read about BLoC pattern [here](https://www.didierboelens.com/2018/08/reactive-programming-streams-bloc/).
+The goal of this package is to make it easy to work `BLoC` and `Isolate`.
 
 The main difference from another BLoC pattern implementations is what blocs work in [Isolate](https://medium.com/dartlang/dart-asynchronous-programming-isolates-and-event-loops-bffc3e296a6a) and don't slow down UI.
+
+You can read about BLoC pattern [here](https://www.didierboelens.com/2018/08/reactive-programming-streams-bloc/).
 
 # Attention
 This package now in beta and you should use it in pet projects only. 
@@ -268,5 +280,6 @@ If you will try to send exception with StackTrace you will also get runtime exce
 Just don't send this object.
 
 # Examples
- - [Counter](https://github.com/Maksimka101/isolate_bloc/tree/master/example)
- - [Weather](https://github.com/Maksimka101/weather_app)
+ - [Counter](https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc/example)
+ - [Weather](https://github.com/Maksimka101/isolate-bloc/tree/master/examples/weather_app)
+ 
