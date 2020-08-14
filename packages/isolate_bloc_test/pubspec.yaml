@@ -1,0 +1,20 @@
+name: isolate_bloc_test
+description: A testing library which make it easy to test isolate_bloc.
+version: 0.1.0
+homepage: https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc_test
+repository: https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc_test
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+  flutter: ">=1.17.0 <2.0.0"
+
+dependencies:
+  isolate_bloc: ^0.3.0
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:

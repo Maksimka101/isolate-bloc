@@ -1,10 +1,7 @@
 import 'dart:isolate';
 
-import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_wrapper.dart';
+import 'package:isolate_bloc/isolate_bloc.dart';
 
-import '../abstract_isolate_manager.dart';
-import '../isolate_messenger.dart';
 import 'mock_isolate_wrapper.dart';
 
 /// [IsolateManager] implementation for tests.

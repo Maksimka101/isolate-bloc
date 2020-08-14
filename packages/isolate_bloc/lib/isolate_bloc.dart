@@ -1,6 +1,10 @@
 library isolate_bloc;
 
 export 'src/common/api_wrappers.dart';
+export 'src/common/isolate/isolate_manager/abstract_isolate_manager.dart';
+export 'src/common/isolate/isolate_manager/isolate_messenger.dart';
+export 'src/common/isolate/isolate_manager/abstract_isolate_wrapper.dart';
+export 'src/common/isolate/bloc_manager.dart';
 export 'src/common/bloc/isolate_bloc.dart';
 export 'src/common/bloc/isolate_bloc_observer.dart';
 export 'src/common/bloc/isolate_bloc_wrapper.dart';

@@ -1,3 +1,6 @@
+## [0.3.1]
+ - Move `initializeMock` function to isolate_bloc_test library.
+
 ## [0.3.0]
  - Add flutter web support.
  - Update readme.

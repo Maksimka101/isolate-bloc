@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
+import 'package:isolate_bloc_test/isolate_bloc_test.dart';
 import 'package:mockito/mockito.dart';
 
 import 'blocs/counter_blocs.dart';

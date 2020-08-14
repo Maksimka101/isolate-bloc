@@ -129,13 +129,6 @@ void isolatedFunc() {
   register(create: () => CounterBloc());
 }
 ```
-For tests you can use `initializeMock()`.
-```dart
-test('Bloc test', () async {
-  await initializeMock(isolatedFunc);
-});
-```
-
 
 ## Create new Bloc instance
 To create a new instance of bloc you can use Widget or function.

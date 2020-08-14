@@ -4,7 +4,6 @@ import 'bloc/isolate_bloc_wrapper.dart';
 import 'bloc/isolate_bloc.dart';
 import 'isolate/isolate_manager/isolate/isolate_manager.dart'
     if (dart.library.html) 'isolate/isolate_manager/web/isolate_manager.dart';
-import 'isolate/isolate_manager/mock/mock_isolate_manager.dart';
 import 'isolate/isolated_bloc_manager.dart';
 
 /// Register [IsolateBloc].
@@ -37,11 +36,6 @@ Future<void> initialize(Initializer userInitializer,
   return BlocManager.initialize(
       userInitializer, IsolateManagerImpl.createIsolate);
 }
-
-/// Work like [initialize] but doesn't create [Isolate]
-@visibleForTesting
-Future<void> initializeMock(Initializer userInitializer) =>
-    BlocManager.initialize(userInitializer, MockIsolateManager.createIsolate);
 
 /// Signature for [IsolateBlocWrapper] injection.
 typedef BlocInjector<Bloc extends IsolateBloc<Object, State>, State>
