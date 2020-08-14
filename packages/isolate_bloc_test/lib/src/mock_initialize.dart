@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 
 import 'mock_isolate_manager.dart';

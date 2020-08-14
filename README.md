@@ -14,6 +14,7 @@ Isolate Bloc's infrastructure repository.
 | Package                                                                              | Pub                                                                                                      |
 | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
 | [isolate_bloc](https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc)                   | [![pub package](https://img.shields.io/pub/v/isolate_bloc.svg)](https://pub.dev/packages/isolate_bloc)                   |
+| [isolate_bloc_test](https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc_test)| [![pub package](https://img.shields.io/pub/v/isolate_bloc_test.svg)](https://pub.dev/packages/isolate_bloc_test)
 
 # Examples
  - [Counter](https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc/example)
