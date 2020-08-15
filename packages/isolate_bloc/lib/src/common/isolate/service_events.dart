@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 /// Class for not user events
 abstract class ServiceEvent {}
 
@@ -37,3 +39,31 @@ class CloseIsolateBlocEvent extends ServiceEvent {
 
   CloseIsolateBlocEvent(this.blocUuid);
 }
+
+/// Event to invoke [MethodChannel] in main isolate.
+class InvokePlatformChannelEvent extends ServiceEvent {
+  final ByteData data;
+  final String channel;
+  final String id;
+
+  InvokePlatformChannelEvent(this.data, this.channel, this.id);
+}
+
+/// Event with response from [MethodChannel]
+class PlatformChannelResponseEvent extends ServiceEvent {
+  final ByteData data;
+  final String id;
+
+  PlatformChannelResponseEvent(this.data, this.id);
+}
+
+/// Event for [PlatformChannelMiddleware] and [IsolatePlatformChannelMiddleware].
+/// This event contains response [data] from platform channel or request to it and event [id]
+/// to response to the right request. Also it is contains [MethodChannel] name ([channel]).
+//class PlatformChannelEvent extends ServiceEvent {
+//  final ByteData data;
+//  final String channel;
+//  final String id;
+//
+//  PlatformChannelEvent(this.channel, this.data, this.id);
+//}

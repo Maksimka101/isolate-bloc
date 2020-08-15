@@ -1,3 +1,5 @@
+import 'package:isolate_bloc/src/common/isolate/isolated_platform_channel_middleware.dart';
+
 import 'isolated_bloc_manager.dart';
 import 'service_events.dart';
 
@@ -20,6 +22,9 @@ class IsolatedConnector {
       IsolatedBlocManager.instance.createBloc(event.blocType);
     } else if (event is CloseIsolateBlocEvent) {
       IsolatedBlocManager.instance.closeBloc(event.blocUuid);
+    } else if (event is PlatformChannelResponseEvent) {
+      IsolatedPlatformChannelMiddleware.instance
+          .platformChannelResponse(event.id, event.data);
     }
   }
 }

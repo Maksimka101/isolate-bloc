@@ -7,8 +7,11 @@ import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate_messenge
 import '../../bloc_manager.dart';
 import 'web_isolate_wrapper.dart';
 
+/// Web [IsolateManager]'s implementation.
+/// It doesn't creates [Isolate].
 class IsolateManagerImpl extends IsolateManager {
-  IsolateManagerImpl(IsolateWrapper isolate, IsolateMessenger messenger)
+  IsolateManagerImpl(IsolateWrapper isolate, IsolateMessenger messenger,
+      [List<String> platformChannels])
       : super(isolate, messenger);
 
   static Future<IsolateManagerImpl> createIsolate(

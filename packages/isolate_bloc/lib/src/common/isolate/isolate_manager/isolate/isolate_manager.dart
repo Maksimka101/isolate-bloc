@@ -1,7 +1,13 @@
 import 'dart:async';
 import 'dart:isolate';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_binding.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_wrapper.dart';
+import 'package:isolate_bloc/src/common/isolate/isolated_platform_channel_middleware.dart';
+import 'package:isolate_bloc/src/common/isolate/platform_channel_middleware.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../bloc_manager.dart';
 import '../isolate_messenger.dart';
@@ -15,7 +21,8 @@ class IsolateManagerImpl extends IsolateManager {
   /// Create Isolate, initialize messages and run your function
   /// with [IsolateMessenger] and user's [Initializer] func
   static Future<IsolateManagerImpl> createIsolate(
-      IsolateRun run, Initializer initializer) async {
+      IsolateRun run, Initializer initializer,
+      [List<String> platformChannels]) async {
     assert(
       '$initializer'.contains(' static'),
       '$Initializer must be a static or global function',
@@ -24,7 +31,15 @@ class IsolateManagerImpl extends IsolateManager {
     final fromIsolate = ReceivePort();
     final toIsolateCompleter = Completer<SendPort>();
     final isolate = await Isolate.spawn<_IsolateSetup>(
-        _runInIsolate, _IsolateSetup(fromIsolate.sendPort, run, initializer));
+      _runInIsolate,
+      _IsolateSetup(
+        fromIsolate.sendPort,
+        run,
+        initializer,
+        platformChannels,
+      ),
+    );
+
     final fromIsolateStream = fromIsolate.asBroadcastStream();
     var subscription = fromIsolateStream.listen((message) {
       if (message is SendPort) {
@@ -33,9 +48,22 @@ class IsolateManagerImpl extends IsolateManager {
     });
     final toIsolate = await toIsolateCompleter.future;
     await subscription.cancel();
+
+    final isolateMessenger =
+        IsolateMessenger(fromIsolateStream, toIsolate.send);
+
+    // Initialize platform channel
+    WidgetsFlutterBinding.ensureInitialized();
+    PlatformChannelMiddleware(
+      generateId: Uuid().v4,
+      platformMessenger: ServicesBinding.instance.defaultBinaryMessenger,
+      sendEvent: isolateMessenger.add,
+      channels: platformChannels,
+    );
+
     return IsolateManagerImpl(
       IsolateWrapperImpl(isolate),
-      IsolateMessenger(fromIsolateStream, toIsolate.send),
+      isolateMessenger,
     );
   }
 
@@ -45,6 +73,15 @@ class IsolateManagerImpl extends IsolateManager {
     setup.fromIsolate.send(toIsolate.sendPort);
     final isolateMessenger =
         IsolateMessenger(toIsolateStream, setup.fromIsolate.send);
+
+    // Initialize platform channel in isolate
+    IsolateBinding();
+    IsolatedPlatformChannelMiddleware(
+      channels: setup.platformChannels,
+      platformMessenger: ServicesBinding.instance.defaultBinaryMessenger,
+      generateId: Uuid().v4,
+      sendEvent: isolateMessenger.add,
+    );
     setup.task(isolateMessenger, setup.userInitializer);
   }
 }
@@ -53,6 +90,8 @@ class _IsolateSetup {
   final SendPort fromIsolate;
   final Initializer userInitializer;
   final IsolateRun task;
+  final List<String> platformChannels;
 
-  _IsolateSetup(this.fromIsolate, this.task, this.userInitializer);
+  _IsolateSetup(
+      this.fromIsolate, this.task, this.userInitializer, this.platformChannels);
 }

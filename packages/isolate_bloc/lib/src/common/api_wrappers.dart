@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:isolate_bloc/src/common/isolate/platform_channel_setup.dart';
 import 'isolate/bloc_manager.dart';
 import 'bloc/isolate_bloc_wrapper.dart';
 import 'bloc/isolate_bloc.dart';
@@ -25,8 +26,11 @@ IsolateBlocWrapper<State>
 
 /// Initialize [Isolate], ServiceEventListener in both Isolates and run [Initializer].
 /// If already initialized and [reCreate] is true kill previous [Isolate] and reinitialize everything.
-Future<void> initialize(Initializer userInitializer,
-    {bool reCreate = false}) async {
+Future<void> initialize(
+  Initializer userInitializer, {
+  PlatformChannelSetup platformChannelSetup = const PlatformChannelSetup(),
+  bool reCreate = false,
+}) async {
   if (!reCreate) {
     assert(
         BlocManager.instance == null,
