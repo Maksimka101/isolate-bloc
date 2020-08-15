@@ -19,10 +19,10 @@ class IsolatedPlatformChannelMiddleware {
     @required this.sendEvent,
   }) : generateId = generateId ?? Uuid().v4 {
     instance = this;
-    _bindPlatformMessageHandlers(channels);
+    _bindMessageHandlers(channels);
   }
 
-  void _bindPlatformMessageHandlers(List<String> channels) {
+  void _bindMessageHandlers(List<String> channels) {
     for (final channel in channels) {
       platformMessenger.setMockMessageHandler(channel, (message) {
         final completer = Completer<ByteData>();
@@ -32,6 +32,12 @@ class IsolatedPlatformChannelMiddleware {
         return completer.future;
       });
     }
+  }
+
+  void handlePlatformMessage(String channel, String id, ByteData message) {
+    platformMessenger.handlePlatformMessage(channel, message, (data) {
+      sendEvent(MethodChannelResponseEvent(data, id));
+    });
   }
 
   void platformChannelResponse(String id, ByteData response) {

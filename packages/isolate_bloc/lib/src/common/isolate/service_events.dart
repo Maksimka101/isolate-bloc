@@ -33,7 +33,7 @@ class IsolateBlocsInitialized extends ServiceEvent {
   IsolateBlocsInitialized(this.initialStates);
 }
 
-/// Event to close IsolateBloc. Called by IsolateBlocWrapper.close()
+/// Event to close IsolateBloc. Called by [IsolateBlocWrapper.close()]
 class CloseIsolateBlocEvent extends ServiceEvent {
   final String blocUuid;
 
@@ -57,13 +57,19 @@ class PlatformChannelResponseEvent extends ServiceEvent {
   PlatformChannelResponseEvent(this.data, this.id);
 }
 
-/// Event for [PlatformChannelMiddleware] and [IsolatePlatformChannelMiddleware].
-/// This event contains response [data] from platform channel or request to it and event [id]
-/// to response to the right request. Also it is contains [MethodChannel] name ([channel]).
-//class PlatformChannelEvent extends ServiceEvent {
-//  final ByteData data;
-//  final String channel;
-//  final String id;
-//
-//  PlatformChannelEvent(this.channel, this.data, this.id);
-//}
+/// Event to invoke [MethodChannel.setMethodCallHandler] in [IsolateBloc]'s isolate.
+class InvokeMethodChannelEvent extends ServiceEvent {
+  final ByteData data;
+  final String channel;
+  final String id;
+
+  InvokeMethodChannelEvent(this.data, this.channel, this.id);
+}
+
+/// Event with response from [MethodChannel.setMethodCallHandler] in [IsolateBloc]'s isolate.
+class MethodChannelResponseEvent extends ServiceEvent {
+  final ByteData data;
+  final String id;
+
+  MethodChannelResponseEvent(this.data, this.id);
+}

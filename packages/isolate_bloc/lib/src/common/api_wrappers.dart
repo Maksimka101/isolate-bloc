@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
-import 'package:isolate_bloc/src/common/isolate/platform_channel_setup.dart';
 import 'isolate/bloc_manager.dart';
 import 'bloc/isolate_bloc_wrapper.dart';
 import 'bloc/isolate_bloc.dart';
 import 'isolate/isolate_manager/isolate/isolate_manager.dart'
     if (dart.library.html) 'isolate/isolate_manager/web/isolate_manager.dart';
 import 'isolate/isolated_bloc_manager.dart';
+import 'isolate/platform_channel/platform_channel_setup.dart';
 
 /// Register [IsolateBloc].
 /// You can create [IsolateBloc] and get [IsolateBlocWrapper] from
@@ -38,7 +38,10 @@ Future<void> initialize(
         "Call `initialize(..., reCreate: true)` if you want to reinitialize.");
   }
   return BlocManager.initialize(
-      userInitializer, IsolateManagerImpl.createIsolate);
+    userInitializer,
+    IsolateManagerImpl.createIsolate,
+    platformChannelSetup.methodChannels,
+  );
 }
 
 /// Signature for [IsolateBlocWrapper] injection.

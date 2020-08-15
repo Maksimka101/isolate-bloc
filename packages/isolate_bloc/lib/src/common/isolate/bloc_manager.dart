@@ -13,7 +13,10 @@ import 'service_events.dart';
 typedef Initializer = Function();
 
 typedef IsolateManagerCreator = Future<IsolateManager> Function(
-    IsolateRun, Initializer);
+  IsolateRun,
+  Initializer, [
+  List<String> channels,
+]);
 
 /// Maintain [IsolateBlocWrapper]s
 class BlocManager {
@@ -34,13 +37,16 @@ class BlocManager {
   /// function.
   /// If already initialized kill previous [Isolate] and reinitialize everything.
   static Future<void> initialize(
-      Initializer initializer, IsolateManagerCreator createIsolate) async {
+    Initializer initializer,
+    IsolateManagerCreator createIsolate,
+    List<String> platformChannels,
+  ) async {
     if (instance != null) {
       await instance.dispose();
     }
 
     final isolateManager =
-        await createIsolate(_isolatedBlocRunner, initializer);
+        await createIsolate(_isolatedBlocRunner, initializer, platformChannels);
 
     final isolateConnector = IsolateConnector(
       isolateManager.messenger.add,

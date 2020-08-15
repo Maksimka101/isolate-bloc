@@ -10,7 +10,7 @@ class PlatformChannelMiddleware {
   final BinaryMessenger platformMessenger;
   final void Function(ServiceEvent) sendEvent;
   final String Function() generateId;
-  final _sendRequestsCompleter = <String, Completer<ByteData>>{};
+  final _messageHandlersCompleter = <String, Completer<ByteData>>{};
 
   PlatformChannelMiddleware({
     @required List<String> channels,
@@ -19,6 +19,23 @@ class PlatformChannelMiddleware {
     String Function() generateId,
   }) : generateId = generateId ?? Uuid().v4 {
     instance = this;
+    _bindPlatformMessageHandlers(channels);
+  }
+
+  void _bindPlatformMessageHandlers(List<String> channels) {
+    for (final channel in channels) {
+      platformMessenger.setMessageHandler(channel, (message) {
+        final completer = Completer<ByteData>();
+        final id = generateId();
+        _messageHandlersCompleter[id] = completer;
+        sendEvent(InvokeMethodChannelEvent(message, channel, id));
+        return completer.future;
+      });
+    }
+  }
+
+  void methodChannelResponse(String id, ByteData response) {
+    _messageHandlersCompleter.remove(id).complete(response);
   }
 
   void send(String channel, ByteData message, String id) {

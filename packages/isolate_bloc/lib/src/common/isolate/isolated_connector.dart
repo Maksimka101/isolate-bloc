@@ -1,6 +1,6 @@
-import 'package:isolate_bloc/src/common/isolate/isolated_platform_channel_middleware.dart';
 
 import 'isolated_bloc_manager.dart';
+import 'platform_channel/isolated_platform_channel_middleware.dart';
 import 'service_events.dart';
 
 /// Listen for [ServiceEvent]s in Isolate
@@ -25,6 +25,9 @@ class IsolatedConnector {
     } else if (event is PlatformChannelResponseEvent) {
       IsolatedPlatformChannelMiddleware.instance
           .platformChannelResponse(event.id, event.data);
+    } else if (event is InvokeMethodChannelEvent) {
+      IsolatedPlatformChannelMiddleware.instance
+          .handlePlatformMessage(event.channel, event.id, event.data);
     }
   }
 }

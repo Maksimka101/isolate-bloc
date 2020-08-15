@@ -1,10 +1,8 @@
 import 'dart:async';
 
-import 'package:isolate_bloc/src/common/isolate/platform_channel_middleware.dart';
-
 import 'bloc_manager.dart';
-
 import 'service_events.dart';
+import 'platform_channel/platform_channel_middleware.dart';
 
 /// Listen for [ServiceEvent]s from isolate
 class IsolateConnector {
@@ -37,11 +35,11 @@ class IsolateConnector {
     } else if (event is IsolateBlocTransitionEvent) {
       BlocManager.instance.blocStateReceiver(event.blocUuid, event.event);
     } else if (event is InvokePlatformChannelEvent) {
-      PlatformChannelMiddleware.instance.send(
-        event.channel,
-        event.data,
-        event.id,
-      );
+      PlatformChannelMiddleware.instance
+          .send(event.channel, event.data, event.id);
+    } else if (event is MethodChannelResponseEvent) {
+      PlatformChannelMiddleware.instance
+          .methodChannelResponse(event.id, event.data);
     }
   }
 

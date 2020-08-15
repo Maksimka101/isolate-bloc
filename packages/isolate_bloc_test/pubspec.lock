@@ -77,10 +77,10 @@ packages:
   isolate_bloc:
     dependency: "direct main"
     description:
-      path: "../isolate_bloc"
-      relative: true
-    source: path
-    version: "0.3.0"
+      name: isolate_bloc
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.1"
   matcher:
     dependency: transitive
     description:
