@@ -3,6 +3,11 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_plugin.dart';
 
+/// Settings for [PlatformChannelMiddleware] and [IsolatedPlatformChannelMiddleware]
+/// In [_platformChannelPlugins] stored all known MethodChannel plugin names.
+/// They are used to receive platform message responses and requests. 
+/// You can add platform MethodChannel names with addChannels function and remove
+/// them by package name with removeChannels function. 
 class PlatformChannelSetup {
   final String Function() generateId;
 
@@ -132,7 +137,7 @@ class PlatformChannelSetup {
     String Function() generateId,
   }) : generateId = generateId ?? _generateId;
 
-  /// Remove [MethodChannel] names by [packageNames]
+  /// Remove [MethodChannel] names from [_platformChannelPlugins] by [packageNames]
   void removeChannels({@required List<String> packageNames}) =>
       _platformChannelPlugins
           .removeWhere((plugin) => packageNames.contains(plugin.name));
@@ -143,6 +148,7 @@ class PlatformChannelSetup {
         .add(Plugin(name: generateId(), methodChannels: methodChannelNames));
   }
 
+  /// Return all method channel names. 
   List<String> get methodChannels {
     return _platformChannelPlugins.fold<List<String>>(
       <String>[],
