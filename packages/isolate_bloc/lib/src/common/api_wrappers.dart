@@ -30,9 +30,10 @@ IsolateBlocWrapper<State>
 /// If already initialized and [reCreate] is true kill previous [Isolate] and reinitialize everything.
 Future<void> initialize(
   Initializer userInitializer, {
-  PlatformChannelSetup platformChannelSetup = const PlatformChannelSetup(),
+  PlatformChannelSetup platformChannelSetup,
   bool reCreate = false,
 }) async {
+  platformChannelSetup ??= PlatformChannelSetup();
   if (!reCreate) {
     assert(
         BlocManager.instance == null,

@@ -9,6 +9,7 @@ export 'src/common/isolate/bloc_manager.dart';
 export 'src/common/isolate/isolate_manager/abstract_isolate_manager.dart';
 export 'src/common/isolate/isolate_manager/abstract_isolate_wrapper.dart';
 export 'src/common/isolate/isolate_manager/isolate_messenger.dart';
+export 'src/common/isolate/platform_channel/platform_channel_setup.dart';
 export 'src/flutter/isolate_bloc_builder.dart';
 export 'src/flutter/isolate_bloc_consumer.dart';
 export 'src/flutter/isolate_bloc_listener.dart';

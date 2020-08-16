@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 
 /// Library info for [PlatformChannelSetup].
-class Plugin {
-  Plugin({
+class Library {
+  const Library({
     @required this.name,
     @required this.methodChannels,
   });

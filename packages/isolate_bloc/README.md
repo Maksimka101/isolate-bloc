@@ -256,6 +256,26 @@ class CounterHistoryBloc extends IsolateBloc<int, List<int>> {
 }
 ```
 
+## Use platform channels
+If you want to use platform channels (MethodChannels) or libraries which use them 
+in your IsolateBlocs or repositories you must add MethodChannel name in 
+`initialize`.
+
+Below you can see example of how to add `url_launcher` library support.
+```dart
+await initialize(
+  isolatedFunc,
+  platformChannelSetup: PlatformChannelSetup(
+    methodChannelNames: [
+      'plugins.flutter.io/url_launcher',
+    ],
+  ),
+);
+```
+
+By default, channels have already been added for flutter fire, common flutter libraries 
+and popular community libraries.
+
 # Limitations
 Your events and states cannot contain any objects. If you will try to send one 
 of the following items you will get `Illegal argument in isolate message` 
