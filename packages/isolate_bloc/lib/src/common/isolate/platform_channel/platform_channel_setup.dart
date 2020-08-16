@@ -4,11 +4,10 @@ import 'package:uuid/uuid.dart';
 
 /// Settings for [PlatformChannelMiddleware] and [IsolatedPlatformChannelMiddleware]
 /// In [_platformChannelPlugins] stored all known MethodChannel plugin names.
-/// They are used to receive platform message responses and requests. 
+/// They are used to receive platform message responses and requests.
 /// You can add platform [MethodChannel] names with [PlatformChannelSetup.addChannels]
 /// function and remove them by package name with [PlatformChannelSetup.removeChannels] function.
 class PlatformChannelSetup {
-
   /// Create instance of this class.
   const PlatformChannelSetup({
     String Function() generateId,
@@ -149,7 +148,7 @@ class PlatformChannelSetup {
         .add(Plugin(name: generateId(), methodChannels: methodChannelNames));
   }
 
-  /// Return all method channel names. 
+  /// Return all method channel names.
   List<String> get methodChannels {
     return _platformChannelPlugins.fold<List<String>>(
       <String>[],
