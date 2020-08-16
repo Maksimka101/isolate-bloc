@@ -1,3 +1,6 @@
+## [0.4.0]
+ - Add platform channels (`MethodChannel`) support.
+
 ## [0.3.1]
  - Move `initializeMock` function to isolate_bloc_test library.
 

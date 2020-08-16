@@ -274,7 +274,7 @@ await initialize(
 ```
 
 By default, channels have already been added for flutter fire, common flutter libraries 
-and popular community libraries.
+and popular community libraries. All out of box supported libraries you can see [here](https://github.com/Maksimka101/isolate-bloc/blob/master/packages/isolate_bloc/lib/src/common/isolate/platform_channel/libraries.dart).
 
 # Limitations
 Your events and states cannot contain any objects. If you will try to send one 
