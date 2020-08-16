@@ -226,12 +226,10 @@ returns this bloc. Else it checks whether the pool of free blocs contains the Bl
 return this bloc. Else it is creates a new BlocA and add to the pull of free blocs. 
 So when UI will call `create<BlocA, BlocAState>()`, it will not create a new bloc but
 return free bloc from pull. 
-
-This mean you should call this function only once to prevent unexpected bloc creation.
 ```dart
 void isolatedFunc() {
   register(create: () => CounterBloc());
-  register(create: () => CounterHistoryBloc(getBloc));
+  register(create: () => CounterHistoryBloc(getBloc<CounterBloc, int>()));
 }
 
 class CounterBloc extends IsolateBloc<CountEvent, int> {
@@ -244,12 +242,11 @@ class CounterBloc extends IsolateBloc<CountEvent, int> {
 }
 
 class CounterHistoryBloc extends IsolateBloc<int, List<int>> {
-  /// BlocInjector: IsolateBlocWrapper<State> Function<T extends IsolateBloc, State>()
-  final BlocInjector injector;
+  final IsolateBlocWrapper<int> counterBloc;
   final _history = <int>[];
 
-  CounterHistoryBloc(this.injector) : super([]) {
-    injector<CounterBloc, int>().listen(onEventReceived);
+  CounterHistoryBloc(this.counterBloc) : super([]) {
+    counterBloc.listen(onEventReceived);
   }
 
   @override
