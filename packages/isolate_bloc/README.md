@@ -95,7 +95,7 @@ class CounterScreen extends StatelessWidget {
           FloatingActionButton(
             heroTag: 'Decrement',
             /// Get bloc using provider class and add new event
-            onPressed: () => IsolateBlocProvider.of<CounterBloc>(context).add(CountEvent.decrement),
+            onPressed: () => IsolateBlocProvider.of<CounterBloc, int>(context).add(CountEvent.decrement),
             child: Icon(Icons.remove),
           ),
         ],
@@ -216,11 +216,10 @@ class SimpleBlocObserver extends IsolateBlocObserver {
 ```
 
 ## Use Bloc in another Bloc
-You can use Bloc in another Bloc. You need to use `getBloc<BlocA>()` function which 
-return `IsolateBlocWrapper<BlocAState>` to do so. Also, you may use BlocInjector typedef 
-which is just a signature for getBloc.
+You can use Bloc in another Bloc. You need to use `getBloc<BlocA, BlocAState>()` 
+function which return `IsolateBlocWrapper<BlocAState>` to do so.
 
-`getBloc<BlocA>()` function works this way: firstly it is wait for user's initialization 
+`getBloc<BlocA, State>()` function works this way: firstly it is wait for user's initialization 
 function secondly it is looks for created bloc with type BlocA. If it is finds any, so it 
 returns this bloc. Else it checks whether the pool of free blocs contains the BlocA and 
 return this bloc. Else it is creates a new BlocA and add to the pull of free blocs. 
@@ -273,8 +272,9 @@ await initialize(
 );
 ```
 
-By default, channels have already been added for flutter fire, common flutter libraries 
-and popular community libraries. All out of box supported libraries you can see [here](https://github.com/Maksimka101/isolate-bloc/blob/master/packages/isolate_bloc/lib/src/common/isolate/platform_channel/libraries.dart).
+By default, channels have already been added for flutter fire, flutter developers libraries 
+and popular community libraries. All out of box supported libraries you can see [here](https://github.com/Maksimka101/isolate-bloc/blob/master/packages/isolate_bloc/lib/src/common/isolate/platform_channel/libraries.dart)
+(look at `Library.name`).
 
 # Limitations
 Your events and states cannot contain any objects. If you will try to send one 
