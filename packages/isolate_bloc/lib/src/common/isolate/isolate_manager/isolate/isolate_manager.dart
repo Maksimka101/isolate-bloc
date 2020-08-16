@@ -41,7 +41,7 @@ class IsolateManagerImpl extends IsolateManager {
     );
 
     final fromIsolateStream = fromIsolate.asBroadcastStream();
-    var subscription = fromIsolateStream.listen((message) {
+    final subscription = fromIsolateStream.listen((message) {
       if (message is SendPort) {
         toIsolateCompleter.complete(message);
       }
@@ -54,9 +54,9 @@ class IsolateManagerImpl extends IsolateManager {
 
     // Initialize platform channel
     WidgetsFlutterBinding.ensureInitialized();
-    PlatformChannelMiddleware(
+    MethodChannelMiddleware(
       generateId: Uuid().v4,
-      platformMessenger: ServicesBinding.instance.defaultBinaryMessenger,
+      binaryMessenger: ServicesBinding.instance.defaultBinaryMessenger,
       sendEvent: isolateMessenger.add,
       channels: platformChannels,
     );
@@ -87,11 +87,11 @@ class IsolateManagerImpl extends IsolateManager {
 }
 
 class _IsolateSetup {
+  _IsolateSetup(
+      this.fromIsolate, this.task, this.userInitializer, this.platformChannels);
+
   final SendPort fromIsolate;
   final Initializer userInitializer;
   final IsolateRun task;
   final List<String> platformChannels;
-
-  _IsolateSetup(
-      this.fromIsolate, this.task, this.userInitializer, this.platformChannels);
 }

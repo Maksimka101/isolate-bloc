@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'isolate/bloc_manager.dart';
-import 'bloc/isolate_bloc_wrapper.dart';
+
 import 'bloc/isolate_bloc.dart';
+import 'bloc/isolate_bloc_wrapper.dart';
+import 'isolate/bloc_manager.dart';
 import 'isolate/isolate_manager/isolate/isolate_manager.dart'
     if (dart.library.html) 'isolate/isolate_manager/web/isolate_manager.dart';
 import 'isolate/isolated_bloc_manager.dart';
@@ -10,17 +11,17 @@ import 'isolate/platform_channel/platform_channel_setup.dart';
 /// Register [IsolateBloc].
 /// You can create [IsolateBloc] and get [IsolateBlocWrapper] from
 /// [createBloc] only if you register this [IsolateBloc].
-void register<Event, State>({@required IsolateBlocCreator create}) =>
+void register<Event, State>({@required IsolateBlocCreator<Event, State> create}) =>
     IsolatedBlocManager.instance.register<Event, State>(create);
 
 /// Start creating [IsolateBloc] and return [IsolateBlocWrapper].
 IsolateBlocWrapper<State>
     createBloc<BlocT extends IsolateBloc<Object, State>, State>() {
-  var blocManager = BlocManager.instance;
+  final blocManager = BlocManager.instance;
   assert(
       blocManager != null,
-      "$BlocManager must not be null. "
-      "Call `await $initialize()` and call this function");
+      '$BlocManager must not be null. '
+      'Call `await $initialize()` and call this function');
   return blocManager.createBloc<BlocT, State>();
 }
 
@@ -34,8 +35,8 @@ Future<void> initialize(
   if (!reCreate) {
     assert(
         BlocManager.instance == null,
-        "You can initialize only once. "
-        "Call `initialize(..., reCreate: true)` if you want to reinitialize.");
+        'You can initialize only once. '
+        'Call `initialize(..., reCreate: true)` if you want to reinitialize.');
   }
   return BlocManager.initialize(
     userInitializer,
@@ -55,11 +56,11 @@ typedef BlocInjector<Bloc extends IsolateBloc<Object, State>, State>
 /// returns this bloc's [IsolateBlocWrapper]. Else it is creates a new bloc and
 /// add to the pull of free blocs. So when UI will call `create()`, it will not create a new bloc but
 /// return free bloc from pull.
-IsolateBlocWrapper<State> getBloc<Bloc extends IsolateBloc, State>() {
+IsolateBlocWrapper<State> getBloc<Bloc extends IsolateBloc<Object, State>, State>() {
   assert(
     IsolatedBlocManager.instance != null,
-    "$IsolatedBlocManager instance is null. "
-    "Make sure that you call this function from $Initializer.",
+    '$IsolatedBlocManager instance is null. '
+    'Make sure that you call this function from $Initializer.',
   );
   return IsolatedBlocManager.instance.getBlocWrapper<Bloc, State>();
 }

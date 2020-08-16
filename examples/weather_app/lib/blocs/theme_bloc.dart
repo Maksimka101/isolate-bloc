@@ -6,14 +6,13 @@ import 'package:weather_app/blocs/weather_bloc.dart';
 import 'package:weather_app/models/models.dart';
 
 class ThemeBloc extends IsolateBloc<WeatherState, ThemeState> {
-  final BlocInjector weatherBlocInjector;
+  final IsolateBlocWrapper weatherBloc;
   StreamSubscription<WeatherState> _weatherStateSubscription;
 
   ThemeBloc({
-    @required this.weatherBlocInjector,
+    @required this.weatherBloc,
   }) : super(ThemeState.initial) {
-    _weatherStateSubscription = weatherBlocInjector<WeatherBloc, WeatherState>()
-        .listen(onEventReceived);
+    _weatherStateSubscription = weatherBloc.listen(onEventReceived);
   }
 
   @override

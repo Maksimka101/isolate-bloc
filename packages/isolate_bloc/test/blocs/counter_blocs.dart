@@ -10,16 +10,15 @@ class CounterBloc extends IsolateBloc<CountEvent, int> {
 }
 
 class CounterIncrementerBloc extends IsolateBloc<CountEvent, int> {
-  final BlocInjector injector;
-  static int _incrementCount = 1;
-
-  CounterIncrementerBloc(this.injector) : super(0) {
-    var bloc = injector<CounterBloc, int>();
+  CounterIncrementerBloc(this.bloc) : super(0) {
     for (var i = 0; i < _incrementCount; i++) {
       bloc.add(CountEvent.increment);
     }
     _incrementCount++;
   }
+
+  final IsolateBlocWrapper<int> bloc;
+  static int _incrementCount = 1;
 
   @override
   void onEventReceived(CountEvent event) {}
@@ -31,12 +30,12 @@ enum CountEvent {
 }
 
 class CounterHistoryWrapperInjector extends IsolateBloc<int, List<int>> {
-  final BlocInjector injector;
-  final _history = <int>[];
-
-  CounterHistoryWrapperInjector(this.injector) : super([]) {
-    injector<CounterBloc, int>().listen(onEventReceived);
+  CounterHistoryWrapperInjector(this.counterBloc) : super([]) {
+    counterBloc.listen(onEventReceived);
   }
+
+  final IsolateBlocWrapper<int> counterBloc;
+  final _history = <int>[];
 
   @override
   void onEventReceived(int event) {

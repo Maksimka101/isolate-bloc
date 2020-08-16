@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'isolate_bloc.dart';
-import '../isolate/service_events.dart';
 
+import '../isolate/service_events.dart';
+import 'isolate_bloc.dart';
 import 'transition.dart';
 
 /// Signature for event receiver function which takes an [IsolateBlocTransitionEvent]
@@ -19,6 +19,25 @@ typedef IsolateBlocKiller = void Function(String uuid);
 /// events as shown above.
 /// createBloc function create [IsolateBloc] in [Isolate] and return this object.
 class IsolateBlocWrapper<State> extends Stream<State> implements Sink<Object> {
+  /// Receives initialState, function which receive events and send them to the
+  /// origin [IsolateBloc] and function which called in [close] and close origin bloc.
+  IsolateBlocWrapper(
+    this._state,
+    this._eventReceiver,
+    this._onBlocClose,
+  ) : _initStateProvided = true {
+    _bindEventsListener();
+  }
+
+  /// Create object as default constructor do but without initialState.
+  IsolateBlocWrapper.noInitState(
+    this._eventReceiver,
+    this._onBlocClose,
+  )   : _state = null,
+        _initStateProvided = false {
+    _bindEventsListener();
+  }
+
   final _eventController = StreamController<Object>.broadcast();
   final _stateController = StreamController<State>.broadcast();
 
@@ -44,25 +63,6 @@ class IsolateBlocWrapper<State> extends Stream<State> implements Sink<Object> {
   /// Returns whether the `Stream<State>` is a broadcast stream.
   @override
   bool get isBroadcast => _stateController.stream.isBroadcast;
-
-  /// Receives initialState, function which receive events and send them to the
-  /// origin [IsolateBloc] and function which called in [close] and close origin bloc.
-  IsolateBlocWrapper(
-    this._state,
-    this._eventReceiver,
-    this._onBlocClose,
-  ) : _initStateProvided = true {
-    _bindEventsListener();
-  }
-
-  /// Create object as default constructor do but without initialState.
-  IsolateBlocWrapper.noInitState(
-    this._eventReceiver,
-    this._onBlocClose,
-  )   : _state = null,
-        _initStateProvided = false {
-    _bindEventsListener();
-  }
 
   /// Adds a subscription to the `Stream<State>`.
   /// Returns a [StreamSubscription] which handles events from

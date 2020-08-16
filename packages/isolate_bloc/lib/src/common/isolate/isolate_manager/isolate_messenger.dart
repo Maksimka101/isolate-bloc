@@ -2,13 +2,13 @@ import 'dart:async';
 
 /// Class that help communicate between [Isolate]s.
 class IsolateMessenger extends Stream<Object> implements Sink {
-  final Stream<Object> _fromIsolateStream;
-  final void Function(Object message) _toIsolate;
-  Object _lastMessage;
-
   IsolateMessenger(this._fromIsolateStream, this._toIsolate) {
     _fromIsolateStream.listen((message) => _lastMessage = message);
   }
+
+  final Stream<Object> _fromIsolateStream;
+  final void Function(Object message) _toIsolate;
+  Object _lastMessage;
 
   /// Send messages to the [Isolate]
   @override

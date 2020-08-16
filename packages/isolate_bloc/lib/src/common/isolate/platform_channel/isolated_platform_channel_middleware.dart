@@ -5,13 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:isolate_bloc/src/common/isolate/service_events.dart';
 import 'package:uuid/uuid.dart';
 
+/// This class receive messages from [MethodChannel.send] and send them to the
+/// main Isolate.
 class IsolatedPlatformChannelMiddleware {
-  static IsolatedPlatformChannelMiddleware instance;
-  final BinaryMessenger platformMessenger;
-  final String Function() generateId;
-  final void Function(ServiceEvent) sendEvent;
-  final _platformResponsesCompleter = <String, Completer<ByteData>>{};
-
   IsolatedPlatformChannelMiddleware({
     @required List<String> channels,
     @required this.platformMessenger,
@@ -21,6 +17,12 @@ class IsolatedPlatformChannelMiddleware {
     instance = this;
     _bindMessageHandlers(channels);
   }
+
+  static IsolatedPlatformChannelMiddleware instance;
+  final BinaryMessenger platformMessenger;
+  final String Function() generateId;
+  final void Function(ServiceEvent) sendEvent;
+  final _platformResponsesCompleter = <String, Completer<ByteData>>{};
 
   void _bindMessageHandlers(List<String> channels) {
     for (final channel in channels) {
@@ -34,12 +36,14 @@ class IsolatedPlatformChannelMiddleware {
     }
   }
 
+  /// Handle platform messages and send them to it's [MessageChannel].
   void handlePlatformMessage(String channel, String id, ByteData message) {
     platformMessenger.handlePlatformMessage(channel, message, (data) {
       sendEvent(MethodChannelResponseEvent(data, id));
     });
   }
 
+  /// Sends response from platform channel to it's message handler.
   void platformChannelResponse(String id, ByteData response) {
     _platformResponsesCompleter.remove(id).complete(response);
   }

@@ -1,14 +1,19 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_plugin.dart';
+import 'package:uuid/uuid.dart';
 
 /// Settings for [PlatformChannelMiddleware] and [IsolatedPlatformChannelMiddleware]
 /// In [_platformChannelPlugins] stored all known MethodChannel plugin names.
 /// They are used to receive platform message responses and requests. 
-/// You can add platform MethodChannel names with addChannels function and remove
-/// them by package name with removeChannels function. 
+/// You can add platform [MethodChannel] names with [PlatformChannelSetup.addChannels]
+/// function and remove them by package name with [PlatformChannelSetup.removeChannels] function.
 class PlatformChannelSetup {
+
+  /// Create instance of this class.
+  const PlatformChannelSetup({
+    String Function() generateId,
+  }) : generateId = generateId ?? _generateId;
+
   final String Function() generateId;
 
   /// Map with platformChannel package names and their [MethodChannel] names.
@@ -133,10 +138,6 @@ class PlatformChannelSetup {
     ),
   ];
 
-  const PlatformChannelSetup({
-    String Function() generateId,
-  }) : generateId = generateId ?? _generateId;
-
   /// Remove [MethodChannel] names from [_platformChannelPlugins] by [packageNames]
   void removeChannels({@required List<String> packageNames}) =>
       _platformChannelPlugins
@@ -157,4 +158,4 @@ class PlatformChannelSetup {
   }
 }
 
-String _generateId() => Random().nextDouble().toString();
+String _generateId() => Uuid().v4();

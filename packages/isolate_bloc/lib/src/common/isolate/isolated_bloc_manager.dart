@@ -12,6 +12,8 @@ typedef IsolateBlocCreator<Event, State> = IsolateBloc<Event, State> Function();
 
 /// Maintain [IsolateBloc]s in isolate
 class IsolatedBlocManager {
+  IsolatedBlocManager._(this._isolatedConnector);
+
   static IsolatedBlocManager instance;
   final IsolatedConnector _isolatedConnector;
   final _initialStates = <Type, Object>{};
@@ -33,8 +35,6 @@ class IsolatedBlocManager {
     return IsolatedBlocManager.instance = IsolatedBlocManager._(connector);
   }
 
-  IsolatedBlocManager._(this._isolatedConnector);
-
   /// Returns new bloc from cached in [_freeBlocs] or create new one.
   IsolateBloc _getFreeBlocByType(Type type) {
     IsolateBloc bloc;
@@ -51,11 +51,11 @@ class IsolatedBlocManager {
   Future<T> _getBloc<T extends IsolateBloc>() async {
     await _initializeCompleter.future;
     if (_createdBlocsByType.containsKey(T)) {
-      return _createdBlocsByType[T];
+      return _createdBlocsByType[T] as T;
     } else if (_freeBlocs.containsKey(T)) {
-      return _freeBlocs[T];
+      return _freeBlocs[T] as T;
     } else {
-      return _freeBlocs[T] = _blocCreators[T]();
+      return (_freeBlocs[T] = _blocCreators[T]()) as T;
     }
   }
 
@@ -66,7 +66,8 @@ class IsolatedBlocManager {
   /// returns this bloc's [IsolateBlocWrapper]. Else it is creates a new bloc and
   /// add to the pull of free blocs. So when UI will call `create()`, it will not create a new bloc but
   /// return free bloc from pull.
-  IsolateBlocWrapper<State> getBlocWrapper<Bloc extends IsolateBloc, State>() {
+  IsolateBlocWrapper<State>
+      getBlocWrapper<Bloc extends IsolateBloc<Object, State>, State>() {
     IsolateBlocWrapper<State> wrapper;
     Bloc isolateBloc;
     _getBloc<Bloc>().then((bloc) {
@@ -91,11 +92,11 @@ class IsolatedBlocManager {
     assert(
       _blocCreators.containsKey(blocType) ||
           _registeredWrappers.containsKey(blocType),
-      "You must register bloc or bloc wrapper to create it.",
+      'You must register bloc or bloc wrapper to create it.',
     );
     if (_blocCreators.containsKey(blocType)) {
       // ignore: close_sinks
-      var bloc = _getFreeBlocByType(blocType);
+      final bloc = _getFreeBlocByType(blocType);
       bloc.listen(
         (state) => _isolatedConnector.sendEvent(
           IsolateBlocTransitionEvent(bloc.id, state),
@@ -112,12 +113,6 @@ class IsolatedBlocManager {
   void closeBloc(String uuid) {
     _createdBlocsByType.remove(_createdBlocs.remove(uuid)).close();
   }
-
-// todo
-// Register [IsolateBlocWrapper].
-//  void registerWrapper<BlocA, BlocAState>() {
-//    _registeredWrappers[BlocA] = BlocAState;
-//  }
 
   /// Register [IsolateBloc].
   /// You can create [IsolateBloc] and get [IsolateBlocWrapper] from

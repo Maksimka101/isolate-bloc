@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+
+import '../common/bloc/isolate_bloc.dart';
 import '../common/bloc/isolate_bloc_wrapper.dart';
 import './isolate_bloc_provider.dart';
-import '../common/bloc/isolate_bloc.dart';
 
 /// Signature for the `builder` function which takes the `BuildContext` and
 /// [state] and is responsible for returning a widget which is to be rendered.
@@ -142,8 +143,7 @@ class _IsolateBlocBuilderBaseState<C extends IsolateBloc<Object, S>, S>
   void didUpdateWidget(IsolateBlocBuilderBase<C, S> oldWidget) {
     super.didUpdateWidget(oldWidget);
     // ignore: close_sinks
-    final oldIsolateBloc =
-        (oldWidget.isolateBloc ?? context.isolateBloc<C, S>());
+    final oldIsolateBloc = oldWidget.isolateBloc ?? context.isolateBloc<C, S>();
     // ignore: close_sinks
     final currentBloc = widget.isolateBloc ?? oldIsolateBloc;
     if (oldIsolateBloc != currentBloc) {

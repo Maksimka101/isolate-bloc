@@ -6,7 +6,9 @@ class BlocInfoHolder {
   final _blocsInfo = <Type, IsolateBlocWrapper>{};
 
   /// Return [IsolateBlocWrapper] associated with given [IsolateBloc]'s Type
-  IsolateBlocWrapper getWrapperByType<T extends IsolateBloc>() => _blocsInfo[T];
+  IsolateBlocWrapper<State>
+      getWrapperByType<T extends IsolateBloc<Object, State>, State>() =>
+      _blocsInfo[T] as IsolateBlocWrapper<State>;
 
   /// Add [IsolateBlocWrapper] associated with [IsolateBloc] type.
   void addBlocInfo<T extends IsolateBloc>(IsolateBlocWrapper wrapper) =>

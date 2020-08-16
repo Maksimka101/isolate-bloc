@@ -1,10 +1,10 @@
 import '../bloc/isolate_bloc.dart';
+import '../bloc/isolate_bloc_wrapper.dart';
+import 'isolate_connector.dart';
 import 'isolate_manager/abstract_isolate_manager.dart';
 import 'isolate_manager/isolate_messenger.dart';
 import 'isolated_bloc_manager.dart';
-import '../bloc/isolate_bloc_wrapper.dart';
 import 'isolated_connector.dart';
-import 'isolate_connector.dart';
 import 'service_events.dart';
 
 /// Signature for initialization function which would be run in [Isolate] to
@@ -20,6 +20,9 @@ typedef IsolateManagerCreator = Future<IsolateManager> Function(
 
 /// Maintain [IsolateBlocWrapper]s
 class BlocManager {
+  BlocManager._(
+      this._initialStates, this._isolateConnector, this._isolateManager);
+
   static BlocManager instance;
 
   final IsolateConnector _isolateConnector;
@@ -27,9 +30,6 @@ class BlocManager {
   final Map<Type, Object> _initialStates;
   final _freeWrappers = <Type, IsolateBlocWrapper>{};
   final _wrappers = <String, IsolateBlocWrapper>{};
-
-  BlocManager._(
-      this._initialStates, this._isolateConnector, this._isolateManager);
 
   /// Create [Isolate], run user [Initializer] and perform other tasks that are
   /// necessary for this library to work.
@@ -42,7 +42,7 @@ class BlocManager {
     List<String> platformChannels,
   ) async {
     if (instance != null) {
-      await instance.dispose();
+      instance.dispose();
     }
 
     final isolateManager =
@@ -55,7 +55,7 @@ class BlocManager {
       ),
     );
 
-    var initialStates = await isolateConnector.initialStates;
+    final initialStates = await isolateConnector.initialStates;
     instance = BlocManager._(
       initialStates,
       isolateConnector,
@@ -67,10 +67,10 @@ class BlocManager {
   IsolateBlocWrapper<State> createBloc<T extends IsolateBloc, State>() {
     final initialState = _initialStates[T];
     final messageReceiver = _isolateConnector.sendEvent;
-    final onBlocClose =
-        (uuid) => _isolateConnector.sendEvent(CloseIsolateBlocEvent(uuid));
-    var blocWrapper =
-        IsolateBlocWrapper<State>(initialState, messageReceiver, onBlocClose);
+    final onBlocClose = (String uuid) =>
+        _isolateConnector.sendEvent(CloseIsolateBlocEvent(uuid));
+    final blocWrapper = IsolateBlocWrapper<State>(
+        initialState as State, messageReceiver, onBlocClose);
     _freeWrappers[T] = blocWrapper;
     _isolateConnector.sendEvent(CreateIsolateBlocEvent(T));
     return blocWrapper;
@@ -90,11 +90,11 @@ class BlocManager {
     _wrappers[blocId].stateReceiver(state);
   }
 
-  static void _isolatedBlocRunner(
+  static Future<void> _isolatedBlocRunner(
     IsolateMessenger messenger,
     Initializer userInitializer,
   ) async {
-    var isolateBlocManager = IsolatedBlocManager.initialize(
+    final isolateBlocManager = IsolatedBlocManager.initialize(
       IsolatedConnector(
         messenger.add,
         Stream.castFrom<Object, ServiceEvent>(

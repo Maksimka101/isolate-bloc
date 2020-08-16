@@ -12,6 +12,7 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   }
 
   @override
+  // ignore: prefer_typing_uninitialized_variables
   var schedulingStrategy;
 
   @override

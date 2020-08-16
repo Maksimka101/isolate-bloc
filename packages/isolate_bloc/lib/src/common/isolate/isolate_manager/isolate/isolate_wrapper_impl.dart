@@ -5,9 +5,9 @@ import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate
 /// [IsolateWrapper] for [IsolateManagerImpl]
 /// Maintain a real [Isolate].
 class IsolateWrapperImpl extends IsolateWrapper {
-  final Isolate isolate;
-
   IsolateWrapperImpl(this.isolate);
+
+  final Isolate isolate;
 
   @override
   void kill() {

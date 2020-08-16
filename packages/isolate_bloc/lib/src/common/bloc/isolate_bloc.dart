@@ -8,6 +8,8 @@ import 'isolate_bloc_observer.dart';
 import 'transition.dart';
 
 class BlocUnhandledErrorException implements Exception {
+  BlocUnhandledErrorException(this.bloc, this.error, [this.stackTrace]);
+
   /// The [bloc] in which the unhandled error occurred.
   final IsolateBloc bloc;
 
@@ -16,9 +18,6 @@ class BlocUnhandledErrorException implements Exception {
 
   /// An optional [stackTrace] which accompanied the error.
   final StackTrace stackTrace;
-
-  /// {@macro bloc_unhandled_error_exception}
-  BlocUnhandledErrorException(this.bloc, this.error, [this.stackTrace]);
 
   @override
   String toString() {
@@ -35,6 +34,11 @@ class BlocUnhandledErrorException implements Exception {
 /// or `getBlocWrapper<BlocT, BlocTState>()`.
 abstract class IsolateBloc<Event, State> extends Stream<State>
     implements Sink<State> {
+  /// Basic constructor. Gain initial state and generate bloc's id;
+  IsolateBloc(this._state) : id = Uuid().v4() {
+    _bindStateReceiver();
+  }
+
   State _state;
   Event _event;
 
@@ -50,19 +54,14 @@ abstract class IsolateBloc<Event, State> extends Stream<State>
   /// Returns the current [state] of the [IsolateBloc].
   State get state => _state;
 
-  /// Basic constructor. Gain initial state and generate bloc's id;
-  IsolateBloc(this._state) : id = Uuid().v4() {
-    _bindStateReceiver();
-  }
-
   /// Notifies the [IsolateBloc] of a new event which triggers onEventReceived.
   @mustCallSuper
   @override
   void add(Object event) {
     try {
-      _event = event;
-      onEvent(event);
-      onEventReceived(event);
+      _event = event as Event;
+      onEvent(_event);
+      onEventReceived(_event);
     } catch (e, stackTrace) {
       onError(e, stackTrace);
     }

@@ -10,8 +10,8 @@ typedef IsolateRun = void Function(
 /// Abstract class for [IsolateManagerImpl] which implement work with real [Isolate],
 /// [MockIsolateManager] which doesn't create a real [Isolate] and web implementation
 abstract class IsolateManager {
+  IsolateManager(this.isolate, this.messenger);
+
   final IsolateWrapper isolate;
   final IsolateMessenger messenger;
-
-  IsolateManager(this.isolate, this.messenger);
 }

@@ -99,11 +99,11 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State>
   /// ```dart
   /// IsolateBlocProvider.of<BlocA, BlocAState>(context)
   /// ```
-  static IsolateBlocWrapper<Object>
+  static IsolateBlocWrapper<State>
       of<T extends IsolateBloc<Object, State>, State>(BuildContext context) {
-    var blocInfoHolder = _getBlocInfoHolder(context);
+    final blocInfoHolder = _getBlocInfoHolder(context);
     if (blocInfoHolder == null ||
-        blocInfoHolder.getWrapperByType<T>() == null) {
+        blocInfoHolder.getWrapperByType<T, State>() == null) {
       throw FlutterError(
         '''
         IsolateBlocProvider.of() called with a context that does not contain a IsolateBlocWrapper for $T.
@@ -115,7 +115,7 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State>
         ''',
       );
     }
-    return blocInfoHolder.getWrapperByType<T>();
+    return blocInfoHolder.getWrapperByType<T, State>();
   }
 
   @override
@@ -124,7 +124,7 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State>
       create: (context) {
         var blocWrapper = _create?.call(context);
         blocWrapper ??= createBloc<T, State>();
-        var blocInfoHolder = _getBlocInfoHolder(context) ?? BlocInfoHolder();
+        final blocInfoHolder = _getBlocInfoHolder(context) ?? BlocInfoHolder();
         blocInfoHolder.addBlocInfo<T>(blocWrapper);
         return blocInfoHolder;
       },
@@ -156,7 +156,7 @@ extension IsolateBlocProviderExtension on BuildContext {
   /// ```dart
   /// BlocProvider.of<C>(context)
   /// ```
-  IsolateBlocWrapper<Object>
+  IsolateBlocWrapper<State>
       isolateBloc<C extends IsolateBloc<Object, State>, State>() =>
           IsolateBlocProvider.of<C, State>(this);
 }

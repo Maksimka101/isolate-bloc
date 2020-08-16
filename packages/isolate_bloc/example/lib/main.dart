@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 
-void main(List<String> arguments) async {
+Future<void> main(List<String> arguments) async {
   await initialize(isolatedFunc);
   runApp(
     MaterialApp(
@@ -17,11 +17,11 @@ class CounterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Counter'),
+        title: const Text('Counter'),
       ),
       body: Center(
         child: IsolateBlocListener<CounterBloc, int>(
-          listener: (context, state) => print("New bloc state: $state"),
+          listener: (context, state) => print('New bloc state: $state'),
           child: IsolateBlocBuilder<CounterBloc, int>(
             builder: (context, state) {
               return Text('You tapped $state times');
@@ -37,15 +37,15 @@ class CounterScreen extends StatelessWidget {
             onPressed: () => context
                 .isolateBloc<CounterBloc, int>()
                 .add(CountEvent.increment),
-            child: Icon(Icons.add),
+            child: const Icon(Icons.add),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           FloatingActionButton(
             heroTag: 'Decrement',
             onPressed: () => context
                 .isolateBloc<CounterBloc, int>()
                 .add(CountEvent.decrement),
-            child: Icon(Icons.remove),
+            child: const Icon(Icons.remove),
           ),
         ],
       ),
@@ -75,19 +75,19 @@ enum CountEvent {
 class SimpleBlocObserver extends IsolateBlocObserver {
   @override
   void onEvent(IsolateBloc bloc, Object event) {
-    print("New $event for $bloc");
+    print('New $event for $bloc');
     super.onEvent(bloc, event);
   }
 
   @override
   void onTransition(IsolateBloc bloc, Transition transition) {
-    print("New ${transition.nextState} from $bloc");
+    print('New ${transition.nextState} from $bloc');
     super.onTransition(bloc, transition);
   }
 
   @override
   void onError(IsolateBloc bloc, Object error, StackTrace stackTrace) {
-    print("$error in $bloc");
+    print('$error in $bloc');
     super.onError(bloc, error, stackTrace);
   }
 }

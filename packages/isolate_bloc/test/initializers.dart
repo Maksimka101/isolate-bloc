@@ -9,11 +9,11 @@ class Initializers {
 
   static void injectionTest() {
     register(create: () => CounterBloc());
-    register(create: () => CounterHistoryWrapperInjector(getBloc));
+    register(create: () => CounterHistoryWrapperInjector(getBloc<CounterBloc, int>()));
   }
 
   static void implicitBlocCreationTest() {
     register(create: () => CounterBloc());
-    register(create: () => CounterIncrementerBloc(getBloc));
+    register(create: () => CounterIncrementerBloc(getBloc<CounterBloc, int>()));
   }
 }

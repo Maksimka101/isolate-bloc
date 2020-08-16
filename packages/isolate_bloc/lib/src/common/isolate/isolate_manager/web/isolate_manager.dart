@@ -10,20 +10,19 @@ import 'web_isolate_wrapper.dart';
 /// Web [IsolateManager]'s implementation.
 /// It doesn't creates [Isolate].
 class IsolateManagerImpl extends IsolateManager {
-  IsolateManagerImpl(IsolateWrapper isolate, IsolateMessenger messenger,
-      [List<String> platformChannels])
+  IsolateManagerImpl(IsolateWrapper isolate, IsolateMessenger messenger)
       : super(isolate, messenger);
 
   static Future<IsolateManagerImpl> createIsolate(
       IsolateRun run, Initializer initializer) async {
-    var fromIsolate = StreamController<Object>.broadcast();
-    var toIsolate = StreamController<Object>.broadcast();
-    var sendFromIsolate = fromIsolate.add;
-    var sendToIsolate = toIsolate.add;
-    var toIsolateStream = toIsolate.stream;
-    var fromIsolateStream = fromIsolate.stream;
+    final fromIsolate = StreamController<Object>.broadcast();
+    final toIsolate = StreamController<Object>.broadcast();
+    final sendFromIsolate = fromIsolate.add;
+    final sendToIsolate = toIsolate.add;
+    final toIsolateStream = toIsolate.stream;
+    final fromIsolateStream = fromIsolate.stream;
 
-    var isolateMessenger = IsolateMessenger(fromIsolateStream, sendToIsolate);
+    final isolateMessenger = IsolateMessenger(fromIsolateStream, sendToIsolate);
 
     // this function run isolated function (IsolateRun)
     run(IsolateMessenger(toIsolateStream, sendFromIsolate), initializer);
