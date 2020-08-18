@@ -74,13 +74,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  isolate_bloc_test:
-    dependency: "direct dev"
-    description:
-      path: "../isolate_bloc_test"
-      relative: true
-    source: path
-    version: "0.1.0"
   matcher:
     dependency: transitive
     description:

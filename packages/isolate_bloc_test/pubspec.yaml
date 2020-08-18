@@ -9,7 +9,7 @@ environment:
   flutter: ">=1.17.0 <2.0.0"
 
 dependencies:
-  isolate_bloc: ^0.3.0
+  isolate_bloc: ^0.4.0
   flutter:
     sdk: flutter
 

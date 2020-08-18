@@ -1,3 +1,9 @@
+## [0.4.1]
+ - Fix web s
+
+## [0.4.0+1]
+ - Fix dependencies.
+
 ## [0.4.0]
  - Add platform channels (`MethodChannel`) support.
 

@@ -14,7 +14,8 @@ class IsolateManagerImpl extends IsolateManager {
       : super(isolate, messenger);
 
   static Future<IsolateManagerImpl> createIsolate(
-      IsolateRun run, Initializer initializer) async {
+      IsolateRun run, Initializer initializer,
+      [List<String> platformChannels]) async {
     final fromIsolate = StreamController<Object>.broadcast();
     final toIsolate = StreamController<Object>.broadcast();
     final sendFromIsolate = fromIsolate.add;

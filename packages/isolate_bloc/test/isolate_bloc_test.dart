@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
-import 'package:isolate_bloc_test/isolate_bloc_test.dart';
 import 'package:mockito/mockito.dart';
 
 import 'blocs/counter_blocs.dart';
@@ -16,7 +15,7 @@ void main() {
         () async {
       final states = [0, -1];
       final actualStates = <int>[];
-      await initializeMock(Initializers.counterTest);
+      await initialize(Initializers.counterTest);
       // ignore: close_sinks
       final counterBloc = createBloc<CounterBloc, int>();
       final complete = Completer();
@@ -36,7 +35,7 @@ void main() {
     });
 
     test('returns correct initial state', () async {
-      await initializeMock(Initializers.counterTest);
+      await initialize(Initializers.counterTest);
       final bloc = createBloc<CounterBloc, int>();
       expect(bloc.state, 0,
           reason:
@@ -46,7 +45,7 @@ void main() {
     test('Test `getBloc`', () async {
       final states = [0, -1, 0, 1, 2, 3];
       var wrapperHistory = <int>[];
-      await initializeMock(Initializers.injectionTest);
+      await initialize(Initializers.injectionTest);
       // ignore: close_sinks
       final counterBloc = createBloc<CounterBloc, int>();
       // ignore: close_sinks
@@ -73,7 +72,7 @@ void main() {
       /// CounterIncrementerBloc create bloc by calling getBloc and add increment event.
       /// createBloc<CounterBloc, int> must provide bloc which was created by CounterIncrementBloc
       /// and this bloc must have the same states.
-      await initializeMock(Initializers.injectionTest);
+      await initialize(Initializers.injectionTest);
       createBloc<CounterIncrementerBloc, int>();
       createBloc<CounterIncrementerBloc, int>();
       createBloc<CounterBloc, int>();
@@ -81,7 +80,6 @@ void main() {
       bloc.skip(1);
       const matcher = 2;
       final actual = await createBloc<CounterBloc, int>().skip(1).first;
-      print('main');
       expect(actual, matcher);
     });
   });
