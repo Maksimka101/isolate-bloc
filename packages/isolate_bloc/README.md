@@ -277,9 +277,8 @@ and popular community libraries. All out of box supported libraries you can see 
 (look at `Library.name`).
 
 # Limitations
-Your events and states cannot contain any objects. If you will try to send one 
-of the following items you will get `Illegal argument in isolate message` 
-runtime exception.
+If you will try to send one of the following items you will get 
+`Illegal argument in isolate message` runtime exception.
 
 ## Lambda functions
 Your event/state cannot contain anonymous functions (something like this `final callback = () {}`).
