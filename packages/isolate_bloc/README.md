@@ -20,10 +20,6 @@ This package works on all flutter platforms.
 
 You can read about BLoC pattern [here](https://www.didierboelens.com/2018/08/reactive-programming-streams-bloc/).
 
-# Attention
-This package now in beta and you should use it in pet projects only. 
-If you find a bug or want some new feature please create a new issue.
-
 ## Creating a Bloc
 ```dart
 class CounterBloc extends IsolateBloc<CountEvent, int> {
@@ -107,11 +103,11 @@ class CounterScreen extends StatelessWidget {
 
 # All Api
 # IsolateBlocWrapper
-IsolateBlocWrapper work like a client for IsolateBloc. It receives IsolateBloc's 
-states and send events added by `wrapperInstance.add(YourEvent())`. So you can 
+IsolateBlocWrapper works like a client for IsolateBloc. It receives IsolateBloc's 
+states and sends events added by `wrapperInstance.add(YourEvent())`. So you can 
 listen for origin bloc's state with `wrapperInstance.listen((state) { })` and add 
-events as shown above.
-createBloc function create IsolateBloc in Isolate and return IsolateBlocWrapper. 
+events as shown above. `createBloc<BlocA, BlocAState>()` function creates IsolateBloc in 
+Isolate and returns IsolateBlocWrapper. 
 
 ## Initialization
 Initialize all services required to work with IsolateBloc and register an `IsolateBloc`. 

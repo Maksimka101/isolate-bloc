@@ -1,5 +1,9 @@
+## [1.0.0]
+ - First stable release. Now api won't be changed without big need.
+ - Change readme due to stable release.
+
 ## [0.4.1]
- - Fix web s
+ - Fix web
 
 ## [0.4.0+1]
  - Fix dependencies.
