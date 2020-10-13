@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:isolate';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_binding.dart';
@@ -21,8 +22,10 @@ class IsolateManagerImpl extends IsolateManager {
   /// Create Isolate, initialize messages and run your function
   /// with [IsolateMessenger] and user's [Initializer] func
   static Future<IsolateManagerImpl> createIsolate(
-      IsolateRun run, Initializer initializer,
-      [List<String> platformChannels]) async {
+    IsolateRun run,
+    Initializer initializer, [
+    List<String> platformChannels,
+  ]) async {
     assert(
       '$initializer'.contains(' static'),
       '$Initializer must be a static or global function',
@@ -38,6 +41,7 @@ class IsolateManagerImpl extends IsolateManager {
         initializer,
         platformChannels,
       ),
+      errorsAreFatal: false,
     );
 
     final fromIsolateStream = fromIsolate.asBroadcastStream();
@@ -71,8 +75,10 @@ class IsolateManagerImpl extends IsolateManager {
     final toIsolate = ReceivePort();
     final toIsolateStream = toIsolate.asBroadcastStream();
     setup.fromIsolate.send(toIsolate.sendPort);
-    final isolateMessenger =
-        IsolateMessenger(toIsolateStream, setup.fromIsolate.send);
+    final isolateMessenger = IsolateMessenger(
+      toIsolateStream,
+      setup.fromIsolate.send,
+    );
 
     // Initialize platform channel in isolate
     IsolateBinding();

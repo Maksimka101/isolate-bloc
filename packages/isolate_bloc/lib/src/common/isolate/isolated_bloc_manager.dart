@@ -21,7 +21,6 @@ class IsolatedBlocManager {
   final _blocCreators = <Type, IsolateBlocCreator>{};
   final _registeredWrappers = <Type, Object>{};
   final _createdBlocs = <String, IsolateBloc>{};
-  final _createdBlocsByType = <Type, IsolateBloc>{};
   final _initializeCompleter = Completer();
 
   /// Finish initialization and send initial states to the [BlocManager].
@@ -44,14 +43,15 @@ class IsolatedBlocManager {
       bloc = _blocCreators[type]();
     }
     _createdBlocs[bloc.id] = bloc;
-    _createdBlocsByType[type] = bloc;
     return bloc;
   }
 
   Future<T> _getBloc<T extends IsolateBloc>() async {
     await _initializeCompleter.future;
-    if (_createdBlocsByType.containsKey(T)) {
-      return _createdBlocsByType[T] as T;
+    // find every blocs with Type T
+    final blocsT = _createdBlocs.values.whereType<T>();
+    if (blocsT.isNotEmpty) {
+      return blocsT.first;
     } else if (_freeBlocs.containsKey(T)) {
       return _freeBlocs[T] as T;
     } else {
@@ -76,7 +76,8 @@ class IsolatedBlocManager {
       wrapper.connectToBloc(bloc.id);
     });
     final onBLocClose = (_) => isolateBloc?.close();
-    final eventReceiver = (Object event) => isolateBloc?.add(event);
+    final eventReceiver = (IsolateBlocTransitionEvent<Object> event) =>
+        isolateBloc?.add(event.event);
     wrapper = IsolateBlocWrapper.noInitState(eventReceiver, onBLocClose);
     return wrapper;
   }
@@ -111,7 +112,12 @@ class IsolatedBlocManager {
 
   /// Get bloc by [uuid] and close it.
   void closeBloc(String uuid) {
-    _createdBlocsByType.remove(_createdBlocs.remove(uuid)).close();
+    assert(
+      _createdBlocs.containsKey(uuid),
+      'You are trying to remove bloc with with a nonexistent uuid($uuid).\n'
+      'This can happen if you call close() twice.',
+    );
+    _createdBlocs.remove(uuid).close();
   }
 
   /// Register [IsolateBloc].

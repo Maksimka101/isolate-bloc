@@ -1,3 +1,10 @@
+## [1.0.2]
+ - Fix this two issues: [first](https://github.com/Maksimka101/isolate-bloc/issues/2), [second](https://github.com/Maksimka101/isolate-bloc/issues/1).
+ - Add error message on error in `Initializer` function.
+
+## [1.0.1]
+ - Fix error in `getBloc()`
+
 ## [1.0.0]
  - First stable release. Now api won't be changed without big need.
  - Change readme due to stable release.

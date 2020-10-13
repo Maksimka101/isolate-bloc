@@ -11,8 +11,9 @@ import 'isolate/platform_channel/platform_channel_setup.dart';
 /// Register [IsolateBloc].
 /// You can create [IsolateBloc] and get [IsolateBlocWrapper] from
 /// [createBloc] only if you register this [IsolateBloc].
-void register<Event, State>(
-        {@required IsolateBlocCreator<Event, State> create}) =>
+void register<Event, State>({
+  @required IsolateBlocCreator<Event, State> create,
+}) =>
     IsolatedBlocManager.instance.register<Event, State>(create);
 
 /// Start creating [IsolateBloc] and return [IsolateBlocWrapper].

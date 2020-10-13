@@ -45,8 +45,11 @@ class BlocManager {
       instance.dispose();
     }
 
-    final isolateManager =
-        await createIsolate(_isolatedBlocRunner, initializer, platformChannels);
+    final isolateManager = await createIsolate(
+      _isolatedBlocRunner,
+      initializer,
+      platformChannels,
+    );
 
     final isolateConnector = IsolateConnector(
       isolateManager.messenger.add,
@@ -102,7 +105,13 @@ class BlocManager {
       ),
     );
 
-    await userInitializer();
+    try {
+      await userInitializer();
+    } catch (e) {
+      print("Error in user's $Initializer function.");
+      print('Error message: ${e.toString()}');
+      print('Last stacktrace: ${StackTrace.current}');
+    }
 
     isolateBlocManager.initializeCompleted();
   }

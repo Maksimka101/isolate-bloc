@@ -114,28 +114,24 @@ const flutterFire = <Library>[
       'plugins.flutter.io/firebase_analytics',
     ],
   ),
-
   Library(
     name: 'firebase_auth',
     methodChannels: [
       'plugins.flutter.io/firebase_auth',
     ],
   ),
-
   Library(
     name: 'cloud_firestore',
     methodChannels: [
       'plugins.flutter.io/cloud_firestore',
     ],
   ),
-
   Library(
     name: 'cloud_functions',
     methodChannels: [
       'plugins.flutter.io/cloud_functions',
     ],
   ),
-
   Library(
     name: 'firebase_messaging',
     methodChannels: [
@@ -143,63 +139,54 @@ const flutterFire = <Library>[
       'plugins.flutter.io/firebase_messaging',
     ],
   ),
-
   Library(
     name: 'firebase_storage',
     methodChannels: [
       'plugins.flutter.io/firebase_storage',
     ],
   ),
-
   Library(
     name: 'firebase_core',
     methodChannels: [
       'plugins.flutter.io/firebase_core',
     ],
   ),
-
   Library(
     name: 'firebase_crashlytics',
     methodChannels: [
       'plugins.flutter.io/firebase_crashlytics',
     ],
   ),
-
   Library(
     name: 'firebase_database',
     methodChannels: [
       'plugins.flutter.io/firebase_database',
     ],
   ),
-
   Library(
     name: 'firebase_dynamic_links',
     methodChannels: [
       'plugins.flutter.io/firebase_dynamic_links',
     ],
   ),
-
   Library(
     name: 'firebase_in_app_messaging',
     methodChannels: [
       'plugins.flutter.io/firebase_in_app_messaging',
     ],
   ),
-
   Library(
     name: 'firebase_ml_vision',
     methodChannels: [
       'plugins.flutter.io/firebase_ml_vision',
     ],
   ),
-
   Library(
     name: 'firebase_performance',
     methodChannels: [
       'plugins.flutter.io/firebase_performance',
     ],
   ),
-
   Library(
     name: 'firebase_remote_config',
     methodChannels: [
@@ -209,7 +196,6 @@ const flutterFire = <Library>[
 ];
 
 const communityLibraries = <Library>[
-
   Library(
     name: 'location',
     methodChannels: [
@@ -217,14 +203,12 @@ const communityLibraries = <Library>[
       'lyokone/locationstream',
     ],
   ),
-
   Library(
     name: 'sqflite',
     methodChannels: [
       'com.tekartik.sqflite',
     ],
   ),
-
   Library(
     name: 'geolocator',
     methodChannels: [
@@ -232,7 +216,6 @@ const communityLibraries = <Library>[
       'flutter.baseflow.com/geolocator/events',
     ],
   ),
-
   Library(
     name: 'sign_in_with_apple',
     methodChannels: [
