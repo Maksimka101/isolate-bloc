@@ -107,10 +107,10 @@ class BlocManager {
 
     try {
       await userInitializer();
-    } catch (e) {
-      print("Error in user's $Initializer function.");
+    } catch (e, stacktrace) {
+      print("Error in user's Initializer function.");
       print('Error message: ${e.toString()}');
-      print('Last stacktrace: ${StackTrace.current}');
+      print('Last stacktrace: $stacktrace');
     }
 
     isolateBlocManager.initializeCompleted();
