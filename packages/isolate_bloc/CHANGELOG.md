@@ -1,3 +1,7 @@
+## [1.0.3]
+ - Update error message on error in `Initializer` function.
+ - Add live template for Android Studio or Intellij IDEA.
+
 ## [1.0.2]
  - Fix this two issues: [first](https://github.com/Maksimka101/isolate-bloc/issues/2), [second](https://github.com/Maksimka101/isolate-bloc/issues/1).
  - Add error message on error in `Initializer` function.

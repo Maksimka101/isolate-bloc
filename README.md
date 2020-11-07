@@ -19,4 +19,10 @@ Isolate Bloc's infrastructure repository.
 # Examples
  - [Counter](https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc/example)
  - [Weather](https://github.com/Maksimka101/isolate-bloc/tree/master/examples/weather_app)
+
+# Articles
+ - [Flutter. Как прокачать ваш BLoC](https://habr.com/ru/post/516764/) (ru)
+ 
+# Helpers
+ - [Live templates](https://github.com/Maksimka101/isolate-bloc/tree/master/docs/intellij_idea_live_template.md)
  
