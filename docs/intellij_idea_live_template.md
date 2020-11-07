@@ -1,8 +1,6 @@
 # Live template for Intellij IDEA
 You can read about live template [here](https://www.jetbrains.com/help/idea/using-live-templates.html#live_templates_types).
-
-Below is an example of using live templates.
-<iframe width="1280" height="720" src="https://www.youtube.com/embed/jKOTFWuC3tM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+Also, you can see how it works [here](https://youtu.be/jKOTFWuC3tM).
 
 ## Simple live template
 ```dart
@@ -47,7 +45,7 @@ class $BlocName$Bloc extends IsolateBloc<$BlocName$BlocEvent, $BlocName$BlocStat
 ```
 Template variables
 
-![Template variables](https://github.com/Maksimka101/isolate-bloc/blob/master/docs/assets/simple_live_template.jpg?raw=true)
+![Template variables](https://github.com/Maksimka101/isolate-bloc/blob/master/docs/assets/simple_live_template.png?raw=true)
 
 
 ## Live template for usage with freezed
@@ -86,4 +84,4 @@ class $BlocName$
 ```
 Template variables
 
-![Template variables](https://github.com/Maksimka101/isolate-bloc/blob/master/docs/assets/freezed_live_template.jpg?raw=true)
+![Template variables](https://github.com/Maksimka101/isolate-bloc/blob/master/docs/assets/freezed_live_template.png?raw=true)
