@@ -1,3 +1,6 @@
+## [1.0.4]
+ - Add tests and fix bug.
+
 ## [1.0.3]
  - Update error message on error in `Initializer` function.
  - Add live template for Android Studio or Intellij IDEA.
