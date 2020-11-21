@@ -12,7 +12,10 @@ class MockIsolateManager extends IsolateManager {
 
   /// Create [MockIsolateManager] object.
   static Future<MockIsolateManager> createIsolate(
-      IsolateRun run, Initializer initializer) async {
+    IsolateRun run,
+    Initializer initializer, [
+    List<String> platformChannels,
+  ]) async {
     var fromIsolate = ReceivePort();
     var toIsolate = ReceivePort();
     var sendFromIsolate = fromIsolate.sendPort.send;
