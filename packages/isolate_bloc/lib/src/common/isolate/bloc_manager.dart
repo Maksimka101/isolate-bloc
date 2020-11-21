@@ -28,7 +28,7 @@ class BlocManager {
   final IsolateConnector _isolateConnector;
   final IsolateManager _isolateManager;
   final Map<Type, Object> _initialStates;
-  final _freeWrappers = <Type, IsolateBlocWrapper>{};
+  final _freeWrappers = <Type, List<IsolateBlocWrapper>>{};
   final _wrappers = <String, IsolateBlocWrapper>{};
 
   /// Create [Isolate], run user [Initializer] and perform other tasks that are
@@ -74,7 +74,10 @@ class BlocManager {
         _isolateConnector.sendEvent(CloseIsolateBlocEvent(uuid));
     final blocWrapper = IsolateBlocWrapper<State>(
         initialState as State, messageReceiver, onBlocClose);
-    _freeWrappers[T] = blocWrapper;
+    if (!_freeWrappers.containsKey(T)) {
+      _freeWrappers[T] = [];
+    }
+    _freeWrappers[T].add(blocWrapper);
     _isolateConnector.sendEvent(CreateIsolateBlocEvent(T));
     return blocWrapper;
   }
@@ -82,9 +85,11 @@ class BlocManager {
   /// Finish [IsolateBloc] creating which started by call [createBloc].
   /// Connect [IsolateBloc] to it's [IsolateBlocWrapper].
   void bindFreeWrapper(Type blocType, String id) {
-    assert(_freeWrappers.containsKey(blocType),
-        'No free bloc wrapper for $blocType');
-    _wrappers[id] = _freeWrappers.remove(blocType)..connectToBloc(id);
+    assert(
+      _freeWrappers.containsKey(blocType) && _freeWrappers[blocType].isNotEmpty,
+      'No free bloc wrapper for $blocType',
+    );
+    _wrappers[id] = _freeWrappers[blocType].removeAt(0)..connectToBloc(id);
   }
 
   /// Call when new state from [IsolateBloc] received.

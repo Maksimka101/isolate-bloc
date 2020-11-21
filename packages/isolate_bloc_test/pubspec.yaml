@@ -1,6 +1,6 @@
 name: isolate_bloc_test
 description: A testing library which make it easy to test isolate_bloc.
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc_test
 repository: https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc_test
 
