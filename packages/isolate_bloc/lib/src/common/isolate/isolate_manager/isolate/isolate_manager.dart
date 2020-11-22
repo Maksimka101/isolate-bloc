@@ -28,7 +28,7 @@ class IsolateManagerImpl extends IsolateManager {
   ]) async {
     assert(
       '$initializer'.contains(' static'),
-      '$Initializer must be a static or global function',
+      'Initialize function must be a static or global function',
     );
 
     final fromIsolate = ReceivePort();
@@ -94,7 +94,11 @@ class IsolateManagerImpl extends IsolateManager {
 
 class _IsolateSetup {
   _IsolateSetup(
-      this.fromIsolate, this.task, this.userInitializer, this.platformChannels);
+    this.fromIsolate,
+    this.task,
+    this.userInitializer,
+    this.platformChannels,
+  );
 
   final SendPort fromIsolate;
   final Initializer userInitializer;

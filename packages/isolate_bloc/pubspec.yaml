@@ -1,6 +1,6 @@
 name: isolate_bloc
 description: A dart package that helps implement the BLoC pattern. BLoC works in Isolate and don't slow down UI.
-version: 1.0.3
+version: 1.0.4
 homepage: https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc
 repository: https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc
 
@@ -17,6 +17,5 @@ dependencies:
 
 dev_dependencies:
   pedantic: 1.9.0
-  mockito: any
   flutter_test:
     sdk: flutter

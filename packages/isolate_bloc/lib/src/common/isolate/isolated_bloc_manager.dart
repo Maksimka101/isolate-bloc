@@ -83,7 +83,7 @@ class IsolatedBlocManager {
   }
 
   /// Receive bloc's [uuid] and [event].
-  /// Find [IsolateBloc] by id and add to [event] to it.
+  /// Find [IsolateBloc] by id and add [event] to it.
   void blocEventReceiver(String uuid, Object event) {
     _createdBlocs[uuid].add(event);
   }
