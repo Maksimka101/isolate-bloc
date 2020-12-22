@@ -3,6 +3,12 @@ import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channe
 /// Standard flutter libraries
 const flutterLibraries = <Library>[
   Library(
+    name: 'flutter_assets',
+    methodChannels: [
+      'flutter/assets',
+    ],
+  ),
+  Library(
     name: 'url_launcher',
     methodChannels: [
       'plugins.flutter.io/url_launcher',
@@ -124,6 +130,12 @@ const flutterFire = <Library>[
     name: 'cloud_firestore',
     methodChannels: [
       'plugins.flutter.io/cloud_firestore',
+    ],
+  ),
+  Library(
+    name: 'cloud_firestore_new_version',
+    methodChannels: [
+      'plugins.flutter.io/firebase_firestore',
     ],
   ),
   Library(
