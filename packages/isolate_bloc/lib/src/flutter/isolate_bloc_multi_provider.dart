@@ -42,10 +42,8 @@ import 'isolate_bloc_provider.dart';
 class MultiIsolateBlocProvider extends MultiProvider {
   /// {@macro multi_bloc_provider}
   MultiIsolateBlocProvider({
-    Key key,
-    @required List<IsolateBlocProviderSingleChildWidget> providers,
-    @required Widget child,
-  })  : assert(providers != null),
-        assert(child != null),
-        super(key: key, providers: providers, child: child);
+    Key? key,
+    required List<IsolateBlocProviderSingleChildWidget> providers,
+    required Widget child,
+  }) : super(key: key, providers: providers, child: child);
 }

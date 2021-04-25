@@ -8,6 +8,12 @@
 </p>
 
 ---
+# Attention
+Before using this package, I recommend reading the article about [performance of Isolate](https://cretezy.com/2020/flutter-fast-json).
+
+When moving data between isolates, they are copied, wasting memory and cpu time. I advise you to use BLoCs from this library as auxiliary ones.
+
+Now Dart team is working on [new Isolates](https://github.com/dart-lang/sdk/issues/36097) which can start faster and move immutable data faster and without coping. If they make communication between isolates fast enough, then you can use this library as the main state management solution.
 
 # Overview 
 The goal of this package is to make it easy to work with `BLoC` and `Isolate`.

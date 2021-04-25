@@ -17,7 +17,7 @@ class BlocUnhandledErrorException implements Exception {
   final Object error;
 
   /// An optional [stackTrace] which accompanied the error.
-  final StackTrace stackTrace;
+  final StackTrace? stackTrace;
 
   @override
   String toString() {
@@ -32,21 +32,21 @@ class BlocUnhandledErrorException implements Exception {
 /// function or `IsolateBlocProvider<BlocT, BlocTState>()`.
 /// You can use it from another [IsolateBloc] with `getBloc<BlocT>()`
 /// or `getBlocWrapper<BlocT, BlocTState>()`.
-abstract class IsolateBloc<Event, State> extends Stream<State>
-    implements Sink<State> {
+abstract class IsolateBloc<Event extends Object, State extends Object>
+    extends Stream<State> implements Sink<State> {
   /// Basic constructor. Gain initial state and generate bloc's id;
-  IsolateBloc(this._state) : id = Uuid().v4() {
+  IsolateBloc(this._state) : id = const Uuid().v4() {
     _bindStateReceiver();
   }
 
   State _state;
-  Event _event;
+  Event? _event;
 
   /// This is bloc's id. Every [IsolateBloc] have it's own unique id used to
   /// communicate with it's own [IsolateBlocWrapper].
   final String id;
   final _stateController = StreamController<State>.broadcast();
-  StreamSubscription<State> _stateSubscription;
+  late StreamSubscription<State> _stateSubscription;
 
   /// The current [IsolateBlocObserver].
   static IsolateBlocObserver observer = IsolateBlocObserver();
@@ -60,8 +60,8 @@ abstract class IsolateBloc<Event, State> extends Stream<State>
   void add(Object event) {
     try {
       _event = event as Event;
-      onEvent(_event);
-      onEventReceived(_event);
+      onEvent(event);
+      onEventReceived(event);
     } catch (e, stackTrace) {
       onError(e, stackTrace);
     }
@@ -145,10 +145,10 @@ abstract class IsolateBloc<Event, State> extends Stream<State>
   /// onError and onDone handlers.
   @override
   StreamSubscription<State> listen(
-    void Function(State event) onData, {
-    Function onError,
-    void Function() onDone,
-    bool cancelOnError,
+    void Function(State event)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
   }) {
     return _prepareStateStream.listen(
       onData,
@@ -170,14 +170,14 @@ abstract class IsolateBloc<Event, State> extends Stream<State>
     _stateSubscription = _stateController.stream.listen((nextState) {
       final transition = Transition(
         currentState: state,
-        event: _event,
+        event: _event!,
         nextState: nextState,
       );
 
       try {
         onTransition(transition);
         _state = transition.nextState;
-      } on dynamic catch (error, stackTrace) {
+      } catch (error, stackTrace) {
         onError(error, stackTrace);
       }
     });

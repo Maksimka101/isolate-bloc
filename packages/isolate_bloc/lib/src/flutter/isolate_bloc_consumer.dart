@@ -59,24 +59,22 @@ import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 /// )
 /// ```
 /// {@endtemplate}
-class IsolateBlocConsumer<C extends IsolateBloc<Object, S>, S>
+class IsolateBlocConsumer<C extends IsolateBloc<Object, S>, S extends Object>
     extends StatelessWidget {
   /// {@macro bloc_consumer}
   const IsolateBlocConsumer({
-    Key key,
-    @required this.builder,
-    @required this.listener,
+    Key? key,
+    required this.builder,
+    required this.listener,
     this.blocWrapper,
     this.buildWhen,
     this.listenWhen,
-  })  : assert(builder != null),
-        assert(listener != null),
-        super(key: key);
+  }) : super(key: key);
 
   /// The [blocWrapper] that the [IsolateBlocConsumer] will interact with.
   /// If omitted, [IsolateBlocConsumer] will automatically perform a lookup using
   /// `IsolateBlocProvider` and the current `BuildContext`.
-  final IsolateBlocWrapper<S> blocWrapper;
+  final IsolateBlocWrapper<S>? blocWrapper;
 
   /// The [builder] function which will be invoked on each widget build.
   /// The [builder] takes the `BuildContext` and current `state` and
@@ -91,12 +89,12 @@ class IsolateBlocConsumer<C extends IsolateBloc<Object, S>, S>
   /// Takes the previous `state` and the current `state` and is responsible for
   /// returning a [bool] which determines whether or not to trigger
   /// [builder] with the current `state`.
-  final IsolateBlocBuilderCondition<S> buildWhen;
+  final IsolateBlocBuilderCondition<S>? buildWhen;
 
   /// Takes the previous `state` and the current `state` and is responsible for
   /// returning a [bool] which determines whether or not to call [listener] of
   /// [IsolateBlocConsumer] with the current `state`.
-  final IsolateBlocListenerCondition<S> listenWhen;
+  final IsolateBlocListenerCondition<S>? listenWhen;
 
   @override
   Widget build(BuildContext context) {

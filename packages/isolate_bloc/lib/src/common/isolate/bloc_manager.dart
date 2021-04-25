@@ -14,16 +14,19 @@ typedef Initializer = Function();
 
 typedef IsolateManagerCreator = Future<IsolateManager> Function(
   IsolateRun,
-  Initializer, [
+  Initializer,
   List<String> channels,
-]);
+);
 
 /// Maintain [IsolateBlocWrapper]s
 class BlocManager {
   BlocManager._(
-      this._initialStates, this._isolateConnector, this._isolateManager);
+    this._initialStates,
+    this._isolateConnector,
+    this._isolateManager,
+  );
 
-  static BlocManager instance;
+  static BlocManager? instance;
 
   final IsolateConnector _isolateConnector;
   final IsolateManager _isolateManager;
@@ -41,8 +44,9 @@ class BlocManager {
     IsolateManagerCreator createIsolate,
     List<String> platformChannels,
   ) async {
-    if (instance != null) {
-      instance.dispose();
+    final managerInstance = instance;
+    if (managerInstance != null) {
+      managerInstance.dispose();
     }
 
     final isolateManager = await createIsolate(
@@ -70,14 +74,17 @@ class BlocManager {
   IsolateBlocWrapper<State> createBloc<T extends IsolateBloc, State>() {
     final initialState = _initialStates[T];
     final messageReceiver = _isolateConnector.sendEvent;
-    final onBlocClose = (String uuid) =>
+    final onBlocClose = (String? uuid) {
+      if (uuid != null) {
         _isolateConnector.sendEvent(CloseIsolateBlocEvent(uuid));
+      }
+    };
     final blocWrapper = IsolateBlocWrapper<State>(
         initialState as State, messageReceiver, onBlocClose);
     if (!_freeWrappers.containsKey(T)) {
       _freeWrappers[T] = [];
     }
-    _freeWrappers[T].add(blocWrapper);
+    _freeWrappers[T]!.add(blocWrapper);
     _isolateConnector.sendEvent(CreateIsolateBlocEvent(T));
     return blocWrapper;
   }
@@ -85,17 +92,18 @@ class BlocManager {
   /// Finish [IsolateBloc] creating which started by call [createBloc].
   /// Connect [IsolateBloc] to it's [IsolateBlocWrapper].
   void bindFreeWrapper(Type blocType, String id) {
-    assert(
-      _freeWrappers.containsKey(blocType) && _freeWrappers[blocType].isNotEmpty,
-      'No free bloc wrapper for $blocType',
-    );
-    _wrappers[id] = _freeWrappers[blocType].removeAt(0)..connectToBloc(id);
+    if (_freeWrappers.containsKey(blocType) &&
+        _freeWrappers[blocType]!.isNotEmpty) {
+      print('No free bloc wrapper for $blocType');
+    } else {
+      _wrappers[id] = _freeWrappers[blocType]!.removeAt(0)..connectToBloc(id);
+    }
   }
 
   /// Call when new state from [IsolateBloc] received.
   /// Find wrapper by bloc id and add new state to it.
   void blocStateReceiver(String blocId, Object state) {
-    _wrappers[blocId].stateReceiver(state);
+    _wrappers[blocId]?.stateReceiver(state);
   }
 
   static Future<void> _isolatedBlocRunner(
@@ -106,7 +114,8 @@ class BlocManager {
       IsolatedConnector(
         messenger.add,
         Stream.castFrom<Object, ServiceEvent>(
-            messenger.where((event) => event is ServiceEvent)),
+          messenger.where((event) => event is ServiceEvent),
+        ),
       ),
     );
 

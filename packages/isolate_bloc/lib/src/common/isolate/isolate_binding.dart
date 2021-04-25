@@ -12,8 +12,7 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   }
 
   @override
-  // ignore: prefer_typing_uninitialized_variables
-  var schedulingStrategy;
+  var schedulingStrategy = defaultSchedulingStrategy;
 
   @override
   void addPersistentFrameCallback(callback) {}
@@ -55,7 +54,7 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   void handleAppLifecycleStateChanged(ui.AppLifecycleState state) {}
 
   @override
-  void handleBeginFrame(Duration rawTimeStamp) {}
+  void handleBeginFrame(Duration? rawTimeStamp) {}
 
   @override
   void handleDrawFrame() {}
@@ -90,8 +89,12 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   }
 
   @override
-  Future<T> scheduleTask<T>(task, Priority priority,
-      {String debugLabel, Flow flow}) {
+  Future<T> scheduleTask<T>(
+    TaskCallback<T> task,
+    Priority priority, {
+    String? debugLabel,
+    Flow? flow,
+  }) {
     throw UnimplementedError();
   }
 

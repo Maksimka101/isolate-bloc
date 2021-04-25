@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_plugin.dart';
 import 'package:uuid/uuid.dart';
 
@@ -11,7 +10,7 @@ import 'libraries.dart';
 class PlatformChannelSetup {
   /// Create instance of this class.
   PlatformChannelSetup({
-    String Function() generateId,
+    String Function()? generateId,
     List<String> methodChannelNames = const [],
   }) : generateId = generateId ?? _generateId {
     _addChannels(methodChannelNames: methodChannelNames);
@@ -34,9 +33,11 @@ class PlatformChannelSetup {
   ];
 
   /// Add [MethodChannel] names.
-  void _addChannels({@required List<String> methodChannelNames}) {
-    _platformChannelPlugins
-        .add(Library(name: generateId(), methodChannels: methodChannelNames));
+  void _addChannels({required List<String> methodChannelNames}) {
+    _platformChannelPlugins.add(Library(
+      name: generateId(),
+      methodChannels: methodChannelNames,
+    ));
   }
 
   /// Return all method channel names.
@@ -48,4 +49,4 @@ class PlatformChannelSetup {
   }
 }
 
-String _generateId() => Uuid().v4();
+final _generateId = const Uuid().v4;

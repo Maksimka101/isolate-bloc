@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:isolate_bloc/src/common/isolate/service_events.dart';
 import 'package:uuid/uuid.dart';
@@ -9,16 +8,16 @@ import 'package:uuid/uuid.dart';
 /// registered in [PlatformChannelSetup] and sends messages from [IsolateBloc]'s Isolate.
 class MethodChannelMiddleware {
   MethodChannelMiddleware({
-    @required List<String> channels,
-    @required this.binaryMessenger,
-    @required this.sendEvent,
-    String Function() generateId,
-  }) : generateId = generateId ?? Uuid().v4 {
+    required List<String> channels,
+    required this.binaryMessenger,
+    required this.sendEvent,
+    String Function()? generateId,
+  }) : generateId = generateId ?? const Uuid().v4 {
     instance = this;
     _bindPlatformMessageHandlers(channels);
   }
 
-  static MethodChannelMiddleware instance;
+  static MethodChannelMiddleware? instance;
   final BinaryMessenger binaryMessenger;
   final void Function(ServiceEvent) sendEvent;
   final String Function() generateId;
@@ -38,13 +37,21 @@ class MethodChannelMiddleware {
 
   /// Send response from [IsolateBloc]'s MessageChannel to the main
   /// Isolate's platform channel.
-  void methodChannelResponse(String id, ByteData response) {
-    _messageHandlersCompleter.remove(id).complete(response);
+  void methodChannelResponse(String id, ByteData? response) {
+    final completer = _messageHandlersCompleter.remove(id);
+    if (completer == null) {
+      print(
+        "Failed to send response from IsolateBloc's MessageChannel "
+        "to the main Isolate's platform channel.",
+      );
+    } else {
+      completer.complete(response);
+    }
   }
 
   /// Send event to the platform and send response to the [IsolateBloc]'s Isolate.
-  void send(String channel, ByteData message, String id) {
-    binaryMessenger.send(channel, message).then(
+  void send(String channel, ByteData? message, String id) {
+    binaryMessenger.send(channel, message)?.then(
         (response) => sendEvent(PlatformChannelResponseEvent(response, id)));
   }
 }

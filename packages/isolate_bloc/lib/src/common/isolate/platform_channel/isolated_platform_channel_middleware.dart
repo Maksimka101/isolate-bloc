@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:isolate_bloc/src/common/isolate/service_events.dart';
 import 'package:uuid/uuid.dart';
@@ -9,16 +8,16 @@ import 'package:uuid/uuid.dart';
 /// main Isolate.
 class IsolatedPlatformChannelMiddleware {
   IsolatedPlatformChannelMiddleware({
-    @required List<String> channels,
-    @required this.platformMessenger,
-    String Function() generateId,
-    @required this.sendEvent,
-  }) : generateId = generateId ?? Uuid().v4 {
+    required List<String> channels,
+    required this.platformMessenger,
+    String Function()? generateId,
+    required this.sendEvent,
+  }) : generateId = generateId ?? const Uuid().v4 {
     instance = this;
     _bindMessageHandlers(channels);
   }
 
-  static IsolatedPlatformChannelMiddleware instance;
+  static IsolatedPlatformChannelMiddleware? instance;
   final BinaryMessenger platformMessenger;
   final String Function() generateId;
   final void Function(ServiceEvent) sendEvent;
@@ -37,14 +36,22 @@ class IsolatedPlatformChannelMiddleware {
   }
 
   /// Handle platform messages and send them to it's [MessageChannel].
-  void handlePlatformMessage(String channel, String id, ByteData message) {
+  void handlePlatformMessage(String channel, String id, ByteData? message) {
     platformMessenger.handlePlatformMessage(channel, message, (data) {
       sendEvent(MethodChannelResponseEvent(data, id));
     });
   }
 
   /// Sends response from platform channel to it's message handler.
-  void platformChannelResponse(String id, ByteData response) {
-    _platformResponsesCompleter.remove(id).complete(response);
+  void platformChannelResponse(String id, ByteData? response) {
+    final completer = _platformResponsesCompleter.remove(id);
+    if (completer == null) {
+      print(
+        "Failed to send response from platform channel "
+        "to it's message handler",
+      );
+    } else {
+      completer.complete(response);
+    }
   }
 }

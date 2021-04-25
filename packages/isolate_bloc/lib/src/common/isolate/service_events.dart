@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 abstract class ServiceEvent {}
 
 /// Event with [IsolateBloc]'s state or or with event from [IsolateBlocWrapper]
-class IsolateBlocTransitionEvent<Event> extends ServiceEvent {
+class IsolateBlocTransitionEvent<Event extends Object> extends ServiceEvent {
   IsolateBlocTransitionEvent(this.blocUuid, this.event);
 
   final String blocUuid;
@@ -44,7 +44,7 @@ class CloseIsolateBlocEvent extends ServiceEvent {
 class InvokePlatformChannelEvent extends ServiceEvent {
   InvokePlatformChannelEvent(this.data, this.channel, this.id);
 
-  final ByteData data;
+  final ByteData? data;
   final String channel;
   final String id;
 }
@@ -53,7 +53,7 @@ class InvokePlatformChannelEvent extends ServiceEvent {
 class PlatformChannelResponseEvent extends ServiceEvent {
   PlatformChannelResponseEvent(this.data, this.id);
 
-  final ByteData data;
+  final ByteData? data;
   final String id;
 }
 
@@ -61,7 +61,7 @@ class PlatformChannelResponseEvent extends ServiceEvent {
 class InvokeMethodChannelEvent extends ServiceEvent {
   InvokeMethodChannelEvent(this.data, this.channel, this.id);
 
-  final ByteData data;
+  final ByteData? data;
   final String channel;
   final String id;
 }
@@ -70,6 +70,6 @@ class InvokeMethodChannelEvent extends ServiceEvent {
 class MethodChannelResponseEvent extends ServiceEvent {
   MethodChannelResponseEvent(this.data, this.id);
 
-  final ByteData data;
+  final ByteData? data;
   final String id;
 }

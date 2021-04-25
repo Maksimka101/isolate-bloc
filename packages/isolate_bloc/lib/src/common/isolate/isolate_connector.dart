@@ -14,7 +14,7 @@ class IsolateConnector {
   /// Function for sending events to [IsolatedConnector].
   final void Function(ServiceEvent) sendEvent;
   final Stream<ServiceEvent> _eventsStream;
-  StreamSubscription<ServiceEvent> _eventSubscription;
+  late StreamSubscription<ServiceEvent> _eventSubscription;
   final _initializeCompleter = Completer<Map<Type, Object>>();
 
   /// Return [Map] with [IsolateBloc] type to it's initial state.
@@ -31,20 +31,40 @@ class IsolateConnector {
     if (event is IsolateBlocsInitialized) {
       _initializeCompleter.complete(event.initialStates);
     } else if (event is IsolateBlocCreatedEvent) {
-      BlocManager.instance.bindFreeWrapper(event.blocType, event.blocUuid);
+      final blocManager = BlocManager.instance;
+      if (blocManager == null) {
+        print("BlocManager is null. Maybe you forgot to initialize?");
+      } else {
+        blocManager.bindFreeWrapper(event.blocType, event.blocUuid);
+      }
     } else if (event is IsolateBlocTransitionEvent) {
-      BlocManager.instance.blocStateReceiver(event.blocUuid, event.event);
+      final blocManager = BlocManager.instance;
+      if (blocManager == null) {
+        print("BlocManager is null. Maybe you forgot to initialize?");
+      } else {
+        blocManager.blocStateReceiver(event.blocUuid, event.event);
+      }
     } else if (event is InvokePlatformChannelEvent) {
-      MethodChannelMiddleware.instance
-          .send(event.channel, event.data, event.id);
+      final methodChannelMiddleware = MethodChannelMiddleware.instance;
+      if (methodChannelMiddleware == null) {
+        print(
+            "MethodChannelMiddleware is null. Maybe you forgot to initialize?");
+      } else {
+        methodChannelMiddleware.send(event.channel, event.data, event.id);
+      }
     } else if (event is MethodChannelResponseEvent) {
-      MethodChannelMiddleware.instance
-          .methodChannelResponse(event.id, event.data);
+      final methodChannelMiddleware = MethodChannelMiddleware.instance;
+      if (methodChannelMiddleware == null) {
+        print(
+            "MethodChannelMiddleware is null. Maybe you forgot to initialize?");
+      } else {
+        methodChannelMiddleware.methodChannelResponse(event.id, event.data);
+      }
     }
   }
 
   /// Free all resources.
   void dispose() {
-    _eventSubscription?.cancel();
+    _eventSubscription.cancel();
   }
 }

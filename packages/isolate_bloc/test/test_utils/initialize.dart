@@ -4,10 +4,11 @@ import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate/isolate_
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/web/isolate_manager.dart'
     as web_isolate;
 
-TestInitializePlatform _testInitializePlatform;
+TestInitializePlatform? _testInitializePlatform;
 
-void testInitializePlatform(TestInitializePlatform platform) =>
-    _testInitializePlatform = platform;
+void testInitializePlatform(TestInitializePlatform platform) {
+  _testInitializePlatform = platform;
+}
 
 Future<void> testInitialize(Initializer userInitializer) async {
   assert(
@@ -17,7 +18,7 @@ Future<void> testInitialize(Initializer userInitializer) async {
   return BlocManager.initialize(
     userInitializer,
     () {
-      switch (_testInitializePlatform) {
+      switch (_testInitializePlatform!) {
         case TestInitializePlatform.web:
           return native_isolate.IsolateManagerImpl.createIsolate;
         case TestInitializePlatform.native:

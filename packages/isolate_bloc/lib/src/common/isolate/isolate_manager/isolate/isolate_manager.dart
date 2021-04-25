@@ -23,9 +23,9 @@ class IsolateManagerImpl extends IsolateManager {
   /// with [IsolateMessenger] and user's [Initializer] func
   static Future<IsolateManagerImpl> createIsolate(
     IsolateRun run,
-    Initializer initializer, [
+    Initializer initializer,
     List<String> platformChannels,
-  ]) async {
+  ) async {
     assert(
       '$initializer'.contains(' static'),
       'Initialize function must be a static or global function',
@@ -53,14 +53,16 @@ class IsolateManagerImpl extends IsolateManager {
     final toIsolate = await toIsolateCompleter.future;
     await subscription.cancel();
 
-    final isolateMessenger =
-        IsolateMessenger(fromIsolateStream, toIsolate.send);
+    final isolateMessenger = IsolateMessenger(
+      fromIsolateStream.cast<Object>(),
+      toIsolate.send,
+    );
 
     // Initialize platform channel
     WidgetsFlutterBinding.ensureInitialized();
     MethodChannelMiddleware(
-      generateId: Uuid().v4,
-      binaryMessenger: ServicesBinding.instance.defaultBinaryMessenger,
+      generateId: const Uuid().v4,
+      binaryMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
       sendEvent: isolateMessenger.add,
       channels: platformChannels,
     );
@@ -76,7 +78,7 @@ class IsolateManagerImpl extends IsolateManager {
     final toIsolateStream = toIsolate.asBroadcastStream();
     setup.fromIsolate.send(toIsolate.sendPort);
     final isolateMessenger = IsolateMessenger(
-      toIsolateStream,
+      toIsolateStream.cast<Object>(),
       setup.fromIsolate.send,
     );
 
@@ -84,8 +86,8 @@ class IsolateManagerImpl extends IsolateManager {
     IsolateBinding();
     IsolatedPlatformChannelMiddleware(
       channels: setup.platformChannels,
-      platformMessenger: ServicesBinding.instance.defaultBinaryMessenger,
-      generateId: Uuid().v4,
+      platformMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
+      generateId: const Uuid().v4,
       sendEvent: isolateMessenger.add,
     );
     setup.task(isolateMessenger, setup.userInitializer);

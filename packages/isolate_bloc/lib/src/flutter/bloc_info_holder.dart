@@ -6,15 +6,18 @@ class BlocInfoHolder {
   final _blocsInfo = <Type, IsolateBlocWrapper>{};
 
   /// Return [IsolateBlocWrapper] associated with given [IsolateBloc]'s Type
-  IsolateBlocWrapper<State>
-      getWrapperByType<T extends IsolateBloc<Object, State>, State>() =>
-          _blocsInfo[T] as IsolateBlocWrapper<State>;
+  IsolateBlocWrapper<State>? getWrapperByType<
+          T extends IsolateBloc<Object, State>, State extends Object>() {
+    _blocsInfo[T] as IsolateBlocWrapper<State>?;
+  }
 
   /// Add [IsolateBlocWrapper] associated with [IsolateBloc] type.
-  void addBlocInfo<T extends IsolateBloc>(IsolateBlocWrapper wrapper) =>
-      _blocsInfo[T] = wrapper;
+  void addBlocInfo<T extends IsolateBloc>(IsolateBlocWrapper wrapper) {
+    _blocsInfo[T] = wrapper;
+  }
 
   /// Remove [IsolateBlocWrapper] associated with [IsolateBloc]
-  IsolateBlocWrapper removeBloc<T extends IsolateBloc>() =>
-      _blocsInfo.remove(T);
+  IsolateBlocWrapper? removeBloc<T extends IsolateBloc>() {
+    _blocsInfo.remove(T);
+  }
 }
