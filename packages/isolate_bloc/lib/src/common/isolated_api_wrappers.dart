@@ -39,7 +39,7 @@ IsolateBlocWrapper<State> getBloc<Bloc extends IsolateBloc<Object, State>, State
   }
 }
 
-class IsolatedBlocManagerUnInitialized {
+class IsolatedBlocManagerUnInitialized implements Exception {
   @override
   String toString() {
     return '$IsolatedBlocManager must not be null. '

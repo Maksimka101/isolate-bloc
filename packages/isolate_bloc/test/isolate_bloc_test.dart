@@ -35,7 +35,7 @@ void runTests() {
         await testInitialize(simpleBlocInitializer);
         final blocWrapper = createBloc<SimpleBloc, String>();
         var valueReceived = false;
-        blocWrapper.listen((_) {
+        blocWrapper.stream.listen((_) {
           valueReceived = true;
         });
         // expect that next task in the event loop will be my listen function so i wait for this task.
@@ -52,7 +52,7 @@ void runTests() {
     test("Test that bloc emits its initial state", () async {
       await testInitialize(simpleBlocInitializer);
       final blocWrapper = createBloc<SimpleBloc, String>();
-      final initialState = await blocWrapper.first;
+      final initialState = await blocWrapper.stream.first;
       expect(
         initialState,
         'empty',
@@ -64,7 +64,7 @@ void runTests() {
       await testInitialize(simpleBlocInitializer);
       final blocWrapper = createBloc<SimpleBloc, String>();
       blocWrapper.add(Object());
-      final stateFuture = blocWrapper.skip(1).first;
+      final stateFuture = blocWrapper.stream.skip(1).first;
       var stateReceived = false;
       // wait for bloc's response
       // ignore: unawaited_futures
@@ -83,7 +83,7 @@ void runTests() {
       await testInitialize(simpleBlocInitializer);
       final blocWrapper = createBloc<SimpleBloc, String>();
       blocWrapper.add(Object());
-      final state = await blocWrapper.skip(1).first;
+      final state = await blocWrapper.stream.skip(1).first;
       expect(state, 'data', reason: "Bloc's not initial state is not right");
     });
 
@@ -92,7 +92,7 @@ void runTests() {
       final blocWrapper = createBloc<CounterBloc, int>();
       const eventsCount = 4;
       var statesReceivedCount = 0;
-      blocWrapper.listen((state) {
+      blocWrapper.stream.listen((state) {
         statesReceivedCount++;
       });
       for (int i = 0; i < eventsCount; i++) {
@@ -118,8 +118,8 @@ void runTests() {
         ..add(true)
         ..add(true)
         ..add(false)
-        ..take(3)
-        ..listen((state) {
+        ..stream.take(3)
+        ..stream.listen((state) {
           expect(
             expectOrder[receivedStatePointer++],
             state,
@@ -132,7 +132,7 @@ void runTests() {
       await testInitialize(simpleBlocInitializer);
       final blocWrapper = createBloc<SimpleBloc, String>();
       var streamClosed = false;
-      blocWrapper.listen((_) {}, onDone: () {
+      blocWrapper.stream.listen((_) {}, onDone: () {
         streamClosed = true;
       });
       await blocWrapper.close();
@@ -150,7 +150,7 @@ void runTests() {
         final bloc1 = createBloc<CounterBloc, int>();
         final bloc2 = createBloc<CounterBloc, int>();
         bloc1.add(true);
-        bloc1.skip(1).listen((state) {
+        bloc1.stream.skip(1).listen((state) {
           expect(
             state,
             1,
@@ -159,7 +159,7 @@ void runTests() {
           );
         });
         bloc2.add(false);
-        bloc2.skip(1).listen((state) {
+        bloc2.stream.skip(1).listen((state) {
           expect(
             state,
             -1,

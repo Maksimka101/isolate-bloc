@@ -55,7 +55,7 @@ class IsolatedBlocManager {
     }
   }
 
-  Future<T?> _getBloc<T extends IsolateBloc>() async {
+  Future<T> _getBloc<T extends IsolateBloc>() async {
     await _initializeCompleter.future;
     final blocsT = _createdBlocs.values.whereType<T>();
     if (blocsT.isNotEmpty) {
@@ -65,8 +65,7 @@ class IsolatedBlocManager {
     } else {
       final blocCreator = _blocCreators[T];
       if (blocCreator == null) {
-        print("Failed to find BlocCreator for $T");
-        return null;
+        throw Exception("Failed to find BlocCreator for $T. Maybe you forget to `register` it?");
       } else {
         return _freeBlocs[T] = blocCreator() as T;
       }
@@ -74,7 +73,7 @@ class IsolatedBlocManager {
   }
 
   /// Use this function to get [IsolateBloc] in [Isolate].
-  /// 
+  ///
   /// To get bloc in UI [Isolate] use [IsolateBlocProvider] which returns [IsolateBlocWrapper].
   /// This function works this way: firstly it is wait for user's [Initializer] function
   /// secondly it is looks for created bloc with type BlocA. If it is finds any, so it
@@ -85,13 +84,11 @@ class IsolatedBlocManager {
     late IsolateBlocWrapper<State> wrapper;
     Bloc? isolateBloc;
     _getBloc<Bloc>().then((bloc) {
-      if (bloc == null) {
-        print("Failed to get bloc with type $Bloc");
-      } else {
-        isolateBloc = bloc;
-        bloc.listen(wrapper.stateReceiver);
-        wrapper.connectToBloc(bloc.id);
-      }
+      isolateBloc = bloc;
+      // ignore: invalid_use_of_protected_member
+      bloc.stream.listen(wrapper.stateReceiver);
+      // ignore: invalid_use_of_protected_member
+      wrapper.connectToBloc(bloc.id);
     });
     final onBLocClose = (_) => isolateBloc?.close();
     final eventReceiver = (IsolateBlocTransitionEvent<Object> event) => isolateBloc?.add(event.event);
@@ -114,7 +111,7 @@ class IsolatedBlocManager {
   void createBloc(Type blocType) {
     final bloc = _getFreeBlocByType(blocType);
     if (bloc != null) {
-      bloc.listen(
+      bloc.stream.listen(
         (state) => _isolatedConnector.sendEvent(
           IsolateBlocTransitionEvent(bloc.id, state),
         ),
@@ -127,7 +124,7 @@ class IsolatedBlocManager {
   void closeBloc(String uuid) {
     final bloc = _createdBlocs.remove(uuid);
     if (bloc == null) {
-      print("Failed to close bloc because it wasn't created yet.");
+      throw Exception("Failed to close bloc because it wasn't created yet.");
     } else {
       bloc.close();
     }

@@ -6,7 +6,7 @@ void main() {
   group('Simple test', () {
     test('Test correct initial state', () async {
       await initializeMock(initializer);
-      expect(await createBloc<SimpleBloc, String>().first, '');
+      expect(await createBloc<SimpleBloc, String>().stream.first, '');
     });
   });
 }

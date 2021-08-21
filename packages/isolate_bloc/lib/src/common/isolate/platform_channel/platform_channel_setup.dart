@@ -1,22 +1,18 @@
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_plugin.dart';
-import 'package:uuid/uuid.dart';
 
 import 'libraries.dart';
 
 /// Settings for [PlatformChannelMiddleware] and [IsolatedPlatformChannelMiddleware]
 /// In [_platformChannelPlugins] stored all known MethodChannel plugin names.
 /// They are used to receive platform message responses and requests.
-/// You can add platform [MethodChannel] names with [PlatformChannelSetup.addChannels] function.
 class PlatformChannelSetup {
   /// Create instance of this class.
-  PlatformChannelSetup({
-    String Function()? generateId,
-    List<String> methodChannelNames = const [],
-  }) : generateId = generateId ?? _generateId {
-    _addChannels(methodChannelNames: methodChannelNames);
-  }
+  const PlatformChannelSetup({
+    final List<String> methodChannelNames = const [],
+  }) : _methodChannelNames = methodChannelNames;
 
-  final String Function() generateId;
+  /// List of user defined method channel names
+  final List<String> _methodChannelNames;
 
   /// List with platformChannel packages. Package contains library name and their [MethodChannel]'s names.
   ///
@@ -32,21 +28,11 @@ class PlatformChannelSetup {
     ...communityLibraries,
   ];
 
-  /// Add [MethodChannel] names.
-  void _addChannels({required List<String> methodChannelNames}) {
-    _platformChannelPlugins.add(Library(
-      name: generateId(),
-      methodChannels: methodChannelNames,
-    ));
-  }
-
   /// Return all method channel names.
   List<String> get methodChannels {
-    return _platformChannelPlugins.fold<List<String>>(
-      <String>[],
-      (previousValue, element) => previousValue..addAll(element.methodChannels),
-    );
+    return [
+      for (final plugin in _platformChannelPlugins) ...plugin.methodChannels,
+      ..._methodChannelNames,
+    ];
   }
 }
-
-final _generateId = const Uuid().v4;

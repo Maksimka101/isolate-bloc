@@ -81,8 +81,7 @@ typedef IsolateBlocListenerCondition<S> = bool Function(S previous, S current);
 /// )
 /// ```
 /// {@endtemplate}
-class IsolateBlocListener<C extends IsolateBloc<Object, S>, S extends Object>
-    extends IsolateBlocListenerBase<C, S>
+class IsolateBlocListener<C extends IsolateBloc<Object, S>, S extends Object> extends IsolateBlocListenerBase<C, S>
     with IsolateBlocListenerSingleChildWidget {
   /// {@macro bloc_listener}
   const IsolateBlocListener({
@@ -107,8 +106,8 @@ class IsolateBlocListener<C extends IsolateBloc<Object, S>, S extends Object>
 /// The type of the state and what happens with each state change
 /// is defined by sub-classes.
 /// {@endtemplate}
-abstract class IsolateBlocListenerBase<C extends IsolateBloc<Object, S>,
-    S extends Object> extends SingleChildStatefulWidget {
+abstract class IsolateBlocListenerBase<C extends IsolateBloc<Object, S>, S extends Object>
+    extends SingleChildStatefulWidget {
   /// {@macro bloc_listener_base}
   const IsolateBlocListenerBase({
     Key? key,
@@ -135,8 +134,7 @@ abstract class IsolateBlocListenerBase<C extends IsolateBloc<Object, S>,
   final IsolateBlocListenerCondition<S>? listenWhen;
 
   @override
-  SingleChildState<IsolateBlocListenerBase<C, S>> createState() =>
-      _BlocListenerBaseState<C, S>();
+  SingleChildState<IsolateBlocListenerBase<C, S>> createState() => _BlocListenerBaseState<C, S>();
 }
 
 class _BlocListenerBaseState<C extends IsolateBloc<Object, S>, S extends Object>
@@ -183,7 +181,7 @@ class _BlocListenerBaseState<C extends IsolateBloc<Object, S>, S extends Object>
 
   void _subscribe() {
     if (_isolateBlocWrapper != null) {
-      _subscription = _isolateBlocWrapper?.listen((state) {
+      _subscription = _isolateBlocWrapper?.stream.listen((state) {
         if (widget.listenWhen?.call(_previousState!, state) ?? true) {
           widget.listener?.call(context, state);
         }

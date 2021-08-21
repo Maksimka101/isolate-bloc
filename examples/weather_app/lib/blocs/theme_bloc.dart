@@ -12,7 +12,7 @@ class ThemeBloc extends IsolateBloc<WeatherState, ThemeState> {
   ThemeBloc({
     @required this.weatherBloc,
   }) : super(ThemeState.initial) {
-    _weatherStateSubscription = weatherBloc.listen(onEventReceived);
+    _weatherStateSubscription = weatherBloc.stream.listen(onEventReceived);
   }
 
   @override

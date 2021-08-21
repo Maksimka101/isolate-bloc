@@ -171,7 +171,7 @@ class _IsolateBlocBuilderBaseState<C extends IsolateBloc<Object, S>,
   }
 
   void _subscribe() {
-    _subscription = _blocWrapper?.listen((state) {
+    _subscription = _blocWrapper?.stream.listen((state) {
       if (widget.buildWhen?.call(_previousState!, state) ?? true) {
         setState(() {
           _state = state;

@@ -5,10 +5,6 @@ import 'isolate/isolate_manager/isolate/isolate_manager.dart'
     if (dart.library.html) 'isolate/isolate_manager/web/isolate_manager.dart';
 import 'isolate/platform_channel/platform_channel_setup.dart';
 
-/// Signature for [IsolateBlocWrapper] injection.
-typedef BlocInjector<Bloc extends IsolateBloc<Object, State>, State extends Object> = IsolateBlocWrapper<State>
-    Function<Bloc extends IsolateBloc, State>();
-
 /// Starts creating [IsolateBloc] and returns [IsolateBlocWrapper].
 ///
 /// Throws [BlocManagerUnInitialized] if [blocManager] is null or in another words if you
@@ -29,7 +25,7 @@ Future<void> initialize(
   PlatformChannelSetup? platformChannelSetup,
   bool reCreate = false,
 }) async {
-  platformChannelSetup ??= PlatformChannelSetup();
+  platformChannelSetup ??= const PlatformChannelSetup();
   assert(
     !reCreate && BlocManager.instance == null,
     'You can initialize only once. '
@@ -42,7 +38,7 @@ Future<void> initialize(
   );
 }
 
-class BlocManagerUnInitialized {
+class BlocManagerUnInitialized implements Exception {
   @override
   String toString() {
     return '$BlocManager must not be null. Call `await $initialize()`';

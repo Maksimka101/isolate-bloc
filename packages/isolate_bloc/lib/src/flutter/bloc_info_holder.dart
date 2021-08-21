@@ -1,7 +1,7 @@
 import '../common/bloc/isolate_bloc.dart';
 import '../common/bloc/isolate_bloc_wrapper.dart';
 
-/// Use it to store bloc uuid's and type's in context using provider.
+/// Use it to store bloc in context using provider.
 class BlocInfoHolder {
   final _blocsInfo = <Type, IsolateBlocWrapper>{};
 

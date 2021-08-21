@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'isolate_bloc_observer.dart';
 import 'transition.dart';
 
+/// This is an exception which is throws on exception in `add` function in debug mode
 class BlocUnhandledErrorException implements Exception {
   BlocUnhandledErrorException(this.bloc, this.error, [this.stackTrace]);
 
@@ -26,15 +27,18 @@ class BlocUnhandledErrorException implements Exception {
   }
 }
 
-/// This bloc works in isolate.
+/// Takes a `Stream` of `Events` as input
+/// and transforms them into a `Stream` of `States` as output.
 ///
 /// [IsolateBlocWrapper]<[Event]>, [State]> will receive this bloc's state.
 /// This bloc must be created from UI with `createBloc<BlocT, BlocTState>`
 /// function or `IsolateBlocProvider<BlocT, BlocTState>()`.
 /// You can get it inside another [IsolateBloc] using `getBloc<BlocT>()`.
-abstract class IsolateBloc<Event extends Object, State extends Object> extends Stream<State> implements Sink<State> {
+abstract class IsolateBloc<Event extends Object, State extends Object> implements Sink<State> {
   /// Basic constructor. Gains initial state and generates bloc's id;
   IsolateBloc(this._state) : id = const Uuid().v4() {
+    // ignore: invalid_use_of_protected_member
+    observer.onCreate(this);
     _bindStateReceiver();
   }
 
@@ -47,11 +51,14 @@ abstract class IsolateBloc<Event extends Object, State extends Object> extends S
   final _stateController = StreamController<State>.broadcast();
   late StreamSubscription<State> _stateSubscription;
 
-  /// The current [IsolateBlocObserver].
+  /// The current [IsolateBlocObserver] instance.
   static IsolateBlocObserver observer = IsolateBlocObserver();
 
   /// Returns the current [state] of the [IsolateBloc].
   State get state => _state;
+
+  /// Returns the stream of states
+  Stream<State> get stream => _stateController.stream;
 
   /// Notifies the [IsolateBloc] of a new event which triggers onEventReceived.
   @mustCallSuper
@@ -139,29 +146,6 @@ abstract class IsolateBloc<Event extends Object, State extends Object> extends S
     }
   }
 
-  /// Adds a subscription to the Stream<State>. Returns a StreamSubscription
-  /// which handles events from the Stream<State> using the provided onData,
-  /// onError and onDone handlers.
-  @override
-  StreamSubscription<State> listen(
-    void Function(State event)? onData, {
-    Function? onError,
-    void Function()? onDone,
-    bool? cancelOnError,
-  }) {
-    return _prepareStateStream.listen(
-      onData,
-      onError: onError,
-      onDone: onDone,
-      cancelOnError: cancelOnError,
-    );
-  }
-
-  Stream<State> get _prepareStateStream async* {
-    yield state;
-    yield* _stateController.stream;
-  }
-
   /// This function receive events from UI.
   void onEventReceived(Event event);
 
@@ -188,6 +172,8 @@ abstract class IsolateBloc<Event extends Object, State extends Object> extends S
   @override
   @mustCallSuper
   Future<void> close() async {
+    // ignore: invalid_use_of_protected_member
+    observer.onClose(this);
     await _stateSubscription.cancel();
     await _stateController.close();
   }

@@ -71,7 +71,7 @@ class BlocManager {
   }
 
   /// Start creating [IsolateBloc] and return [IsolateBlocWrapper].
-  IsolateBlocWrapper<State> createBloc<T extends IsolateBloc, State>() {
+  IsolateBlocWrapper<State> createBloc<T extends IsolateBloc, State extends Object>() {
     final initialState = _initialStates[T];
     final messageReceiver = _isolateConnector.sendEvent;
     final onBlocClose = (String? uuid) {
@@ -80,7 +80,10 @@ class BlocManager {
       }
     };
     final blocWrapper = IsolateBlocWrapper<State>(
-        initialState as State, messageReceiver, onBlocClose);
+      state: initialState as State,
+      eventReceiver: messageReceiver,
+      onBlocClose: onBlocClose,
+    );
     if (!_freeWrappers.containsKey(T)) {
       _freeWrappers[T] = [];
     }
@@ -92,10 +95,10 @@ class BlocManager {
   /// Finish [IsolateBloc] creating which started by call [createBloc].
   /// Connect [IsolateBloc] to it's [IsolateBlocWrapper].
   void bindFreeWrapper(Type blocType, String id) {
-    if (_freeWrappers.containsKey(blocType) &&
-        _freeWrappers[blocType]!.isNotEmpty) {
-      print('No free bloc wrapper for $blocType');
+    if (_freeWrappers.containsKey(blocType) && _freeWrappers[blocType]!.isNotEmpty) {
+      throw Exception('No free bloc wrapper for $blocType');
     } else {
+      // ignore: invalid_use_of_protected_member
       _wrappers[id] = _freeWrappers[blocType]!.removeAt(0)..connectToBloc(id);
     }
   }
@@ -103,6 +106,7 @@ class BlocManager {
   /// Call when new state from [IsolateBloc] received.
   /// Find wrapper by bloc id and add new state to it.
   void blocStateReceiver(String blocId, Object state) {
+    // ignore: invalid_use_of_protected_member
     _wrappers[blocId]?.stateReceiver(state);
   }
 
