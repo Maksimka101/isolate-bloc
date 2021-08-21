@@ -5,7 +5,7 @@ import 'isolate_messenger.dart';
 
 /// Signature for function which will run in isolate
 typedef IsolateRun = void Function(
-  IsolateMessenger messager,
+  IsolateMessenger messenger,
   Initializer initializer,
 );
 

@@ -8,12 +8,16 @@ import 'package:isolate_bloc/src/common/isolate/service_events.dart';
 import '../bloc/isolate_bloc.dart';
 
 /// Signature for function which creates [IsolateBloc].
-typedef IsolateBlocCreator<Event extends Object, State extends Object>
-    = IsolateBloc<Event, State> Function();
+typedef IsolateBlocCreator = IsolateBloc Function();
 
 /// Maintain [IsolateBloc]s in isolate
 class IsolatedBlocManager {
   IsolatedBlocManager._(this._isolatedConnector);
+
+  /// Initialize [IsolatedBlocManager]. Receive [IsolatedConnector].
+  factory IsolatedBlocManager.initialize(IsolatedConnector connector) {
+    return IsolatedBlocManager.instance = IsolatedBlocManager._(connector);
+  }
 
   static IsolatedBlocManager? instance;
   final IsolatedConnector _isolatedConnector;
@@ -27,11 +31,6 @@ class IsolatedBlocManager {
   void initializeCompleted() {
     _initializeCompleter.complete();
     _isolatedConnector.sendEvent(IsolateBlocsInitialized(_initialStates));
-  }
-
-  /// Initialize [IsolatedBlocManager]. Receive [IsolatedConnector].
-  static IsolatedBlocManager initialize(IsolatedConnector connector) {
-    return IsolatedBlocManager.instance = IsolatedBlocManager._(connector);
   }
 
   /// Returns new bloc from cached in [_freeBlocs] or create new one.
@@ -75,14 +74,14 @@ class IsolatedBlocManager {
   }
 
   /// Use this function to get [IsolateBloc] in [Isolate].
-  /// To get bloc in UI [Isolate] use IsolateBlocProvider which returns [IsolateBlocWrapper].
+  /// 
+  /// To get bloc in UI [Isolate] use [IsolateBlocProvider] which returns [IsolateBlocWrapper].
   /// This function works this way: firstly it is wait for user's [Initializer] function
   /// secondly it is looks for created bloc with type BlocA. If it is finds any, so it
   /// returns this bloc's [IsolateBlocWrapper]. Else it is creates a new bloc and
   /// add to the pull of free blocs. So when UI will call `create()`, it will not create a new bloc but
   /// return free bloc from pull.
-  IsolateBlocWrapper<State> getBlocWrapper<
-      Bloc extends IsolateBloc<Object, State>, State extends Object>() {
+  IsolateBlocWrapper<State> getBlocWrapper<Bloc extends IsolateBloc<Object, State>, State extends Object>() {
     late IsolateBlocWrapper<State> wrapper;
     Bloc? isolateBloc;
     _getBloc<Bloc>().then((bloc) {
@@ -95,8 +94,7 @@ class IsolatedBlocManager {
       }
     });
     final onBLocClose = (_) => isolateBloc?.close();
-    final eventReceiver = (IsolateBlocTransitionEvent<Object> event) =>
-        isolateBloc?.add(event.event);
+    final eventReceiver = (IsolateBlocTransitionEvent<Object> event) => isolateBloc?.add(event.event);
     wrapper = IsolateBlocWrapper.noInitState(eventReceiver, onBLocClose);
     return wrapper;
   }
@@ -121,8 +119,7 @@ class IsolatedBlocManager {
           IsolateBlocTransitionEvent(bloc.id, state),
         ),
       );
-      _isolatedConnector
-          .sendEvent(IsolateBlocCreatedEvent(bloc.runtimeType, bloc.id));
+      _isolatedConnector.sendEvent(IsolateBlocCreatedEvent(bloc.runtimeType, bloc.id));
     }
   }
 
@@ -139,7 +136,7 @@ class IsolatedBlocManager {
   /// Register [IsolateBloc].
   /// You can create [IsolateBloc] and get [IsolateBlocWrapper] from
   /// [BlocManager].createBloc only if you register this [IsolateBloc].
-  void register<Event, State>(IsolateBlocCreator creator) {
+  void register(IsolateBlocCreator creator) {
     final bloc = creator();
     _initialStates[bloc.runtimeType] = bloc.state;
     _freeBlocs[bloc.runtimeType] = bloc;

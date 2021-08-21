@@ -31,8 +31,7 @@ mixin IsolateBlocProviderSingleChildWidget on SingleChildWidget {}
 /// );
 /// ```
 /// {@endtemplate}
-class IsolateBlocProvider<T extends IsolateBloc<Object, State>,
-        State extends Object> extends SingleChildStatelessWidget
+class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State extends Object> extends SingleChildStatelessWidget
     with IsolateBlocProviderSingleChildWidget {
   /// {@macro bloc_provider}
   IsolateBlocProvider({
@@ -99,9 +98,8 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>,
   /// ```dart
   /// IsolateBlocProvider.of<BlocA, BlocAState>(context)
   /// ```
-  static IsolateBlocWrapper<State>
-      of<T extends IsolateBloc<Object, State>, State extends Object>(
-          BuildContext context) {
+  static IsolateBlocWrapper<State> of<T extends IsolateBloc<Object, State>, State extends Object>(
+      BuildContext context) {
     final blocInfoHolder = _getBlocInfoHolder(context);
     final blocWrapper = blocInfoHolder?.getWrapperByType<T, State>();
     if (blocWrapper == null) {
@@ -125,10 +123,6 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>,
       create: (context) {
         var blocWrapper = _create.call(context);
         blocWrapper ??= createBloc<T, State>();
-        if (blocWrapper == null) {
-          print("Failed to create bloc");
-          return null;
-        }
         final blocInfoHolder = _getBlocInfoHolder(context) ?? BlocInfoHolder();
         blocInfoHolder.addBlocInfo<T>(blocWrapper);
         return blocInfoHolder;
@@ -161,8 +155,7 @@ extension IsolateBlocProviderExtension on BuildContext {
   /// ```dart
   /// BlocProvider.of<C>(context)
   /// ```
-  IsolateBlocWrapper<State> isolateBloc<C extends IsolateBloc<Object, State>,
-      State extends Object>() {
+  IsolateBlocWrapper<State> isolateBloc<C extends IsolateBloc<Object, State>, State extends Object>() {
     return IsolateBlocProvider.of<C, State>(this);
   }
 }

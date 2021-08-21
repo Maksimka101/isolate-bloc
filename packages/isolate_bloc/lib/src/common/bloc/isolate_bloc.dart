@@ -27,14 +27,13 @@ class BlocUnhandledErrorException implements Exception {
 }
 
 /// This bloc works in isolate.
-/// [IsolateBlocWrapper]<Event>, State> will receive this bloc's state.
+///
+/// [IsolateBlocWrapper]<[Event]>, [State]> will receive this bloc's state.
 /// This bloc must be created from UI with `createBloc<BlocT, BlocTState>`
 /// function or `IsolateBlocProvider<BlocT, BlocTState>()`.
-/// You can use it from another [IsolateBloc] with `getBloc<BlocT>()`
-/// or `getBlocWrapper<BlocT, BlocTState>()`.
-abstract class IsolateBloc<Event extends Object, State extends Object>
-    extends Stream<State> implements Sink<State> {
-  /// Basic constructor. Gain initial state and generate bloc's id;
+/// You can get it inside another [IsolateBloc] using `getBloc<BlocT>()`.
+abstract class IsolateBloc<Event extends Object, State extends Object> extends Stream<State> implements Sink<State> {
+  /// Basic constructor. Gains initial state and generates bloc's id;
   IsolateBloc(this._state) : id = const Uuid().v4() {
     _bindStateReceiver();
   }

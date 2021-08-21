@@ -3,32 +3,20 @@ import 'bloc/isolate_bloc_wrapper.dart';
 import 'isolate/bloc_manager.dart';
 import 'isolate/isolate_manager/isolate/isolate_manager.dart'
     if (dart.library.html) 'isolate/isolate_manager/web/isolate_manager.dart';
-import 'isolate/isolated_bloc_manager.dart';
 import 'isolate/platform_channel/platform_channel_setup.dart';
 
 /// Signature for [IsolateBlocWrapper] injection.
-typedef BlocInjector<Bloc extends IsolateBloc<Object, State>,
-        State extends Object>
-    = IsolateBlocWrapper<State> Function<Bloc extends IsolateBloc, State>();
+typedef BlocInjector<Bloc extends IsolateBloc<Object, State>, State extends Object> = IsolateBlocWrapper<State>
+    Function<Bloc extends IsolateBloc, State>();
 
-/// Register [IsolateBloc].
-/// You can create [IsolateBloc] and get [IsolateBlocWrapper] from
-/// [createBloc] only if you register this [IsolateBloc].
-void register<Event extends Object, State extends Object>({
-  required IsolateBlocCreator<Event, State> create,
-}) {
-  IsolatedBlocManager.instance?.register<Event, State>(create);
-}
-
-/// Start creating [IsolateBloc] and return [IsolateBlocWrapper].
-IsolateBlocWrapper<State>? createBloc<BlocT extends IsolateBloc<Object, State>,
-    State extends Object>() {
+/// Starts creating [IsolateBloc] and returns [IsolateBlocWrapper].
+///
+/// Throws [BlocManagerUnInitialized] if [blocManager] is null or in another words if you
+/// didn't call [initialize] function before
+IsolateBlocWrapper<State> createBloc<BlocT extends IsolateBloc<Object, State>, State extends Object>() {
   final blocManager = BlocManager.instance;
   if (blocManager == null) {
-    print(
-      '$BlocManager must not be null. '
-      'Call `await $initialize()` and call this function',
-    );
+    throw BlocManagerUnInitialized();
   } else {
     return blocManager.createBloc<BlocT, State>();
   }
@@ -54,22 +42,9 @@ Future<void> initialize(
   );
 }
 
-/// Use this function to get [IsolateBloc] in [Isolate].
-/// To get bloc in UI Isolate use IsolateBlocProvider which returns [IsolateBlocWrapper].
-/// This function works this way: firstly it is wait for user's [Initializer] function
-/// secondly it is looks for created bloc with type BlocA. If it is finds any, so it
-/// returns this bloc's [IsolateBlocWrapper]. Else it is creates a new bloc and
-/// add to the pull of free blocs. So when UI will call `create()`, it will not create a new bloc but
-/// return free bloc from pull.
-IsolateBlocWrapper<State>?
-    getBloc<Bloc extends IsolateBloc<Object, State>, State extends Object>() {
-  final blocManager = IsolatedBlocManager.instance;
-  if (blocManager == null) {
-    print(
-      '$IsolatedBlocManager instance is null. '
-      'Make sure that you call this function from $Initializer.',
-    );
-  } else {
-    return blocManager.getBlocWrapper<Bloc, State>();
+class BlocManagerUnInitialized {
+  @override
+  String toString() {
+    return '$BlocManager must not be null. Call `await $initialize()`';
   }
 }
