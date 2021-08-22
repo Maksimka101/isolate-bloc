@@ -1,13 +1,13 @@
 import 'package:flutter/widgets.dart';
+import 'package:isolate_bloc/src/common/api_wrappers.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
+import 'package:isolate_bloc/src/flutter/bloc_info_holder.dart';
 import 'package:nested/nested.dart';
 import 'package:provider/provider.dart';
-import '../common/api_wrappers.dart';
-import '../common/bloc/isolate_bloc.dart';
-import '../common/bloc/isolate_bloc_wrapper.dart';
-import './bloc_info_holder.dart';
 
 /// A function that creates a `Bloc` of type [T].
-typedef CreateIsolateBloc<T extends IsolateBloc<Object, Object>> = T Function(
+typedef CreateIsolateBloc<T extends IsolateBlocBase<Object, Object>> = T Function(
   BuildContext context,
 );
 
@@ -31,8 +31,8 @@ mixin IsolateBlocProviderSingleChildWidget on SingleChildWidget {}
 /// );
 /// ```
 /// {@endtemplate}
-class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State extends Object> extends SingleChildStatelessWidget
-    with IsolateBlocProviderSingleChildWidget {
+class IsolateBlocProvider<T extends IsolateBlocBase<Object, State>, State extends Object>
+    extends SingleChildStatelessWidget with IsolateBlocProviderSingleChildWidget {
   /// {@macro bloc_provider}
   IsolateBlocProvider({
     Key? key,
@@ -63,7 +63,7 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State extends Ob
   /// ```
   IsolateBlocProvider.value({
     Key? key,
-    required IsolateBlocWrapper<Object> value,
+    required IsolateBlocWrapper<Object?> value,
     Widget? child,
   }) : this._(
           key: key,
@@ -75,7 +75,7 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State extends Ob
   /// Used by the [IsolateBlocProvider] default and value constructors.
   IsolateBlocProvider._({
     Key? key,
-    required Create<IsolateBlocWrapper<Object>?> create,
+    required Create<IsolateBlocWrapper<Object?>?> create,
     Dispose<IsolateBlocWrapper?>? dispose,
     this.child,
   })  : _dispose = dispose,
@@ -85,7 +85,7 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State extends Ob
   /// [child] and its descendants which will have access to the `bloc`.
   final Widget? child;
 
-  final Create<IsolateBlocWrapper<Object>?> _create;
+  final Create<IsolateBlocWrapper<Object?>?> _create;
 
   final Dispose<IsolateBlocWrapper?>? _dispose;
 
@@ -98,8 +98,7 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State extends Ob
   /// ```dart
   /// IsolateBlocProvider.of<BlocA, BlocAState>(context)
   /// ```
-  static IsolateBlocWrapper<State> of<T extends IsolateBloc<Object, State>, State extends Object>(
-      BuildContext context) {
+  static IsolateBlocWrapper<State> of<T extends IsolateBlocBase<Object?, State>, State>(BuildContext context) {
     final blocInfoHolder = _getBlocInfoHolder(context);
     final blocWrapper = blocInfoHolder?.getWrapperByType<T, State>();
     if (blocWrapper == null) {
@@ -119,7 +118,7 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State extends Ob
 
   @override
   Widget buildWithChild(BuildContext context, Widget? child) {
-    return InheritedProvider<BlocInfoHolder?>(
+    return InheritedProvider<BlocInfoHolder>(
       create: (context) {
         var blocWrapper = _create.call(context);
         blocWrapper ??= createBloc<T, State>();
@@ -128,7 +127,7 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State extends Ob
         return blocInfoHolder;
       },
       dispose: (context, infoHolder) {
-        _dispose?.call(context, infoHolder?.removeBloc<T>());
+        _dispose?.call(context, infoHolder.removeBloc<T>());
       },
       lazy: false,
       child: child,
@@ -145,7 +144,7 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State extends Ob
 }
 
 /// Extends the `BuildContext` class with the ability
-/// to perform a lookup based on a `Bloc` type.
+/// to perform a lookup based on a `IsolateBlocBase` type.
 extension IsolateBlocProviderExtension on BuildContext {
   /// Performs a lookup using the `BuildContext` to obtain
   /// the nearest ancestor `Cubit` of type [C].
@@ -153,9 +152,9 @@ extension IsolateBlocProviderExtension on BuildContext {
   /// Calling this method is equivalent to calling:
   ///
   /// ```dart
-  /// BlocProvider.of<C>(context)
+  /// IsolateBlocProvider.of<C>(context)
   /// ```
-  IsolateBlocWrapper<State> isolateBloc<C extends IsolateBloc<Object, State>, State extends Object>() {
+  IsolateBlocWrapper<State> isolateBloc<C extends IsolateBlocBase<Object?, State>, State>() {
     return IsolateBlocProvider.of<C, State>(this);
   }
 }

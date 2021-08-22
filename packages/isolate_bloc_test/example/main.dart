@@ -15,7 +15,7 @@ void initializer() {
   register(create: () => SimpleBloc());
 }
 
-class SimpleBloc extends IsolateBloc<Object, String> {
+class SimpleBloc extends IsolateCubit<Object, String> {
   SimpleBloc() : super('');
 
   @override

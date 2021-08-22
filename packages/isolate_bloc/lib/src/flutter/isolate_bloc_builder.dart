@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-
-import '../common/bloc/isolate_bloc.dart';
-import '../common/bloc/isolate_bloc_wrapper.dart';
-import './isolate_bloc_provider.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
+import 'package:isolate_bloc/src/flutter/isolate_bloc_provider.dart';
 
 /// Signature for the `builder` function which takes the `BuildContext` and
 /// [state] and is responsible for returning a widget which is to be rendered.
@@ -74,8 +73,7 @@ typedef IsolateBlocBuilderCondition<S> = bool Function(S previous, S current);
 ///)
 /// ```
 /// {@endtemplate}
-class IsolateBlocBuilder<C extends IsolateBloc<Object, S>, S extends Object>
-    extends IsolateBlocBuilderBase<C, S> {
+class IsolateBlocBuilder<C extends IsolateBlocBase<Object, S>, S extends Object> extends IsolateBlocBuilderBase<C, S> {
   /// {@macro bloc_builder}
   const IsolateBlocBuilder({
     Key? key,
@@ -102,8 +100,7 @@ class IsolateBlocBuilder<C extends IsolateBloc<Object, S>, S extends Object>
 /// so far. The type of the state and how it is updated with each interaction
 /// is defined by sub-classes.
 /// {@endtemplate}
-abstract class IsolateBlocBuilderBase<C extends IsolateBloc<Object, S>,
-    S extends Object> extends StatefulWidget {
+abstract class IsolateBlocBuilderBase<C extends IsolateBlocBase<Object?, S>, S> extends StatefulWidget {
   /// {@macro bloc_builder_base}
   const IsolateBlocBuilderBase({
     Key? key,
@@ -123,12 +120,11 @@ abstract class IsolateBlocBuilderBase<C extends IsolateBloc<Object, S>,
   Widget build(BuildContext context, S state);
 
   @override
-  State<IsolateBlocBuilderBase<C, S>> createState() =>
-      _IsolateBlocBuilderBaseState<C, S>();
+  State<IsolateBlocBuilderBase<C, S>> createState() => _IsolateBlocBuilderBaseState<C, S>();
 }
 
-class _IsolateBlocBuilderBaseState<C extends IsolateBloc<Object, S>,
-    S extends Object> extends State<IsolateBlocBuilderBase<C, S>> {
+class _IsolateBlocBuilderBaseState<C extends IsolateBlocBase<Object?, S>, S>
+    extends State<IsolateBlocBuilderBase<C , S>> {
   StreamSubscription<S>? _subscription;
   S? _previousState;
   S? _state;

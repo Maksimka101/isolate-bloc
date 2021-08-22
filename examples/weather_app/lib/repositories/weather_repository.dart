@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:meta/meta.dart';
 
 import '../models/weather.dart';
 import 'weather_api_client.dart';

@@ -4,11 +4,11 @@ import 'package:flutter/services.dart';
 abstract class ServiceEvent {}
 
 /// Event with [IsolateBloc]'s state or or with event from [IsolateBlocWrapper]
-class IsolateBlocTransitionEvent<Event extends Object> extends ServiceEvent {
+class IsolateBlocTransitionEvent extends ServiceEvent {
   IsolateBlocTransitionEvent(this.blocUuid, this.event);
 
   final String blocUuid;
-  final Event event;
+  final Object? event;
 }
 
 /// Request to create new [IsolateBloc]
@@ -30,7 +30,7 @@ class IsolateBlocCreatedEvent extends ServiceEvent {
 class IsolateBlocsInitialized extends ServiceEvent {
   IsolateBlocsInitialized(this.initialStates);
 
-  final Map<Type, Object> initialStates;
+  final Map<Type, dynamic> initialStates;
 }
 
 /// Event to close IsolateBloc. Called by [IsolateBlocWrapper.close()]

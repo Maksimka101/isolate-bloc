@@ -2,10 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
-import 'package:isolate_bloc/src/common/bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:nested/nested.dart';
-import 'package:provider/provider.dart';
 
 /// Mixin which allows `IsolateMultiBlocListener` to infer the types
 /// of multiple [IsolateBlocListener]s.
@@ -82,7 +80,7 @@ typedef IsolateBlocListenerCondition<S> = bool Function(S previous, S current);
 /// )
 /// ```
 /// {@endtemplate}
-class IsolateBlocListener<C extends IsolateBloc<Object, S>, S extends Object> extends IsolateBlocListenerBase<C, S>
+class IsolateBlocListener<C extends IsolateBlocBase<Object?, S>, S> extends IsolateBlocListenerBase<C, S>
     with IsolateBlocListenerSingleChildWidget {
   /// {@macro bloc_listener}
   const IsolateBlocListener({
@@ -107,8 +105,7 @@ class IsolateBlocListener<C extends IsolateBloc<Object, S>, S extends Object> ex
 /// The type of the state and what happens with each state change
 /// is defined by sub-classes.
 /// {@endtemplate}
-abstract class IsolateBlocListenerBase<C extends IsolateBloc<Object, S>, S extends Object>
-    extends SingleChildStatefulWidget {
+abstract class IsolateBlocListenerBase<C extends IsolateBlocBase<Object?, S>, S> extends SingleChildStatefulWidget {
   /// {@macro bloc_listener_base}
   const IsolateBlocListenerBase({
     Key? key,
@@ -138,7 +135,7 @@ abstract class IsolateBlocListenerBase<C extends IsolateBloc<Object, S>, S exten
   SingleChildState<IsolateBlocListenerBase<C, S>> createState() => _BlocListenerBaseState<C, S>();
 }
 
-class _BlocListenerBaseState<C extends IsolateBloc<Object, S>, S extends Object>
+class _BlocListenerBaseState<C extends IsolateBlocBase<Object?, S>, S>
     extends SingleChildState<IsolateBlocListenerBase<C, S>> {
   StreamSubscription<S>? _subscription;
   S? _previousState;
@@ -155,9 +152,7 @@ class _BlocListenerBaseState<C extends IsolateBloc<Object, S>, S extends Object>
   @override
   void didUpdateWidget(IsolateBlocListenerBase<C, S> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // ignore: close_sinks
     final oldCubit = oldWidget.isolateBloc ?? context.isolateBloc<C, S>();
-    // ignore: close_sinks
     final currentCubit = widget.isolateBloc ?? oldCubit;
     if (oldCubit != currentCubit) {
       if (_subscription != null) {

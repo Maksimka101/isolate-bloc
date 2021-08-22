@@ -14,7 +14,7 @@ dependencies:
   isolate_bloc:
     path: ../../packages/isolate_bloc/
   equatable: 2.0.3
-  http: any
+  http: 0.13.3
 
 dev_dependencies:
   flutter_test:

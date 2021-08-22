@@ -16,7 +16,7 @@ class IsolateConnector {
   final void Function(ServiceEvent) sendEvent;
   final Stream<ServiceEvent> _eventsStream;
   late StreamSubscription<ServiceEvent> _eventSubscription;
-  final _initializeCompleter = Completer<Map<Type, Object>>();
+  final _initializeCompleter = Completer<Map<Type, Object?>>();
 
   /// Return [Map] with [IsolateBloc] type to it's initial state.
   /// ```dart
@@ -24,7 +24,7 @@ class IsolateConnector {
   ///   IsolateBlocType: IsolateBlocState,
   /// })
   /// ```
-  Future<Map<Type, Object>> get initialStates async {
+  Future<Map<Type, Object?>> get initialStates async {
     return _initializeCompleter.future;
   }
 

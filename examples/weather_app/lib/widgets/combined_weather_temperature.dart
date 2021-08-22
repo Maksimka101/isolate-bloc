@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 
-import 'package:meta/meta.dart';
 import 'package:weather_app/blocs/settings_bloc.dart';
 
 import '../models/models.dart' as model;

@@ -1,4 +1,5 @@
-import 'package:isolate_bloc/src/common/bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_cubit.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_connector.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_manager.dart';
@@ -7,7 +8,6 @@ import 'package:isolate_bloc/src/common/isolate/isolated_bloc_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/isolated_connector.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 import 'package:isolate_bloc/src/common/isolate/service_events.dart';
-
 
 /// Signature for initialization function which would be run in [Isolate] to
 /// initialize your blocs and repository.
@@ -32,7 +32,7 @@ class BlocManager {
 
   final IsolateConnector _isolateConnector;
   final IsolateManager _isolateManager;
-  final Map<Type, Object> _initialStates;
+  final Map<Type, Object?> _initialStates;
   final _freeWrappers = <Type, List<IsolateBlocWrapper>>{};
   final _wrappers = <String, IsolateBlocWrapper>{};
 
@@ -69,30 +69,31 @@ class BlocManager {
     );
   }
 
-  /// Start creating [IsolateBloc] and return [IsolateBlocWrapper].
-  IsolateBlocWrapper<State> createBloc<T extends IsolateBloc, State extends Object>() {
-    final initialState = _initialStates[T];
-    final messageReceiver = _isolateConnector.sendEvent;
-    final onBlocClose = (String? uuid) {
+  /// Start creating [IsolateCubit] and return [IsolateBlocWrapper].
+  IsolateBlocWrapper<State> createBloc<T extends IsolateBlocBase, State extends Object>() {
+    void onBlocClose(String? uuid) {
       if (uuid != null) {
         _isolateConnector.sendEvent(CloseIsolateBlocEvent(uuid));
       }
-    };
+    }
+
+    final initialState = _initialStates[T];
+    final messageReceiver = _isolateConnector.sendEvent;
+
     final blocWrapper = IsolateBlocWrapper<State>(
       state: initialState as State,
       eventReceiver: messageReceiver,
       onBlocClose: onBlocClose,
     );
-    if (!_freeWrappers.containsKey(T)) {
-      _freeWrappers[T] = [];
-    }
+
+    _freeWrappers[T] ??= [];
     _freeWrappers[T]!.add(blocWrapper);
     _isolateConnector.sendEvent(CreateIsolateBlocEvent(T));
     return blocWrapper;
   }
 
-  /// Finish [IsolateBloc] creating which started by call [createBloc].
-  /// Connect [IsolateBloc] to it's [IsolateBlocWrapper].
+  /// Finish [IsolateCubit] creating which started by call [createBloc].
+  /// Connect [IsolateCubit] to it's [IsolateBlocWrapper].
   void bindFreeWrapper(Type blocType, String id) {
     if (_freeWrappers.containsKey(blocType) && _freeWrappers[blocType]!.isNotEmpty) {
       throw Exception('No free bloc wrapper for $blocType');
@@ -102,9 +103,9 @@ class BlocManager {
     }
   }
 
-  /// Call when new state from [IsolateBloc] received.
+  /// Call when new state from [IsolateCubit] received.
   /// Find wrapper by bloc id and add new state to it.
-  void blocStateReceiver(String blocId, Object state) {
+  void blocStateReceiver(String blocId, Object? state) {
     // ignore: invalid_use_of_protected_member
     _wrappers[blocId]?.stateReceiver(state);
   }
@@ -133,7 +134,7 @@ class BlocManager {
     isolateBlocManager.initializeCompleted();
   }
 
-  /// Free all resources and kill [Isolate] with [IsolateBloc]s.
+  /// Free all resources and kill [Isolate] with [IsolateCubit]s.
   void dispose() {
     _isolateManager.isolate.kill();
     _isolateConnector.dispose();

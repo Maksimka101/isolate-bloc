@@ -1,16 +1,17 @@
 import 'package:flutter/foundation.dart';
-import 'package:isolate_bloc/src/common/bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_cubit.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate/isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/web/isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 
-/// Starts creating [IsolateBloc] and returns [IsolateBlocWrapper].
+/// Starts creating [IsolateCubit] and returns [IsolateBlocWrapper].
 ///
 /// Throws [BlocManagerUnInitialized] if [blocManager] is null or in another words if you
 /// didn't call [initialize] function before
-IsolateBlocWrapper<State> createBloc<BlocT extends IsolateBloc<Object, State>, State extends Object>() {
+IsolateBlocWrapper<State> createBloc<BlocT extends IsolateBlocBase<Object, State>, State extends Object>() {
   final blocManager = BlocManager.instance;
   if (blocManager == null) {
     throw BlocManagerUnInitialized();

@@ -1,10 +1,9 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:weather_app/models/weather.dart';
 import 'package:weather_app/repositories/repositories.dart';
 
-class WeatherBloc extends IsolateBloc<WeatherEvent, WeatherState> {
+class WeatherBloc extends IsolateCubit<WeatherEvent, WeatherState> {
   final WeatherRepository weatherRepository;
 
   WeatherBloc({required this.weatherRepository}) : super(WeatherInitial());
