@@ -1,11 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
+import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate/isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/web/isolate_manager.dart';
-
-import 'bloc/isolate_bloc.dart';
-import 'bloc/isolate_bloc_wrapper.dart';
-import 'isolate/bloc_manager.dart';
-import 'isolate/platform_channel/platform_channel_setup.dart';
+import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 
 /// Starts creating [IsolateBloc] and returns [IsolateBlocWrapper].
 ///

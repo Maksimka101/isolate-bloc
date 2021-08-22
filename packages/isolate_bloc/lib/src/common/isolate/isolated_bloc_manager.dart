@@ -5,8 +5,6 @@ import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/isolated_connector.dart';
 import 'package:isolate_bloc/src/common/isolate/service_events.dart';
 
-import '../bloc/isolate_bloc.dart';
-
 /// Signature for function which creates [IsolateBloc].
 typedef IsolateBlocCreator = IsolateBloc Function();
 

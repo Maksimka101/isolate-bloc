@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'bloc_manager.dart';
-import 'platform_channel/platform_channel_middleware.dart';
-import 'service_events.dart';
+import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
+import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_middleware.dart';
+import 'package:isolate_bloc/src/common/isolate/service_events.dart';
+
 
 /// Listen for [ServiceEvent]s from isolate
 class IsolateConnector {

@@ -5,9 +5,7 @@ import 'package:meta/meta.dart';
 class Location extends StatelessWidget {
   final String location;
 
-  Location({Key key, @required this.location})
-      : assert(location != null),
-        super(key: key);
+  Location({Key? key, required this.location}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

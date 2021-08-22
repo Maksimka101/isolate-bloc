@@ -1,11 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:isolate_bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_observer.dart';
+import 'package:isolate_bloc/src/common/bloc/transition.dart';
 import 'package:uuid/uuid.dart';
 
-import 'isolate_bloc_observer.dart';
-import 'transition.dart';
 
 /// This is an exception which is throws on exception in `add` function in debug mode
 class BlocUnhandledErrorException implements Exception {

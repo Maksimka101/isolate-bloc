@@ -11,10 +11,9 @@ class CombinedWeatherTemperature extends StatelessWidget {
   final model.Weather weather;
 
   CombinedWeatherTemperature({
-    Key key,
-    @required this.weather,
-  })  : assert(weather != null),
-        super(key: key);
+    Key? key,
+    required this.weather,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

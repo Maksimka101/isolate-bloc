@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-
-import '../isolate/service_events.dart';
-import 'isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/isolate/service_events.dart';
 
 /// Signature for event receiver function which takes an [IsolateBlocTransitionEvent]
 /// and send this event to the [IsolateBloc]

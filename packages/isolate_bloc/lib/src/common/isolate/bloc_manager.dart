@@ -1,11 +1,13 @@
-import '../bloc/isolate_bloc.dart';
-import '../bloc/isolate_bloc_wrapper.dart';
-import 'isolate_connector.dart';
-import 'isolate_manager/abstract_isolate_manager.dart';
-import 'isolate_manager/isolate_messenger.dart';
-import 'isolated_bloc_manager.dart';
-import 'isolated_connector.dart';
-import 'service_events.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_connector.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_manager.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate_messenger.dart';
+import 'package:isolate_bloc/src/common/isolate/isolated_bloc_manager.dart';
+import 'package:isolate_bloc/src/common/isolate/isolated_connector.dart';
+import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
+import 'package:isolate_bloc/src/common/isolate/service_events.dart';
+
 
 /// Signature for initialization function which would be run in [Isolate] to
 /// initialize your blocs and repository.
@@ -42,7 +44,7 @@ class BlocManager {
   static Future<void> initialize(
     Initializer initializer,
     IsolateManagerFactory managerFactory,
-    List<String> platformChannels,
+    MethodChannels platformChannels,
   ) async {
     instance?.dispose();
 

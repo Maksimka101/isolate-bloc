@@ -3,17 +3,16 @@ import 'dart:isolate';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_binding.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_wrapper.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate/io_isolate_wrapper.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/isolated_platform_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../bloc_manager.dart';
-import '../isolate_messenger.dart';
-import 'io_isolate_wrapper.dart';
 
 class _IsolateSetup {
   _IsolateSetup(

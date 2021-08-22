@@ -8,11 +8,11 @@ class Temperature extends StatelessWidget {
   final TemperatureUnits units;
 
   Temperature({
-    Key key,
-    this.temperature,
-    this.low,
-    this.high,
-    this.units,
+    Key? key,
+    required this.temperature,
+    required this.low,
+    required this.high,
+    required this.units,
   }) : super(key: key);
 
   @override

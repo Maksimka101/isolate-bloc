@@ -13,7 +13,7 @@ class Weather extends StatefulWidget {
 }
 
 class _WeatherState extends State<Weather> {
-  Completer<void> _refreshCompleter;
+  Completer<void>? _refreshCompleter;
 
   @override
   void initState() {
@@ -80,7 +80,7 @@ class _WeatherState extends State<Weather> {
                               .add(
                             WeatherRefreshRequested(city: weather.location),
                           );
-                          return _refreshCompleter.future;
+                          return _refreshCompleter!.future;
                         },
                         child: ListView(
                           children: <Widget>[

@@ -6,11 +6,11 @@ import 'package:weather_app/blocs/weather_bloc.dart';
 import 'package:weather_app/models/models.dart';
 
 class ThemeBloc extends IsolateBloc<WeatherState, ThemeState> {
-  final IsolateBlocWrapper weatherBloc;
-  StreamSubscription<WeatherState> _weatherStateSubscription;
+  final IsolateBlocWrapper<WeatherState> weatherBloc;
+  late StreamSubscription<WeatherState> _weatherStateSubscription;
 
   ThemeBloc({
-    @required this.weatherBloc,
+    required this.weatherBloc,
   }) : super(ThemeState.initial) {
     _weatherStateSubscription = weatherBloc.stream.listen(onEventReceived);
   }
@@ -28,7 +28,7 @@ class ThemeBloc extends IsolateBloc<WeatherState, ThemeState> {
     }
   }
 
-  ThemeState _mapWeatherCondition(WeatherCondition condition) {
+  ThemeState _mapWeatherCondition(WeatherCondition? condition) {
     ThemeState state;
     switch (condition) {
       case WeatherCondition.clear:
@@ -52,6 +52,7 @@ class ThemeBloc extends IsolateBloc<WeatherState, ThemeState> {
         state = ThemeState.thunderstorm;
         break;
       case WeatherCondition.unknown:
+      case null:
         state = ThemeState.initial;
         break;
     }
