@@ -96,10 +96,10 @@ class BlocManager {
   /// Connect [IsolateCubit] to it's [IsolateBlocWrapper].
   void bindFreeWrapper(Type blocType, String id) {
     if (_freeWrappers.containsKey(blocType) && _freeWrappers[blocType]!.isNotEmpty) {
-      throw Exception('No free bloc wrapper for $blocType');
-    } else {
       // ignore: invalid_use_of_protected_member
       _wrappers[id] = _freeWrappers[blocType]!.removeAt(0)..connectToBloc(id);
+    } else {
+      throw Exception('No free bloc wrapper for $blocType');
     }
   }
 

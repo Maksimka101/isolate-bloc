@@ -15,7 +15,7 @@ class IsolatedBlocManager {
 
   /// Initialize [IsolatedBlocManager]. Receive [IsolatedConnector].
   factory IsolatedBlocManager.initialize(IsolatedConnector connector) {
-    return IsolatedBlocManager.instance = IsolatedBlocManager._(connector);
+    return instance = IsolatedBlocManager._(connector);
   }
 
   static IsolatedBlocManager? instance;

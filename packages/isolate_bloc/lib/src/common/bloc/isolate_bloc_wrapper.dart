@@ -95,7 +95,7 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
   /// Receives [IsolateBloc]'s state and add to the state Stream.
   @protected
   void stateReceiver(State nextState) {
-    if (nextState != state) {
+    if (nextState != _state) {
       _stateController.add(nextState);
       _state = nextState;
     }

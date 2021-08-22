@@ -2,7 +2,7 @@ import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channe
 
 import 'libraries.dart';
 
-/// Signature of List of string which is used as List of method channel names
+/// Signature for List of string which is used as List of method channel names
 typedef MethodChannels = List<String>;
 
 /// Settings for [PlatformChannelMiddleware] and [IsolatedPlatformChannelMiddleware]

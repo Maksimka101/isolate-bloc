@@ -13,19 +13,18 @@ import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channe
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 import 'package:uuid/uuid.dart';
 
-
 class _IsolateSetup {
   _IsolateSetup(
-    this.fromIsolate,
+    this.fromIsolateBloc,
     this.task,
     this.userInitializer,
-    this.platformChannels,
+    this.methodChannels,
   );
 
-  final SendPort fromIsolate;
+  final SendPort fromIsolateBloc;
   final Initializer userInitializer;
   final IsolateRun task;
-  final List<String> platformChannels;
+  final MethodChannels methodChannels;
 }
 
 /// Creates and initializes [Isolate] and [IsolateMessenger].
@@ -41,12 +40,12 @@ class IOIsolateManagerFactory implements IsolateManagerFactory {
       'Initialize function must be a static or global function',
     );
 
-    final fromIsolate = ReceivePort();
-    final toIsolateCompleter = Completer<SendPort>();
+    final fromIsolateBloc = ReceivePort();
+    final toIsolateBlocCompleter = Completer<SendPort>();
     final isolate = await Isolate.spawn<_IsolateSetup>(
       _runInIsolate,
       _IsolateSetup(
-        fromIsolate.sendPort,
+        fromIsolateBloc.sendPort,
         isolateRun,
         initializer,
         methodChannels,
@@ -54,17 +53,17 @@ class IOIsolateManagerFactory implements IsolateManagerFactory {
       errorsAreFatal: false,
     );
 
-    final fromIsolateStream = fromIsolate.asBroadcastStream();
-    final subscription = fromIsolateStream.listen((message) {
+    final fromIsolateBlocStream = fromIsolateBloc.asBroadcastStream();
+    final subscription = fromIsolateBlocStream.listen((message) {
       if (message is SendPort) {
-        toIsolateCompleter.complete(message);
+        toIsolateBlocCompleter.complete(message);
       }
     });
-    final toIsolate = await toIsolateCompleter.future;
+    final toIsolate = await toIsolateBlocCompleter.future;
     await subscription.cancel();
 
     final isolateMessenger = IsolateMessenger(
-      fromIsolateStream.cast<Object>(),
+      fromIsolateBlocStream.cast<Object>(),
       toIsolate.send,
     );
 
@@ -84,18 +83,18 @@ class IOIsolateManagerFactory implements IsolateManagerFactory {
   }
 
   static Future<void> _runInIsolate(_IsolateSetup setup) async {
-    final toIsolate = ReceivePort();
-    final toIsolateStream = toIsolate.asBroadcastStream();
-    setup.fromIsolate.send(toIsolate.sendPort);
+    final toUiIsolate = ReceivePort();
+    final toUiIsolateStream = toUiIsolate.asBroadcastStream();
+    setup.fromIsolateBloc.send(toUiIsolate.sendPort);
     final isolateMessenger = IsolateMessenger(
-      toIsolateStream.cast<Object>(),
-      setup.fromIsolate.send,
+      toUiIsolateStream.cast<Object>(),
+      setup.fromIsolateBloc.send,
     );
 
     // Initialize platform channel in isolate
     IsolateBinding();
     IsolatedPlatformChannelMiddleware(
-      channels: setup.platformChannels,
+      channels: setup.methodChannels,
       platformMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
       generateId: const Uuid().v4,
       sendEvent: isolateMessenger.add,

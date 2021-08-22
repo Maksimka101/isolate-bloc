@@ -21,8 +21,7 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   void addPostFrameCallback(callback) {}
 
   @override
-  void addTimingsCallback(
-      void Function(List<ui.FrameTiming> timings) callback) {}
+  void addTimingsCallback(void Function(List<ui.FrameTiming> timings) callback) {}
 
   @override
   void cancelFrameCallbackWithId(int id) {}
@@ -71,8 +70,7 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   ui.AppLifecycleState get lifecycleState => ui.AppLifecycleState.resumed;
 
   @override
-  void removeTimingsCallback(
-      void Function(List<ui.FrameTiming> timings) callback) {}
+  void removeTimingsCallback(void Function(List<ui.FrameTiming> timings) callback) {}
 
   @override
   void resetEpoch() {}
@@ -108,5 +106,4 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   int get transientCallbackCount => throw UnimplementedError();
 }
 
-class IsolateBinding extends BindingBase
-    with MockSchedulerBinding, ServicesBinding {}
+class IsolateBinding extends BindingBase with MockSchedulerBinding, ServicesBinding {}

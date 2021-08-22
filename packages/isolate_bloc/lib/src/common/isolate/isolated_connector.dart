@@ -1,4 +1,3 @@
-
 import 'package:isolate_bloc/src/common/isolate/isolated_bloc_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/isolated_platform_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/service_events.dart';
@@ -13,6 +12,8 @@ class IsolatedConnector {
   /// Function for sending events to [IsolateConnector].
   final void Function(ServiceEvent) sendEvent;
   final Stream<ServiceEvent> _eventsStream;
+  static const _errorReason = '`IsolatedBlocManager` is null. '
+      'Maybe you forget to await `initialize` function';
 
   void _listener(ServiceEvent event) {
     if (event is IsolateBlocTransitionEvent) {
