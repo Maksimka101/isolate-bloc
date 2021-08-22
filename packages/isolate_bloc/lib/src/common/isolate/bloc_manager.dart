@@ -34,22 +34,19 @@ class BlocManager {
   final _freeWrappers = <Type, List<IsolateBlocWrapper>>{};
   final _wrappers = <String, IsolateBlocWrapper>{};
 
-  /// Create [Isolate], run user [Initializer] and perform other tasks that are
+  /// Creates [Isolate], run user's [Initializer] and perform other tasks that are
   /// necessary for this library to work.
   /// Ensure that your app or interactions with this library starts with this
   /// function.
-  /// If already initialized kill previous [Isolate] and reinitialize everything.
+  /// If already initialized kills previous [Isolate] and reinitialize.
   static Future<void> initialize(
     Initializer initializer,
-    IsolateManagerCreator createIsolate,
+    IsolateManagerFactory managerFactory,
     List<String> platformChannels,
   ) async {
-    final managerInstance = instance;
-    if (managerInstance != null) {
-      managerInstance.dispose();
-    }
+    instance?.dispose();
 
-    final isolateManager = await createIsolate(
+    final isolateManager = await managerFactory.create(
       _isolatedBlocRunner,
       initializer,
       platformChannels,

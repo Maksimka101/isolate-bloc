@@ -22,7 +22,7 @@ Future<void> testInitialize(Initializer userInitializer) async {
         case TestInitializePlatform.web:
           return native_isolate.IsolateManagerImpl.createIsolate;
         case TestInitializePlatform.native:
-          return web_isolate.IsolateManagerImpl.createIsolate;
+          return web_isolate.WebIsolateManager.createIsolate;
       }
     }(),
     [],

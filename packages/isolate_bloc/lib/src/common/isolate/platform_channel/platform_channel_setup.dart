@@ -2,6 +2,9 @@ import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channe
 
 import 'libraries.dart';
 
+/// Signature of List of string which is used as List of method channel names
+typedef MethodChannels = List<String>;
+
 /// Settings for [PlatformChannelMiddleware] and [IsolatedPlatformChannelMiddleware]
 /// In [_platformChannelPlugins] stored all known MethodChannel plugin names.
 /// They are used to receive platform message responses and requests.
@@ -29,7 +32,7 @@ class PlatformChannelSetup {
   ];
 
   /// Return all method channel names.
-  List<String> get methodChannels {
+  MethodChannels get methodChannels {
     return [
       for (final plugin in _platformChannelPlugins) ...plugin.methodChannels,
       ..._methodChannelNames,

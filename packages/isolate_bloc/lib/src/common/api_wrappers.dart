@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate/isolate_manager.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_manager/web/isolate_manager.dart';
+
 import 'bloc/isolate_bloc.dart';
 import 'bloc/isolate_bloc_wrapper.dart';
 import 'isolate/bloc_manager.dart';
-import 'isolate/isolate_manager/isolate/isolate_manager.dart'
-    if (dart.library.html) 'isolate/isolate_manager/web/isolate_manager.dart';
 import 'isolate/platform_channel/platform_channel_setup.dart';
 
 /// Starts creating [IsolateBloc] and returns [IsolateBlocWrapper].
@@ -22,10 +24,9 @@ IsolateBlocWrapper<State> createBloc<BlocT extends IsolateBloc<Object, State>, S
 /// If already initialized and [reCreate] is true kill previous [Isolate] and reinitialize everything.
 Future<void> initialize(
   Initializer userInitializer, {
-  PlatformChannelSetup? platformChannelSetup,
+  PlatformChannelSetup platformChannelSetup = const PlatformChannelSetup(),
   bool reCreate = false,
 }) async {
-  platformChannelSetup ??= const PlatformChannelSetup();
   assert(
     !reCreate && BlocManager.instance == null,
     'You can initialize only once. '
@@ -33,7 +34,7 @@ Future<void> initialize(
   );
   return BlocManager.initialize(
     userInitializer,
-    IsolateManagerImpl.createIsolate,
+    kIsWeb ? WebIsolateManagerFactory() : IOIsolateManagerFactory(),
     platformChannelSetup.methodChannels,
   );
 }

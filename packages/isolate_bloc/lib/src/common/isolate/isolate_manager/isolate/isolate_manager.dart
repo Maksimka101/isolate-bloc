@@ -8,23 +8,34 @@ import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/isolated_platform_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_middleware.dart';
+import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../bloc_manager.dart';
 import '../isolate_messenger.dart';
-import 'isolate_wrapper_impl.dart';
+import 'io_isolate_wrapper.dart';
 
-/// Create and initialize [Isolate] and [IsolateMessenger].
-class IsolateManagerImpl extends IsolateManager {
-  IsolateManagerImpl(IsolateWrapper isolate, IsolateMessenger messenger)
-      : super(isolate, messenger);
+class _IsolateSetup {
+  _IsolateSetup(
+    this.fromIsolate,
+    this.task,
+    this.userInitializer,
+    this.platformChannels,
+  );
 
-  /// Create Isolate, initialize messages and run your function
-  /// with [IsolateMessenger] and user's [Initializer] func
-  static Future<IsolateManagerImpl> createIsolate(
-    IsolateRun run,
+  final SendPort fromIsolate;
+  final Initializer userInitializer;
+  final IsolateRun task;
+  final List<String> platformChannels;
+}
+
+/// Creates and initializes [Isolate] and [IsolateMessenger].
+class IOIsolateManagerFactory implements IsolateManagerFactory {
+  @override
+  Future<IsolateManager> create(
+    IsolateRun isolateRun,
     Initializer initializer,
-    List<String> platformChannels,
+    MethodChannels methodChannels,
   ) async {
     assert(
       '$initializer'.contains(' static'),
@@ -37,9 +48,9 @@ class IsolateManagerImpl extends IsolateManager {
       _runInIsolate,
       _IsolateSetup(
         fromIsolate.sendPort,
-        run,
+        isolateRun,
         initializer,
-        platformChannels,
+        methodChannels,
       ),
       errorsAreFatal: false,
     );
@@ -64,11 +75,11 @@ class IsolateManagerImpl extends IsolateManager {
       generateId: const Uuid().v4,
       binaryMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
       sendEvent: isolateMessenger.add,
-      channels: platformChannels,
+      channels: methodChannels,
     );
 
-    return IsolateManagerImpl(
-      IsolateWrapperImpl(isolate),
+    return IsolateManager(
+      IOIsolateWrapper(isolate),
       isolateMessenger,
     );
   }
@@ -92,18 +103,4 @@ class IsolateManagerImpl extends IsolateManager {
     );
     setup.task(isolateMessenger, setup.userInitializer);
   }
-}
-
-class _IsolateSetup {
-  _IsolateSetup(
-    this.fromIsolate,
-    this.task,
-    this.userInitializer,
-    this.platformChannels,
-  );
-
-  final SendPort fromIsolate;
-  final Initializer userInitializer;
-  final IsolateRun task;
-  final List<String> platformChannels;
 }
