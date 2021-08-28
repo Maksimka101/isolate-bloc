@@ -21,13 +21,6 @@ abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
   /// The current [IsolateBlocObserver] instance.
   static IsolateBlocObserver observer = IsolateBlocObserver();
 
-  @override
-  void onEventReceived(Event event) {
-    if (!_eventController.isClosed) {
-      _eventController.add(event);
-    }
-  }
-
   /// Transforms the [events] stream along with a [transitionFn] function into
   /// a `Stream<Transition>`.
   /// Events that should be processed by [mapEventToState] need to be passed to
@@ -78,6 +71,17 @@ abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
   @visibleForTesting
   @override
   void emit(State state) => super.emit(state);
+
+  /// Called whenever new [event] received
+  ///
+  /// Can't be overridden because must adds [event] to the [_eventController]
+  @protected
+  @override
+  void onEventReceived(Event event) {
+    if (!_eventController.isClosed) {
+      _eventController.add(event);
+    }
+  }
 
   /// Must be implemented when a class extends [Bloc].
   /// [mapEventToState] is called whenever an [event] is [add]ed
