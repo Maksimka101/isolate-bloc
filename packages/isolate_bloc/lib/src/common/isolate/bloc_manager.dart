@@ -1,5 +1,4 @@
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
-import 'package:isolate_bloc/src/common/bloc/isolate_cubit.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_connector.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_manager.dart';
