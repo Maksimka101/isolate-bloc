@@ -12,8 +12,6 @@ class IsolatedConnector {
   /// Function for sending events to [IsolateConnector].
   final void Function(ServiceEvent) sendEvent;
   final Stream<ServiceEvent> _eventsStream;
-  static const _errorReason = '`IsolatedBlocManager` is null. '
-      'Maybe you forget to await `initialize` function';
 
   void _listener(ServiceEvent event) {
     if (event is IsolateBlocTransitionEvent) {

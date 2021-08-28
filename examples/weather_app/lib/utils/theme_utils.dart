@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:weather_app/blocs/theme_bloc.dart';
+import 'package:weather_app/blocs/theme_cubit.dart';
 
 MaterialColor mapThemeStateToColor(ThemeState state) {
   MaterialColor color;

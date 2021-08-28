@@ -4,11 +4,11 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:weather_app/blocs/weather_bloc.dart';
 import 'package:weather_app/models/models.dart';
 
-class ThemeBloc extends IsolateCubit<WeatherState, ThemeState> {
+class ThemeCubit extends IsolateCubit<WeatherState, ThemeState> {
   final IsolateBlocWrapper<WeatherState> weatherBloc;
   late StreamSubscription<WeatherState> _weatherStateSubscription;
 
-  ThemeBloc({
+  ThemeCubit({
     required this.weatherBloc,
   }) : super(ThemeState.initial) {
     _weatherStateSubscription = weatherBloc.stream.listen(onEventReceived);

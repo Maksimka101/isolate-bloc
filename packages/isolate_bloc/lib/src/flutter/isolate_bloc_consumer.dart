@@ -59,7 +59,7 @@ import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 /// )
 /// ```
 /// {@endtemplate}
-class IsolateBlocConsumer<C extends IsolateCubit<Object, S>, S extends Object>
+class IsolateBlocConsumer<C extends IsolateBlocBase<Object?, S>, S>
     extends StatelessWidget {
   /// {@macro bloc_consumer}
   const IsolateBlocConsumer({

@@ -3,37 +3,37 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:weather_app/models/weather.dart';
 import 'package:weather_app/repositories/repositories.dart';
 
-class WeatherBloc extends IsolateCubit<WeatherEvent, WeatherState> {
+class WeatherBloc extends IsolateBloc<WeatherEvent, WeatherState> {
   final WeatherRepository weatherRepository;
 
   WeatherBloc({required this.weatherRepository}) : super(WeatherInitial());
 
+  Stream<WeatherState> _weatherRequested(WeatherRequested event) async* {
+    yield WeatherLoadInProgress();
+    try {
+      final Weather weather = await weatherRepository.getWeather(event.city);
+      yield WeatherLoadSuccess(weather: weather);
+    } catch (e) {
+      print(e);
+      yield WeatherLoadFailure();
+    }
+  }
+
+  Stream<WeatherState> _weatherRefreshRequested(WeatherRefreshRequested event) async* {
+    try {
+      final Weather weather = await weatherRepository.getWeather(event.city);
+      yield WeatherLoadSuccess(weather: weather);
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
-  void onEventReceived(WeatherEvent event) {
+  Stream<WeatherState> mapEventToState(WeatherEvent event) async* {
     if (event is WeatherRequested) {
-      _weatherRequested(event);
+      yield* _weatherRequested(event);
     } else if (event is WeatherRefreshRequested) {
-      _weatherRefreshRequested(event);
-    }
-  }
-
-  Future<void> _weatherRequested(WeatherRequested event) async {
-    emit(WeatherLoadInProgress());
-    try {
-      final Weather weather = await weatherRepository.getWeather(event.city);
-      emit(WeatherLoadSuccess(weather: weather));
-    } catch (e) {
-      print(e);
-      emit(WeatherLoadFailure());
-    }
-  }
-
-  Future<void> _weatherRefreshRequested(WeatherRefreshRequested event) async {
-    try {
-      final Weather weather = await weatherRepository.getWeather(event.city);
-      emit(WeatherLoadSuccess(weather: weather));
-    } catch (e) {
-      print(e);
+      yield* _weatherRefreshRequested(event);
     }
   }
 }

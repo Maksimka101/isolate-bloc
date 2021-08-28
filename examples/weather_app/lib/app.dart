@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
-import 'package:weather_app/blocs/settings_bloc.dart';
-import 'package:weather_app/blocs/theme_bloc.dart';
+import 'package:weather_app/blocs/settings_cubit.dart';
+import 'package:weather_app/blocs/theme_cubit.dart';
 import 'package:weather_app/blocs/weather_bloc.dart';
 import 'package:weather_app/utils/theme_utils.dart';
 
@@ -13,8 +13,8 @@ Future<void> runWeatherApp() async {
   runApp(
     MultiIsolateBlocProvider(
       providers: [
-        IsolateBlocProvider<ThemeBloc, ThemeState>(),
-        IsolateBlocProvider<SettingsBloc, SettingsState>(),
+        IsolateBlocProvider<ThemeCubit, ThemeState>(),
+        IsolateBlocProvider<SettingsCubit, SettingsState>(),
         IsolateBlocProvider<WeatherBloc, WeatherState>(),
       ],
       child: App(),
@@ -25,7 +25,7 @@ Future<void> runWeatherApp() async {
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return IsolateBlocBuilder<ThemeBloc, ThemeState>(
+    return IsolateBlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, themeState) {
         return MaterialApp(
           title: 'Flutter weather',

@@ -6,7 +6,7 @@ import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'isolate_cubit.dart';
 import 'transition.dart';
 
-/// An interface for observing the behavior of [IsolateCubit] instances.
+/// An interface for observing the behavior of [IsolateBloc] and [IsolateCubit] instances.
 class IsolateBlocObserver {
   /// Called whenever a [Bloc] is instantiated.
   /// In many cases, a cubit may be lazily instantiated and

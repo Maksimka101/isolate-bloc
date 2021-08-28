@@ -1,12 +1,13 @@
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_cubit.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/isolated_bloc_manager.dart';
 
-/// Registers [IsolateCubit].
+/// Registers [IsolateBlocBase].
 ///
-/// You can create [IsolateCubit] and get [IsolateBlocWrapper] using
-/// [createBloc] only if you have registered this [IsolateCubit].
+/// You can create [IsolateBlocBase] and get [IsolateBlocWrapper] using
+/// [createBloc] only if you have registered this [IsolateBlocBase].
 ///
 /// Throws [IsolatedBlocManagerUnInitialized] if [IsolatedBlocManager] is null
 void register({
@@ -20,7 +21,7 @@ void register({
   }
 }
 
-/// Use this function to get [IsolateCubit] in [Isolate].
+/// Use this function to get [IsolateBlocBase] in [Isolate].
 ///
 /// To get bloc in UI Isolate use IsolateBlocProvider which returns [IsolateBlocWrapper].
 /// This function works this way: firstly it is wait for user's [Initializer] function
@@ -30,7 +31,7 @@ void register({
 /// return free bloc from pull.
 ///
 /// Throws [IsolatedBlocManagerUnInitialized] if [IsolatedBlocManager] is null
-IsolateBlocWrapper<State> getBloc<Bloc extends IsolateCubit<Object, State>, State extends Object>() {
+IsolateBlocWrapper<State> getBloc<Bloc extends IsolateBlocBase<Object, State>, State>() {
   final blocManager = IsolatedBlocManager.instance;
   if (blocManager == null) {
     throw IsolatedBlocManagerUnInitialized();

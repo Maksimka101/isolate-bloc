@@ -80,7 +80,7 @@ class IsolatedBlocManager {
   /// returns this bloc's [IsolateBlocWrapper]. Else it is creates a new bloc and
   /// add to the pull of free blocs. So when UI will call `create()`, it will not create a new bloc but
   /// return free bloc from pull.
-  IsolateBlocWrapper<State> getBlocWrapper<Bloc extends IsolateBlocBase<Object?, State>, State extends Object>() {
+  IsolateBlocWrapper<State> getBlocWrapper<Bloc extends IsolateBlocBase<Object?, State>, State>() {
     late IsolateBlocWrapper<State> wrapper;
     Bloc? isolateBloc;
     _getBloc<Bloc>().then((bloc) {

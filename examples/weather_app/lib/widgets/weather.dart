@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
-import 'package:weather_app/blocs/theme_bloc.dart';
+import 'package:weather_app/blocs/theme_cubit.dart';
 import 'package:weather_app/blocs/weather_bloc.dart';
 import 'package:weather_app/utils/theme_utils.dart';
 import 'package:weather_app/widgets/widgets.dart';
@@ -56,7 +56,7 @@ class _WeatherState extends State<Weather> {
         ],
       ),
       body: Center(
-        child: IsolateBlocListener<ThemeBloc, ThemeState>(
+        child: IsolateBlocListener<ThemeCubit, ThemeState>(
           listener: (context, state) {
             _refreshCompleter?.complete();
             _refreshCompleter = Completer();
@@ -69,7 +69,7 @@ class _WeatherState extends State<Weather> {
               if (state is WeatherLoadSuccess) {
                 final weather = state.weather;
 
-                return IsolateBlocBuilder<ThemeBloc, ThemeState>(
+                return IsolateBlocBuilder<ThemeCubit, ThemeState>(
                   builder: (context, themeState) {
                     return GradientContainer(
                       color: mapThemeStateToColor(themeState),

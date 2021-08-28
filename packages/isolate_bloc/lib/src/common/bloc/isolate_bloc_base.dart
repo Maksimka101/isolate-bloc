@@ -28,7 +28,7 @@ class BlocUnhandledErrorException implements Exception {
 
 /// {@template bloc_stream}
 /// An interface for the core functionality implemented by
-/// both [IsolateCubit] and [IsolateCubit].
+/// both [IsolateCubit] and [IsolateBloc].
 /// {@endtemplate}
 abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
   /// {@macro bloc_stream}
@@ -45,6 +45,9 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
   State _state;
 
   bool _emitted = false;
+  
+  /// Whenever first emit is called
+  bool get emitted => _emitted;
 
   /// This is bloc's id. Every [IsolateBlocBase] have it's own unique id used to
   /// communicate with it's own [IsolateBlocWrapper].

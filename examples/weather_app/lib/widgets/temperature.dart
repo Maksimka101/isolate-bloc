@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:weather_app/blocs/settings_bloc.dart';
+import 'package:weather_app/blocs/settings_cubit.dart';
 
 class Temperature extends StatelessWidget {
   final double temperature;

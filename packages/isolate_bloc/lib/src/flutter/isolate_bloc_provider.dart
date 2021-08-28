@@ -7,7 +7,7 @@ import 'package:nested/nested.dart';
 import 'package:provider/provider.dart';
 
 /// A function that creates a `Bloc` of type [T].
-typedef CreateIsolateBloc<T extends IsolateBlocBase<Object, Object>> = T Function(
+typedef CreateIsolateBloc<T extends IsolateBlocBase<Object?, Object?>> = T Function(
   BuildContext context,
 );
 
@@ -31,7 +31,7 @@ mixin IsolateBlocProviderSingleChildWidget on SingleChildWidget {}
 /// );
 /// ```
 /// {@endtemplate}
-class IsolateBlocProvider<T extends IsolateBlocBase<Object, State>, State extends Object>
+class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State>
     extends SingleChildStatelessWidget with IsolateBlocProviderSingleChildWidget {
   /// {@macro bloc_provider}
   IsolateBlocProvider({

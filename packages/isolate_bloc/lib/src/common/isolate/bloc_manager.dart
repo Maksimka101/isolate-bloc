@@ -69,8 +69,8 @@ class BlocManager {
     );
   }
 
-  /// Start creating [IsolateCubit] and return [IsolateBlocWrapper].
-  IsolateBlocWrapper<State> createBloc<T extends IsolateBlocBase, State extends Object>() {
+  /// Start creating [IsolateBlocBase] and return [IsolateBlocWrapper].
+  IsolateBlocWrapper<State> createBloc<T extends IsolateBlocBase, State>() {
     void onBlocClose(String? uuid) {
       if (uuid != null) {
         _isolateConnector.sendEvent(CloseIsolateBlocEvent(uuid));
@@ -92,8 +92,8 @@ class BlocManager {
     return blocWrapper;
   }
 
-  /// Finish [IsolateCubit] creating which started by call [createBloc].
-  /// Connect [IsolateCubit] to it's [IsolateBlocWrapper].
+  /// Finish [IsolateBlocBase] creating which started by call [createBloc].
+  /// Connect [IsolateBlocBase] to it's [IsolateBlocWrapper].
   void bindFreeWrapper(Type blocType, String id) {
     if (_freeWrappers.containsKey(blocType) && _freeWrappers[blocType]!.isNotEmpty) {
       // ignore: invalid_use_of_protected_member
@@ -103,7 +103,7 @@ class BlocManager {
     }
   }
 
-  /// Call when new state from [IsolateCubit] received.
+  /// Call when new state from [IsolateBlocBase] received.
   /// Find wrapper by bloc id and add new state to it.
   void blocStateReceiver(String blocId, Object? state) {
     // ignore: invalid_use_of_protected_member
@@ -134,7 +134,7 @@ class BlocManager {
     isolateBlocManager.initializeCompleted();
   }
 
-  /// Free all resources and kill [Isolate] with [IsolateCubit]s.
+  /// Free all resources and kill [Isolate] with [IsolateBlocBase]s.
   void dispose() {
     _isolateManager.isolate.kill();
     _isolateConnector.dispose();

@@ -73,7 +73,7 @@ typedef IsolateBlocBuilderCondition<S> = bool Function(S previous, S current);
 ///)
 /// ```
 /// {@endtemplate}
-class IsolateBlocBuilder<C extends IsolateBlocBase<Object, S>, S extends Object> extends IsolateBlocBuilderBase<C, S> {
+class IsolateBlocBuilder<C extends IsolateBlocBase<Object?, S>, S> extends IsolateBlocBuilderBase<C, S> {
   /// {@macro bloc_builder}
   const IsolateBlocBuilder({
     Key? key,
