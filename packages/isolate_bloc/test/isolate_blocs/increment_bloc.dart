@@ -1,7 +1,7 @@
 import 'package:isolate_bloc/isolate_bloc.dart';
 
 /// Simple counter bloc. Increment state on `true` event and decrement on `false`
-class CounterBloc extends IsolateBloc<bool, int> {
+class CounterBloc extends IsolateCubit<bool, int> {
   CounterBloc() : super(0);
 
   @override

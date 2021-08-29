@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:weather_app/blocs/theme_bloc.dart';
+import 'package:weather_app/blocs/theme_cubit.dart';
 
-Color mapThemeStateToColor(ThemeState state) {
-  Color color;
+MaterialColor mapThemeStateToColor(ThemeState state) {
+  MaterialColor color;
   switch (state) {
     case ThemeState.clear:
       color = Colors.yellow;

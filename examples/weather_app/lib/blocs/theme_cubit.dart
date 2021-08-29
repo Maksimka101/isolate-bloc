@@ -1,18 +1,17 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:weather_app/blocs/weather_bloc.dart';
 import 'package:weather_app/models/models.dart';
 
-class ThemeBloc extends IsolateBloc<WeatherState, ThemeState> {
-  final IsolateBlocWrapper weatherBloc;
-  StreamSubscription<WeatherState> _weatherStateSubscription;
+class ThemeCubit extends IsolateCubit<WeatherState, ThemeState> {
+  final IsolateBlocWrapper<WeatherState> weatherBloc;
+  late StreamSubscription<WeatherState> _weatherStateSubscription;
 
-  ThemeBloc({
-    @required this.weatherBloc,
+  ThemeCubit({
+    required this.weatherBloc,
   }) : super(ThemeState.initial) {
-    _weatherStateSubscription = weatherBloc.listen(onEventReceived);
+    _weatherStateSubscription = weatherBloc.stream.listen(onEventReceived);
   }
 
   @override
@@ -28,7 +27,7 @@ class ThemeBloc extends IsolateBloc<WeatherState, ThemeState> {
     }
   }
 
-  ThemeState _mapWeatherCondition(WeatherCondition condition) {
+  ThemeState _mapWeatherCondition(WeatherCondition? condition) {
     ThemeState state;
     switch (condition) {
       case WeatherCondition.clear:
@@ -52,6 +51,7 @@ class ThemeBloc extends IsolateBloc<WeatherState, ThemeState> {
         state = ThemeState.thunderstorm;
         break;
       case WeatherCondition.unknown:
+      case null:
         state = ThemeState.initial;
         break;
     }
@@ -60,7 +60,7 @@ class ThemeBloc extends IsolateBloc<WeatherState, ThemeState> {
 
   @override
   Future<void> close() {
-    _weatherStateSubscription?.cancel();
+    _weatherStateSubscription.cancel();
     return super.close();
   }
 }

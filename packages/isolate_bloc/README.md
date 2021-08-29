@@ -8,7 +8,6 @@
 </p>
 
 ---
-
 # Overview 
 The goal of this package is to make it easy to work with `BLoC` and `Isolate`.
 
@@ -20,11 +19,23 @@ This package works on all flutter platforms.
 
 You can read about BLoC pattern [here](https://www.didierboelens.com/2018/08/reactive-programming-streams-bloc/).
 
-## Creating a Bloc
+# Attention
+Before using this package, I recommend reading the article about [performance of Isolate](https://cretezy.com/2020/flutter-fast-json).
+
+When moving data between isolates, they are copied, wasting memory and cpu time. 
+
+Now Dart team is working on [new Isolates](https://github.com/dart-lang/sdk/issues/36097) which can start quickly and move immutable data faster and without coping. I hope they will be able to sufficiently improve the interaction between the isolates. This will allow more people to use this package
+
+
+## Bloc and Cubit
+todo: Tell about differences between Bloc and Cubit
+
+## Creating
+### IsolateCubit
 ```dart
-class CounterBloc extends IsolateBloc<CountEvent, int> {
-  /// The initial state of the `CounterBloc` is 0.
-  CounterBloc() : super(0);
+class CounterCubit extends IsolateCubit<CountEvent, int> {
+  /// The initial state of the `CounterCubit` is 0.
+  CounterCubit() : super(0);
 
   /// When `CountEvent` is received, the current state
   /// of the bloc is accessed via `state` and
@@ -36,21 +47,36 @@ class CounterBloc extends IsolateBloc<CountEvent, int> {
 }
 ```
 
-## Registering a Bloc
+### IsolateBloc
+```dart
+class CounterBloc extends IsolateBloc<CountEvent, int> {
+  /// The initial state of the `CounterBloc` is 0.
+  CounterBloc() : super(0);
+
+  /// When a `CounterEvent.increment` event is added,
+  /// the current `state` of the bloc is accessed via the `state` property
+  /// and a new state is emitted via `yield`.
+  Stream<int> mapEventToState(CountEvent event) async* {
+    yield event == CountEvent.increment ? state+1 : state-1;
+  }
+}
+```
+
+## Registering a Bloc or Cubit
 ```dart
 void main() async {
   await initialize(isolatedFunc);
   ...
 }
 
-/// Global function which is used to register blocs and called in Isolate
+/// Global function which is used to register blocs or cubits and called in Isolate
 void isolatedFunc() {
-  /// Register a bloc to be able to create it in main Isolate
+  /// Register a bloc or cubit to be able to create it in main Isolate
   register(create: () => CounterBloc());
 }
 ```
 
-## Using Bloc in UI
+## Using Bloc or Cubit in UI
 ```dart
 YourWidget(
   /// Create CounterBloc and provide it down to the widget tree

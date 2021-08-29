@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
-import 'package:weather_app/blocs/settings_bloc.dart';
+import 'package:weather_app/blocs/settings_cubit.dart';
 
 class Settings extends StatelessWidget {
   @override
@@ -9,7 +9,7 @@ class Settings extends StatelessWidget {
       appBar: AppBar(title: Text('Settings')),
       body: ListView(
         children: <Widget>[
-          IsolateBlocBuilder<SettingsBloc, SettingsState>(
+          IsolateBlocBuilder<SettingsCubit, SettingsState>(
             builder: (context, state) {
               return ListTile(
                 title: Text(
@@ -21,7 +21,7 @@ class Settings extends StatelessWidget {
                 trailing: Switch(
                   value: state.temperatureUnits == TemperatureUnits.celsius,
                   onChanged: (_) =>
-                      IsolateBlocProvider.of<SettingsBloc, SettingsState>(
+                      IsolateBlocProvider.of<SettingsCubit, SettingsState>(
                               context)
                           .add(TemperatureUnitsToggled()),
                 ),

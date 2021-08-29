@@ -1,6 +1,6 @@
-import 'isolated_bloc_manager.dart';
-import 'platform_channel/isolated_platform_channel_middleware.dart';
-import 'service_events.dart';
+import 'package:isolate_bloc/src/common/isolate/isolated_bloc_manager.dart';
+import 'package:isolate_bloc/src/common/isolate/platform_channel/isolated_platform_channel_middleware.dart';
+import 'package:isolate_bloc/src/common/isolate/service_events.dart';
 
 /// Listen for [ServiceEvent]s in Isolate
 class IsolatedConnector {
@@ -15,18 +15,50 @@ class IsolatedConnector {
 
   void _listener(ServiceEvent event) {
     if (event is IsolateBlocTransitionEvent) {
-      IsolatedBlocManager.instance
-          .blocEventReceiver(event.blocUuid, event.event);
+      final blocManager = IsolatedBlocManager.instance;
+      if (blocManager == null) {
+        print("Failed to receive event in Isolate. Bloc manager is null");
+      } else {
+        blocManager.blocEventReceiver(event.blocUuid, event.event);
+      }
     } else if (event is CreateIsolateBlocEvent) {
-      IsolatedBlocManager.instance.createBloc(event.blocType);
+      final blocManager = IsolatedBlocManager.instance;
+      if (blocManager == null) {
+        print("Failed to create IsolateBloc. Bloc manager is null");
+      } else {
+        blocManager.createBloc(event.blocType);
+      }
     } else if (event is CloseIsolateBlocEvent) {
-      IsolatedBlocManager.instance.closeBloc(event.blocUuid);
+      final blocManager = IsolatedBlocManager.instance;
+      if (blocManager == null) {
+        print("Failed to close IsolateBloc. Bloc manager is null");
+      } else {
+        blocManager.closeBloc(event.blocUuid);
+      }
     } else if (event is PlatformChannelResponseEvent) {
-      IsolatedPlatformChannelMiddleware.instance
-          .platformChannelResponse(event.id, event.data);
+      final middleware = IsolatedPlatformChannelMiddleware.instance;
+      if (middleware == null) {
+        print(
+          "Failed to receive platform channel data. "
+          "Platform channel middleware is null",
+        );
+      } else {
+        middleware.platformChannelResponse(event.id, event.data);
+      }
     } else if (event is InvokeMethodChannelEvent) {
-      IsolatedPlatformChannelMiddleware.instance
-          .handlePlatformMessage(event.channel, event.id, event.data);
+      final middleware = IsolatedPlatformChannelMiddleware.instance;
+      if (middleware == null) {
+        print(
+          "Failed to send platform channel data. "
+          "Platform channel middleware is null",
+        );
+      } else {
+        middleware.handlePlatformMessage(
+          event.channel,
+          event.id,
+          event.data,
+        );
+      }
     }
   }
 }

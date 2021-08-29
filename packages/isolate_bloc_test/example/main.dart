@@ -6,7 +6,7 @@ void main() {
   group('Simple test', () {
     test('Test correct initial state', () async {
       await initializeMock(initializer);
-      expect(await createBloc<SimpleBloc, String>().first, '');
+      expect(await createBloc<SimpleBloc, String>().stream.first, '');
     });
   });
 }
@@ -15,7 +15,7 @@ void initializer() {
   register(create: () => SimpleBloc());
 }
 
-class SimpleBloc extends IsolateBloc<Object, String> {
+class SimpleBloc extends IsolateCubit<Object, String> {
   SimpleBloc() : super('');
 
   @override

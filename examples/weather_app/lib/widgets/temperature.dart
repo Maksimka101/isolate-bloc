@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:weather_app/blocs/settings_bloc.dart';
+import 'package:weather_app/blocs/settings_cubit.dart';
 
 class Temperature extends StatelessWidget {
   final double temperature;
@@ -8,11 +8,11 @@ class Temperature extends StatelessWidget {
   final TemperatureUnits units;
 
   Temperature({
-    Key key,
-    this.temperature,
-    this.low,
-    this.high,
-    this.units,
+    Key? key,
+    required this.temperature,
+    required this.low,
+    required this.high,
+    required this.units,
   }) : super(key: key);
 
   @override

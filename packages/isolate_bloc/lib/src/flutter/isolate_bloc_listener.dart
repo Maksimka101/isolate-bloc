@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:isolate_bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:nested/nested.dart';
-import '../common/bloc/isolate_bloc.dart';
-import '../common/bloc/isolate_bloc_wrapper.dart';
-import 'isolate_bloc_provider.dart';
 
 /// Mixin which allows `IsolateMultiBlocListener` to infer the types
 /// of multiple [IsolateBlocListener]s.
@@ -14,7 +13,9 @@ mixin IsolateBlocListenerSingleChildWidget on SingleChildWidget {}
 /// with the `state` and is responsible for executing in response to
 /// `state` changes.
 typedef IsolateBlocWidgetListener<S> = void Function(
-    BuildContext context, S state);
+  BuildContext context,
+  S state,
+);
 
 /// Signature for the `listenWhen` function which takes the previous `state`
 /// and the current `state` and is responsible for returning a [bool] which
@@ -79,29 +80,22 @@ typedef IsolateBlocListenerCondition<S> = bool Function(S previous, S current);
 /// )
 /// ```
 /// {@endtemplate}
-class IsolateBlocListener<C extends IsolateBloc<Object, S>, S>
-    extends IsolateBlocListenerBase<C, S>
+class IsolateBlocListener<C extends IsolateBlocBase<Object?, S>, S> extends IsolateBlocListenerBase<C, S>
     with IsolateBlocListenerSingleChildWidget {
   /// {@macro bloc_listener}
   const IsolateBlocListener({
-    Key key,
-    @required IsolateBlocWidgetListener<S> listener,
-    IsolateBlocWrapper<S> isolateBloc,
-    IsolateBlocListenerCondition<S> listenWhen,
-    this.child,
-  })  : assert(listener != null),
-        super(
+    Key? key,
+    required IsolateBlocWidgetListener<S> listener,
+    IsolateBlocWrapper<S>? isolateBloc,
+    IsolateBlocListenerCondition<S>? listenWhen,
+    Widget? child,
+  }) : super(
           key: key,
           child: child,
           listener: listener,
           isolateBloc: isolateBloc,
           listenWhen: listenWhen,
         );
-
-  /// The widget which will be rendered as a descendant of the [IsolateBlocListener].
-  @override
-  // ignore: overridden_fields
-  final Widget child;
 }
 
 /// {@template bloc_listener_base}
@@ -111,11 +105,10 @@ class IsolateBlocListener<C extends IsolateBloc<Object, S>, S>
 /// The type of the state and what happens with each state change
 /// is defined by sub-classes.
 /// {@endtemplate}
-abstract class IsolateBlocListenerBase<C extends IsolateBloc<Object, S>, S>
-    extends SingleChildStatefulWidget {
+abstract class IsolateBlocListenerBase<C extends IsolateBlocBase<Object?, S>, S> extends SingleChildStatefulWidget {
   /// {@macro bloc_listener_base}
   const IsolateBlocListenerBase({
-    Key key,
+    Key? key,
     this.listener,
     this.isolateBloc,
     this.child,
@@ -124,30 +117,29 @@ abstract class IsolateBlocListenerBase<C extends IsolateBloc<Object, S>, S>
 
   /// The widget which will be rendered as a descendant of the
   /// [IsolateBlocListenerBase].
-  final Widget child;
+  final Widget? child;
 
   /// The [isolateBloc] whose `state` will be listened to.
   /// Whenever the [isolateBloc]'s `state` changes, [listener] will be invoked.
-  final IsolateBlocWrapper<S> isolateBloc;
+  final IsolateBlocWrapper<S>? isolateBloc;
 
   /// The [IsolateBlocWidgetListener] which will be called on every `state` change.
   /// This [listener] should be used for any code which needs to execute
   /// in response to a `state` change.
-  final IsolateBlocWidgetListener<S> listener;
+  final IsolateBlocWidgetListener<S>? listener;
 
   /// {@macro bloc_listener_listen_when}
-  final IsolateBlocListenerCondition<S> listenWhen;
+  final IsolateBlocListenerCondition<S>? listenWhen;
 
   @override
-  SingleChildState<IsolateBlocListenerBase<C, S>> createState() =>
-      _BlocListenerBaseState<C, S>();
+  SingleChildState<IsolateBlocListenerBase<C, S>> createState() => _BlocListenerBaseState<C, S>();
 }
 
-class _BlocListenerBaseState<C extends IsolateBloc<Object, S>, S>
+class _BlocListenerBaseState<C extends IsolateBlocBase<Object?, S>, S>
     extends SingleChildState<IsolateBlocListenerBase<C, S>> {
-  StreamSubscription<S> _subscription;
-  S _previousState;
-  IsolateBlocWrapper<S> _isolateBlocWrapper;
+  StreamSubscription<S>? _subscription;
+  S? _previousState;
+  IsolateBlocWrapper<S>? _isolateBlocWrapper;
 
   @override
   void initState() {
@@ -160,9 +152,7 @@ class _BlocListenerBaseState<C extends IsolateBloc<Object, S>, S>
   @override
   void didUpdateWidget(IsolateBlocListenerBase<C, S> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // ignore: close_sinks
     final oldCubit = oldWidget.isolateBloc ?? context.isolateBloc<C, S>();
-    // ignore: close_sinks
     final currentCubit = widget.isolateBloc ?? oldCubit;
     if (oldCubit != currentCubit) {
       if (_subscription != null) {
@@ -175,7 +165,9 @@ class _BlocListenerBaseState<C extends IsolateBloc<Object, S>, S>
   }
 
   @override
-  Widget buildWithChild(BuildContext context, Widget child) => child;
+  Widget buildWithChild(BuildContext context, Widget? child) {
+    return child ?? const SizedBox.shrink();
+  }
 
   @override
   void dispose() {
@@ -185,9 +177,9 @@ class _BlocListenerBaseState<C extends IsolateBloc<Object, S>, S>
 
   void _subscribe() {
     if (_isolateBlocWrapper != null) {
-      _subscription = _isolateBlocWrapper.listen((state) {
-        if (widget.listenWhen?.call(_previousState, state) ?? true) {
-          widget.listener(context, state);
+      _subscription = _isolateBlocWrapper?.stream.listen((state) {
+        if (widget.listenWhen?.call(_previousState!, state) ?? true) {
+          widget.listener?.call(context, state);
         }
         _previousState = state;
       });
@@ -195,9 +187,7 @@ class _BlocListenerBaseState<C extends IsolateBloc<Object, S>, S>
   }
 
   void _unsubscribe() {
-    if (_subscription != null) {
-      _subscription.cancel();
-      _subscription = null;
-    }
+    _subscription?.cancel();
+    _subscription = null;
   }
 }

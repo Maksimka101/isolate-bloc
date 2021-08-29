@@ -3,105 +3,102 @@ import 'dart:isolate';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_binding.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_wrapper.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate/io_isolate_wrapper.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/isolated_platform_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_middleware.dart';
+import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../bloc_manager.dart';
-import '../isolate_messenger.dart';
-import 'isolate_wrapper_impl.dart';
+class _IsolateSetup {
+  _IsolateSetup(
+    this.fromIsolateBloc,
+    this.task,
+    this.userInitializer,
+    this.methodChannels,
+  );
 
-/// Create and initialize [Isolate] and [IsolateMessenger].
-class IsolateManagerImpl extends IsolateManager {
-  IsolateManagerImpl(IsolateWrapper isolate, IsolateMessenger messenger)
-      : super(isolate, messenger);
+  final SendPort fromIsolateBloc;
+  final Initializer userInitializer;
+  final IsolateRun task;
+  final MethodChannels methodChannels;
+}
 
-  /// Create Isolate, initialize messages and run your function
-  /// with [IsolateMessenger] and user's [Initializer] func
-  static Future<IsolateManagerImpl> createIsolate(
-    IsolateRun run,
-    Initializer initializer, [
-    List<String> platformChannels,
-  ]) async {
+/// Creates and initializes [Isolate] and [IsolateMessenger].
+class IOIsolateManagerFactory implements IsolateManagerFactory {
+  @override
+  Future<IsolateManager> create(
+    IsolateRun isolateRun,
+    Initializer initializer,
+    MethodChannels methodChannels,
+  ) async {
     assert(
       '$initializer'.contains(' static'),
       'Initialize function must be a static or global function',
     );
 
-    final fromIsolate = ReceivePort();
-    final toIsolateCompleter = Completer<SendPort>();
+    final fromIsolateBloc = ReceivePort();
+    final toIsolateBlocCompleter = Completer<SendPort>();
     final isolate = await Isolate.spawn<_IsolateSetup>(
       _runInIsolate,
       _IsolateSetup(
-        fromIsolate.sendPort,
-        run,
+        fromIsolateBloc.sendPort,
+        isolateRun,
         initializer,
-        platformChannels,
+        methodChannels,
       ),
       errorsAreFatal: false,
     );
 
-    final fromIsolateStream = fromIsolate.asBroadcastStream();
-    final subscription = fromIsolateStream.listen((message) {
+    final fromIsolateBlocStream = fromIsolateBloc.asBroadcastStream();
+    final subscription = fromIsolateBlocStream.listen((message) {
       if (message is SendPort) {
-        toIsolateCompleter.complete(message);
+        toIsolateBlocCompleter.complete(message);
       }
     });
-    final toIsolate = await toIsolateCompleter.future;
+    final toIsolate = await toIsolateBlocCompleter.future;
     await subscription.cancel();
 
-    final isolateMessenger =
-        IsolateMessenger(fromIsolateStream, toIsolate.send);
+    final isolateMessenger = IsolateMessenger(
+      fromIsolateBlocStream.cast<Object>(),
+      toIsolate.send,
+    );
 
     // Initialize platform channel
     WidgetsFlutterBinding.ensureInitialized();
     MethodChannelMiddleware(
-      generateId: Uuid().v4,
-      binaryMessenger: ServicesBinding.instance.defaultBinaryMessenger,
+      generateId: const Uuid().v4,
+      binaryMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
       sendEvent: isolateMessenger.add,
-      channels: platformChannels,
+      channels: methodChannels,
     );
 
-    return IsolateManagerImpl(
-      IsolateWrapperImpl(isolate),
+    return IsolateManager(
+      IOIsolateWrapper(isolate),
       isolateMessenger,
     );
   }
 
   static Future<void> _runInIsolate(_IsolateSetup setup) async {
-    final toIsolate = ReceivePort();
-    final toIsolateStream = toIsolate.asBroadcastStream();
-    setup.fromIsolate.send(toIsolate.sendPort);
+    final toUiIsolate = ReceivePort();
+    final toUiIsolateStream = toUiIsolate.asBroadcastStream();
+    setup.fromIsolateBloc.send(toUiIsolate.sendPort);
     final isolateMessenger = IsolateMessenger(
-      toIsolateStream,
-      setup.fromIsolate.send,
+      toUiIsolateStream.cast<Object>(),
+      setup.fromIsolateBloc.send,
     );
 
     // Initialize platform channel in isolate
     IsolateBinding();
     IsolatedPlatformChannelMiddleware(
-      channels: setup.platformChannels,
-      platformMessenger: ServicesBinding.instance.defaultBinaryMessenger,
-      generateId: Uuid().v4,
+      channels: setup.methodChannels,
+      platformMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
+      generateId: const Uuid().v4,
       sendEvent: isolateMessenger.add,
     );
     setup.task(isolateMessenger, setup.userInitializer);
   }
-}
-
-class _IsolateSetup {
-  _IsolateSetup(
-    this.fromIsolate,
-    this.task,
-    this.userInitializer,
-    this.platformChannels,
-  );
-
-  final SendPort fromIsolate;
-  final Initializer userInitializer;
-  final IsolateRun task;
-  final List<String> platformChannels;
 }

@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'bloc_manager.dart';
-import 'platform_channel/platform_channel_middleware.dart';
-import 'service_events.dart';
+import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
+import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_middleware.dart';
+import 'package:isolate_bloc/src/common/isolate/service_events.dart';
 
 /// Listen for [ServiceEvent]s from isolate
 class IsolateConnector {
@@ -14,8 +14,8 @@ class IsolateConnector {
   /// Function for sending events to [IsolatedConnector].
   final void Function(ServiceEvent) sendEvent;
   final Stream<ServiceEvent> _eventsStream;
-  StreamSubscription<ServiceEvent> _eventSubscription;
-  final _initializeCompleter = Completer<Map<Type, Object>>();
+  late StreamSubscription<ServiceEvent> _eventSubscription;
+  final _initializeCompleter = Completer<Map<Type, Object?>>();
 
   /// Return [Map] with [IsolateBloc] type to it's initial state.
   /// ```dart
@@ -23,7 +23,7 @@ class IsolateConnector {
   ///   IsolateBlocType: IsolateBlocState,
   /// })
   /// ```
-  Future<Map<Type, Object>> get initialStates async {
+  Future<Map<Type, Object?>> get initialStates async {
     return _initializeCompleter.future;
   }
 
@@ -31,20 +31,42 @@ class IsolateConnector {
     if (event is IsolateBlocsInitialized) {
       _initializeCompleter.complete(event.initialStates);
     } else if (event is IsolateBlocCreatedEvent) {
-      BlocManager.instance.bindFreeWrapper(event.blocType, event.blocUuid);
+      final blocManager = BlocManager.instance;
+      if (blocManager == null) {
+        // todo(maksim): Replace with exception
+        print("BlocManager is null. Maybe you forgot to initialize?");
+      } else {
+        blocManager.bindFreeWrapper(event.blocType, event.blocUuid);
+      }
     } else if (event is IsolateBlocTransitionEvent) {
-      BlocManager.instance.blocStateReceiver(event.blocUuid, event.event);
+      final blocManager = BlocManager.instance;
+      if (blocManager == null) {
+        // todo(maksim): Replace with exception
+        print("BlocManager is null. Maybe you forgot to initialize?");
+      } else {
+        blocManager.blocStateReceiver(event.blocUuid, event.event);
+      }
     } else if (event is InvokePlatformChannelEvent) {
-      MethodChannelMiddleware.instance
-          .send(event.channel, event.data, event.id);
+      final methodChannelMiddleware = MethodChannelMiddleware.instance;
+      if (methodChannelMiddleware == null) {
+        // todo(maksim): Replace with exception
+        print("MethodChannelMiddleware is null. Maybe you forgot to initialize?");
+      } else {
+        methodChannelMiddleware.send(event.channel, event.data, event.id);
+      }
     } else if (event is MethodChannelResponseEvent) {
-      MethodChannelMiddleware.instance
-          .methodChannelResponse(event.id, event.data);
+      final methodChannelMiddleware = MethodChannelMiddleware.instance;
+      if (methodChannelMiddleware == null) {
+        // todo(maksim): Replace with exception
+        print("MethodChannelMiddleware is null. Maybe you forgot to initialize?");
+      } else {
+        methodChannelMiddleware.methodChannelResponse(event.id, event.data);
+      }
     }
   }
 
   /// Free all resources.
   void dispose() {
-    _eventSubscription?.cancel();
+    _eventSubscription.cancel();
   }
 }

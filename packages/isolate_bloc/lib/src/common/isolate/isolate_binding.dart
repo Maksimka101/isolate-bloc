@@ -12,8 +12,7 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   }
 
   @override
-  // ignore: prefer_typing_uninitialized_variables
-  var schedulingStrategy;
+  var schedulingStrategy = defaultSchedulingStrategy;
 
   @override
   void addPersistentFrameCallback(callback) {}
@@ -22,8 +21,7 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   void addPostFrameCallback(callback) {}
 
   @override
-  void addTimingsCallback(
-      void Function(List<ui.FrameTiming> timings) callback) {}
+  void addTimingsCallback(void Function(List<ui.FrameTiming> timings) callback) {}
 
   @override
   void cancelFrameCallbackWithId(int id) {}
@@ -55,7 +53,7 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   void handleAppLifecycleStateChanged(ui.AppLifecycleState state) {}
 
   @override
-  void handleBeginFrame(Duration rawTimeStamp) {}
+  void handleBeginFrame(Duration? rawTimeStamp) {}
 
   @override
   void handleDrawFrame() {}
@@ -72,8 +70,7 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   ui.AppLifecycleState get lifecycleState => ui.AppLifecycleState.resumed;
 
   @override
-  void removeTimingsCallback(
-      void Function(List<ui.FrameTiming> timings) callback) {}
+  void removeTimingsCallback(void Function(List<ui.FrameTiming> timings) callback) {}
 
   @override
   void resetEpoch() {}
@@ -90,8 +87,12 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   }
 
   @override
-  Future<T> scheduleTask<T>(task, Priority priority,
-      {String debugLabel, Flow flow}) {
+  Future<T> scheduleTask<T>(
+    TaskCallback<T> task,
+    Priority priority, {
+    String? debugLabel,
+    Flow? flow,
+  }) {
     throw UnimplementedError();
   }
 
@@ -105,5 +106,4 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   int get transientCallbackCount => throw UnimplementedError();
 }
 
-class IsolateBinding extends BindingBase
-    with MockSchedulerBinding, ServicesBinding {}
+class IsolateBinding extends BindingBase with MockSchedulerBinding, ServicesBinding {}

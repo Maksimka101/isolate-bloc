@@ -12,9 +12,9 @@ import 'change.dart';
 class Transition<Event, State> extends Change<State> {
   /// {@macro transition}
   const Transition({
-    @required State currentState,
-    @required this.event,
-    @required State nextState,
+    required State currentState,
+    required this.event,
+    required State nextState,
   }) : super(currentState: currentState, nextState: nextState);
 
   /// The [Event] which triggered the current [Transition].
@@ -36,6 +36,7 @@ class Transition<Event, State> extends Change<State> {
 
   @override
   String toString() {
-    return '''Transition { currentState: $currentState, event: $event, nextState: $nextState }''';
+    return "Transition { currentState: $currentState, "
+        "event: $event, nextState: $nextState }";
   }
 }

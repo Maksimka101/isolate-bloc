@@ -34,17 +34,13 @@ class CounterScreen extends StatelessWidget {
         children: [
           FloatingActionButton(
             heroTag: 'Increment',
-            onPressed: () => context
-                .isolateBloc<CounterBloc, int>()
-                .add(CountEvent.increment),
+            onPressed: () => context.isolateBloc<CounterBloc, int>().add(CountEvent.increment),
             child: const Icon(Icons.add),
           ),
           const SizedBox(height: 10),
           FloatingActionButton(
             heroTag: 'Decrement',
-            onPressed: () => context
-                .isolateBloc<CounterBloc, int>()
-                .add(CountEvent.decrement),
+            onPressed: () => context.isolateBloc<CounterBloc, int>().add(CountEvent.decrement),
             child: const Icon(Icons.remove),
           ),
         ],
@@ -58,7 +54,7 @@ Future<void> isolatedFunc() async {
   register(create: () => CounterBloc());
 }
 
-class CounterBloc extends IsolateBloc<CountEvent, int> {
+class CounterBloc extends IsolateCubit<CountEvent, int> {
   CounterBloc() : super(0);
 
   @override
@@ -74,7 +70,7 @@ enum CountEvent {
 
 class SimpleBlocObserver extends IsolateBlocObserver {
   @override
-  void onEvent(IsolateBloc bloc, Object event) {
+  void onEvent(IsolateBlocBase bloc, Object? event) {
     print('New $event for $bloc');
     super.onEvent(bloc, event);
   }
@@ -86,7 +82,7 @@ class SimpleBlocObserver extends IsolateBlocObserver {
   }
 
   @override
-  void onError(IsolateBloc bloc, Object error, StackTrace stackTrace) {
+  void onError(IsolateBlocBase bloc, Object error, StackTrace stackTrace) {
     print('$error in $bloc');
     super.onError(bloc, error, stackTrace);
   }

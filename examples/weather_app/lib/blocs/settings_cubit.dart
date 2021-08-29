@@ -1,10 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 
-class SettingsBloc extends IsolateBloc<SettingsEvent, SettingsState> {
-  SettingsBloc()
-      : super(SettingsState(temperatureUnits: TemperatureUnits.celsius));
+class SettingsCubit extends IsolateCubit<SettingsEvent, SettingsState> {
+  SettingsCubit() : super(SettingsState(temperatureUnits: TemperatureUnits.celsius));
 
   @override
   void onEventReceived(SettingsEvent event) {
@@ -22,19 +20,18 @@ class SettingsBloc extends IsolateBloc<SettingsEvent, SettingsState> {
 
 abstract class SettingsEvent extends Equatable {}
 
-class TemperatureUnitsToggled extends SettingsEvent {
+class SettingsState extends Equatable {
+  final TemperatureUnits temperatureUnits;
+
+  const SettingsState({required this.temperatureUnits});
+
   @override
-  List<Object> get props => [];
+  List<Object> get props => [temperatureUnits];
 }
 
 enum TemperatureUnits { fahrenheit, celsius }
 
-class SettingsState extends Equatable {
-  final TemperatureUnits temperatureUnits;
-
-  const SettingsState({@required this.temperatureUnits})
-      : assert(temperatureUnits != null);
-
+class TemperatureUnitsToggled extends SettingsEvent {
   @override
-  List<Object> get props => [temperatureUnits];
+  List<Object> get props => [];
 }

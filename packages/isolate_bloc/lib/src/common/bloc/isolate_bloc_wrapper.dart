@@ -1,31 +1,35 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-
-import '../isolate/service_events.dart';
-import 'isolate_bloc.dart';
-import 'transition.dart';
+import 'package:isolate_bloc/src/common/isolate/service_events.dart';
 
 /// Signature for event receiver function which takes an [IsolateBlocTransitionEvent]
 /// and send this event to the [IsolateBloc]
-typedef EventReceiver = void Function(IsolateBlocTransitionEvent<Object> event);
+typedef EventReceiver = void Function(IsolateBlocTransitionEvent event);
 
 /// Signature for function which takes [IsolateBloc]'s uuid and close it
-typedef IsolateBlocKiller = void Function(String uuid);
+typedef IsolateBlocKiller = void Function(String? uuid);
 
-/// [IsolateBlocWrapper] work like a client for [IsolateBloc]. It receives [IsolateBloc]'s
+/// Takes a `Stream` of `Events` as input
+/// and transforms them into a `Stream` of `States` as output using [IsolateBloc].
+///
+/// It works like a client for [IsolateBloc]. It receives [IsolateBloc]'s
 /// states and send events added by `wrapperInstance.add(YourEvent())`. So you can
 /// listen for origin bloc's state with `wrapperInstance.listen((state) { })` and add
 /// events as shown above.
-/// createBloc function create [IsolateBloc] in [Isolate] and return this object.
-class IsolateBlocWrapper<State> extends Stream<State> implements Sink<Object> {
+///
+/// [createBloc] function creates [IsolateBloc] in [Isolate] and return this object.
+class IsolateBlocWrapper<State> implements Sink<Object?> {
   /// Receives initialState, function which receive events and send them to the
   /// origin [IsolateBloc] and function which called in [close] and close origin bloc.
-  IsolateBlocWrapper(
-    this._state,
-    this._eventReceiver,
-    this._onBlocClose,
-  ) : _initStateProvided = true {
+  @protected
+  IsolateBlocWrapper({
+    State? state,
+    required EventReceiver eventReceiver,
+    required IsolateBlocKiller onBlocClose,
+  })  : _eventReceiver = eventReceiver,
+        _onBlocClose = onBlocClose,
+        _state = state {
     _bindEventsListener();
   }
 
@@ -33,66 +37,36 @@ class IsolateBlocWrapper<State> extends Stream<State> implements Sink<Object> {
   IsolateBlocWrapper.noInitState(
     this._eventReceiver,
     this._onBlocClose,
-  )   : _state = null,
-        _initStateProvided = false {
+  ) : _state = null {
     _bindEventsListener();
   }
 
-  final _eventController = StreamController<Object>.broadcast();
+  final _eventController = StreamController<Object?>.broadcast();
   final _stateController = StreamController<State>.broadcast();
 
   /// Id of IsolateBloc. It's needed to find bloc in isolate.
-  String _originBlocUuid;
+  String? _isolateBlocId;
 
-  State _state;
-  bool _initStateProvided;
-  final _unsentEvents = <Object>[];
+  State? _state;
+  final _unsentEvents = <Object?>[];
   final IsolateBlocKiller _onBlocClose;
-  StreamSubscription<Transition<Object, State>> _stateTransitionSubscription;
-  StreamSubscription<Object> _eventReceiverSubscription;
+  late StreamSubscription<Object?> _eventReceiverSubscription;
 
   /// Returns stream with `event`
-  Stream<Object> get eventStream => _eventController.stream;
+  Stream<Object?> get eventStream => _eventController.stream;
 
   /// Callback which receive events and send them to the IsolateBloc
   final EventReceiver _eventReceiver;
 
   /// Returns the current [state] of the [bloc].
-  State get state => _state;
+  State get state => _state!;
 
-  /// Returns whether the `Stream<State>` is a broadcast stream.
-  @override
-  bool get isBroadcast => _stateController.stream.isBroadcast;
-
-  /// Adds a subscription to the `Stream<State>`.
-  /// Returns a [StreamSubscription] which handles events from
-  /// the `Stream<State>` using the provided [onData], [onError] and [onDone]
-  /// handlers.
-  @override
-  StreamSubscription<State> listen(
-    void Function(State) onData, {
-    Function onError,
-    void Function() onDone,
-    bool cancelOnError,
-  }) {
-    return _prepareStateStream.listen(
-      onData,
-      onError: onError,
-      onDone: onDone,
-      cancelOnError: cancelOnError,
-    );
-  }
-
-  Stream<State> get _prepareStateStream async* {
-    if (_initStateProvided) {
-      yield state;
-    }
-    yield* _stateController.stream;
-  }
+  /// Returns the stream of states
+  Stream<State> get stream => _stateController.stream;
 
   /// As a result, call original [IsolateBloc]'s add function.
   @override
-  void add(Object event) {
+  void add(Object? event) {
     _eventController.add(event);
   }
 
@@ -100,40 +74,39 @@ class IsolateBlocWrapper<State> extends Stream<State> implements Sink<Object> {
   @override
   @mustCallSuper
   Future<void> close() async {
-    _onBlocClose(_originBlocUuid);
+    _onBlocClose(_isolateBlocId);
     await _eventController.close();
     await _stateController.close();
-    await _stateTransitionSubscription?.cancel();
-    await _eventReceiverSubscription?.cancel();
+    await _eventReceiverSubscription.cancel();
   }
 
-  /// Connect this wrapper to the origin [IsolateBloc] and start listening for state.
+  /// Connects this wrapper to the [IsolateBloc] and sends all unsent events.
+  @protected
   void connectToBloc(String uuid) {
-    assert(uuid != null);
-    _originBlocUuid = uuid;
+    _isolateBlocId = uuid;
     while (_unsentEvents.isNotEmpty) {
-      _eventReceiver(IsolateBlocTransitionEvent<Object>(
-        _originBlocUuid,
+      _eventReceiver(IsolateBlocTransitionEvent(
+        uuid,
         _unsentEvents.removeAt(0),
       ));
     }
   }
 
-  /// Receive [IsolateBloc]'s state and add to the state Stream.
+  /// Receives [IsolateBloc]'s state and add to the state Stream.
+  @protected
   void stateReceiver(State nextState) {
-    _initStateProvided = true;
-    if (nextState != state) {
+    if (nextState != _state) {
       _stateController.add(nextState);
+      _state = nextState;
     }
-    _state = nextState;
   }
 
-  /// Start listening for new `events`
+  /// Starts listening for new `events`
   void _bindEventsListener() {
     _eventReceiverSubscription = eventStream.listen((event) {
-      if (_originBlocUuid != null) {
-        _eventReceiver(
-            IsolateBlocTransitionEvent<Object>(_originBlocUuid, event));
+      final uuid = _isolateBlocId;
+      if (uuid != null) {
+        _eventReceiver(IsolateBlocTransitionEvent(uuid, event));
       } else {
         _unsentEvents.add(event);
       }

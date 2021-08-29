@@ -1,6 +1,6 @@
 import 'package:isolate_bloc/isolate_bloc.dart';
 
-class SimpleBloc extends IsolateBloc<Object, Object> {
+class SimpleBloc extends IsolateCubit<Object, Object> {
   SimpleBloc() : super('');
 
   @override

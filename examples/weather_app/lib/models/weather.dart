@@ -26,19 +26,19 @@ class Weather extends Equatable {
   final String location;
 
   const Weather({
-    this.condition,
-    this.formattedCondition,
-    this.minTemp,
-    this.temp,
-    this.maxTemp,
-    this.locationId,
-    this.created,
-    this.lastUpdated,
-    this.location,
+    required this.condition,
+    required this.formattedCondition,
+    required this.minTemp,
+    required this.temp,
+    required this.maxTemp,
+    required this.locationId,
+    required this.created,
+    required this.lastUpdated,
+    required this.location,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         condition,
         formattedCondition,
         minTemp,
@@ -53,8 +53,7 @@ class Weather extends Equatable {
   static Weather fromJson(dynamic json) {
     final consolidatedWeather = json['consolidated_weather'][0];
     return Weather(
-      condition: _mapStringToWeatherCondition(
-          consolidatedWeather['weather_state_abbr']),
+      condition: _mapStringToWeatherCondition(consolidatedWeather['weather_state_abbr']),
       formattedCondition: consolidatedWeather['weather_state_name'],
       minTemp: consolidatedWeather['min_temp'] as double,
       temp: consolidatedWeather['the_temp'] as double,

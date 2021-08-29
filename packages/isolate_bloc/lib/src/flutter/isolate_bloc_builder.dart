@@ -1,16 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-
-import '../common/bloc/isolate_bloc.dart';
-import '../common/bloc/isolate_bloc_wrapper.dart';
-import './isolate_bloc_provider.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
+import 'package:isolate_bloc/src/flutter/isolate_bloc_provider.dart';
 
 /// Signature for the `builder` function which takes the `BuildContext` and
 /// [state] and is responsible for returning a widget which is to be rendered.
 /// This is analogous to the `builder` function in [StreamBuilder].
 typedef IsolateBlocWidgetBuilder<S> = Widget Function(
-    BuildContext context, S state);
+  BuildContext context,
+  S state,
+);
 
 /// Signature for the `buildWhen` function which takes the previous `state` and
 /// the current `state` and is responsible for returning a [bool] which
@@ -72,16 +73,14 @@ typedef IsolateBlocBuilderCondition<S> = bool Function(S previous, S current);
 ///)
 /// ```
 /// {@endtemplate}
-class IsolateBlocBuilder<C extends IsolateBloc<Object, S>, S>
-    extends IsolateBlocBuilderBase<C, S> {
+class IsolateBlocBuilder<C extends IsolateBlocBase<Object?, S>, S> extends IsolateBlocBuilderBase<C, S> {
   /// {@macro bloc_builder}
   const IsolateBlocBuilder({
-    Key key,
-    @required this.builder,
-    IsolateBlocWrapper<S> isolateBloc,
-    IsolateBlocBuilderCondition<S> buildWhen,
-  })  : assert(builder != null),
-        super(key: key, isolateBloc: isolateBloc, buildWhen: buildWhen);
+    Key? key,
+    required this.builder,
+    IsolateBlocWrapper<S>? isolateBloc,
+    IsolateBlocBuilderCondition<S>? buildWhen,
+  }) : super(key: key, isolateBloc: isolateBloc, buildWhen: buildWhen);
 
   /// The [builder] function which will be invoked on each widget build.
   /// The [builder] takes the `BuildContext` and current `state` and
@@ -101,34 +100,35 @@ class IsolateBlocBuilder<C extends IsolateBloc<Object, S>, S>
 /// so far. The type of the state and how it is updated with each interaction
 /// is defined by sub-classes.
 /// {@endtemplate}
-abstract class IsolateBlocBuilderBase<C extends IsolateBloc<Object, S>, S>
-    extends StatefulWidget {
+abstract class IsolateBlocBuilderBase<C extends IsolateBlocBase<Object?, S>, S> extends StatefulWidget {
   /// {@macro bloc_builder_base}
-  const IsolateBlocBuilderBase({Key key, this.isolateBloc, this.buildWhen})
-      : super(key: key);
+  const IsolateBlocBuilderBase({
+    Key? key,
+    this.isolateBloc,
+    this.buildWhen,
+  }) : super(key: key);
 
   /// The [isolateBloc] that the [IsolateBlocBuilderBase] will interact with.
   /// If omitted, [IsolateBlocBuilderBase] will automatically perform a lookup using
   /// [IsolateBlocProvider] and the current `BuildContext`.
-  final IsolateBlocWrapper<S> isolateBloc;
+  final IsolateBlocWrapper<S>? isolateBloc;
 
   /// {@macro bloc_builder_build_when}
-  final IsolateBlocBuilderCondition<S> buildWhen;
+  final IsolateBlocBuilderCondition<S>? buildWhen;
 
   /// Returns a widget based on the `BuildContext` and current [state].
   Widget build(BuildContext context, S state);
 
   @override
-  State<IsolateBlocBuilderBase<C, S>> createState() =>
-      _IsolateBlocBuilderBaseState<C, S>();
+  State<IsolateBlocBuilderBase<C, S>> createState() => _IsolateBlocBuilderBaseState<C, S>();
 }
 
-class _IsolateBlocBuilderBaseState<C extends IsolateBloc<Object, S>, S>
-    extends State<IsolateBlocBuilderBase<C, S>> {
-  StreamSubscription<S> _subscription;
-  S _previousState;
-  S _state;
-  IsolateBlocWrapper<S> _blocWrapper;
+class _IsolateBlocBuilderBaseState<C extends IsolateBlocBase<Object?, S>, S>
+    extends State<IsolateBlocBuilderBase<C , S>> {
+  StreamSubscription<S>? _subscription;
+  S? _previousState;
+  S? _state;
+  IsolateBlocWrapper<S>? _blocWrapper;
 
   @override
   void initState() {
@@ -158,7 +158,7 @@ class _IsolateBlocBuilderBaseState<C extends IsolateBloc<Object, S>, S>
   }
 
   @override
-  Widget build(BuildContext context) => widget.build(context, _state);
+  Widget build(BuildContext context) => widget.build(context, _state!);
 
   @override
   void dispose() {
@@ -167,22 +167,18 @@ class _IsolateBlocBuilderBaseState<C extends IsolateBloc<Object, S>, S>
   }
 
   void _subscribe() {
-    if (_blocWrapper != null) {
-      _subscription = _blocWrapper.listen((state) {
-        if (widget.buildWhen?.call(_previousState, state) ?? true) {
-          setState(() {
-            _state = state;
-          });
-        }
-        _previousState = state;
-      });
-    }
+    _subscription = _blocWrapper?.stream.listen((state) {
+      if (widget.buildWhen?.call(_previousState!, state) ?? true) {
+        setState(() {
+          _state = state;
+        });
+      }
+      _previousState = state;
+    });
   }
 
   void _unsubscribe() {
-    if (_subscription != null) {
-      _subscription.cancel();
-      _subscription = null;
-    }
+    _subscription?.cancel();
+    _subscription = null;
   }
 }

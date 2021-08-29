@@ -4,8 +4,8 @@ import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate
 
 /// [IsolateWrapper] for [IsolateManagerImpl]
 /// Maintain a real [Isolate].
-class IsolateWrapperImpl extends IsolateWrapper {
-  IsolateWrapperImpl(this.isolate);
+class IOIsolateWrapper extends IsolateWrapper {
+  IOIsolateWrapper(this.isolate);
 
   final Isolate isolate;
 
