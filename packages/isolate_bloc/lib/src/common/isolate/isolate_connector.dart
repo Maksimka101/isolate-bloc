@@ -4,7 +4,6 @@ import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/service_events.dart';
 
-
 /// Listen for [ServiceEvent]s from isolate
 class IsolateConnector {
   /// Create new isolate connector which communicate with [IsolatedConnector].
@@ -34,6 +33,7 @@ class IsolateConnector {
     } else if (event is IsolateBlocCreatedEvent) {
       final blocManager = BlocManager.instance;
       if (blocManager == null) {
+        // todo(maksim): Replace with exception
         print("BlocManager is null. Maybe you forgot to initialize?");
       } else {
         blocManager.bindFreeWrapper(event.blocType, event.blocUuid);
@@ -41,6 +41,7 @@ class IsolateConnector {
     } else if (event is IsolateBlocTransitionEvent) {
       final blocManager = BlocManager.instance;
       if (blocManager == null) {
+        // todo(maksim): Replace with exception
         print("BlocManager is null. Maybe you forgot to initialize?");
       } else {
         blocManager.blocStateReceiver(event.blocUuid, event.event);
@@ -48,16 +49,16 @@ class IsolateConnector {
     } else if (event is InvokePlatformChannelEvent) {
       final methodChannelMiddleware = MethodChannelMiddleware.instance;
       if (methodChannelMiddleware == null) {
-        print(
-            "MethodChannelMiddleware is null. Maybe you forgot to initialize?");
+        // todo(maksim): Replace with exception
+        print("MethodChannelMiddleware is null. Maybe you forgot to initialize?");
       } else {
         methodChannelMiddleware.send(event.channel, event.data, event.id);
       }
     } else if (event is MethodChannelResponseEvent) {
       final methodChannelMiddleware = MethodChannelMiddleware.instance;
       if (methodChannelMiddleware == null) {
-        print(
-            "MethodChannelMiddleware is null. Maybe you forgot to initialize?");
+        // todo(maksim): Replace with exception
+        print("MethodChannelMiddleware is null. Maybe you forgot to initialize?");
       } else {
         methodChannelMiddleware.methodChannelResponse(event.id, event.data);
       }

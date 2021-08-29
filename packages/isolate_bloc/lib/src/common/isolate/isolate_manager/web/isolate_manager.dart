@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:isolate';
 
 import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_manager.dart';
@@ -7,7 +8,7 @@ import 'package:isolate_bloc/src/common/isolate/isolate_manager/web/web_isolate_
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 
 /// Web [IsolateManagerFactory]'s implementation.
-/// It doesn't creates [Isolate].
+/// It doesn't create [Isolate].
 class WebIsolateManagerFactory implements IsolateManagerFactory {
   @override
   Future<IsolateManager> create(

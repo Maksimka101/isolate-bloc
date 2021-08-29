@@ -20,14 +20,14 @@ IsolateBlocWrapper<State> createBloc<BlocT extends IsolateBlocBase<Object?, Stat
 }
 
 /// Initialize [Isolate], ServiceEventListener in both Isolates and run [Initializer].
-/// If already initialized and [reCreate] is true kill previous [Isolate] and reinitialize everything.
+/// If already initialized and [recreate] is true kill previous [Isolate] and reinitialize everything.
 Future<void> initialize(
   Initializer userInitializer, {
   PlatformChannelSetup platformChannelSetup = const PlatformChannelSetup(),
-  bool reCreate = false,
+  bool recreate = false,
 }) async {
   assert(
-    !reCreate && BlocManager.instance == null,
+    !recreate && BlocManager.instance == null,
     'You can initialize only once. '
     'Call `initialize(..., reCreate: true)` if you want to reinitialize.',
   );

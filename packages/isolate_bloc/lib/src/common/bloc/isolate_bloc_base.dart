@@ -6,7 +6,7 @@ import 'package:isolate_bloc/src/common/bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_cubit.dart';
 import 'package:uuid/uuid.dart';
 
-/// This is an exception which is throws on exception in `add` function in debug mode
+/// This is an exception which is thrown on exception in `add` function in debug mode
 class BlocUnhandledErrorException implements Exception {
   BlocUnhandledErrorException(this.bloc, this.error, [this.stackTrace]);
 

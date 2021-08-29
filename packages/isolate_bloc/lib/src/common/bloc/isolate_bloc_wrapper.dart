@@ -13,7 +13,7 @@ typedef IsolateBlocKiller = void Function(String? uuid);
 /// Takes a `Stream` of `Events` as input
 /// and transforms them into a `Stream` of `States` as output using [IsolateBloc].
 ///
-/// It is work like a client for [IsolateBloc]. It receives [IsolateBloc]'s
+/// It works like a client for [IsolateBloc]. It receives [IsolateBloc]'s
 /// states and send events added by `wrapperInstance.add(YourEvent())`. So you can
 /// listen for origin bloc's state with `wrapperInstance.listen((state) { })` and add
 /// events as shown above.
