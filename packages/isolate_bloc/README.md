@@ -321,3 +321,6 @@ Just don't send this object.
 
 # Helpers
  - [Live templates](https://github.com/Maksimka101/isolate-bloc/tree/master/docs/intellij_idea_live_template.md)
+ 
+# Gratitude
+Special thanks to [Felix Angelov](https://github.com/felangel) for the reference in the form of [bloc](https://github.com/felangel/bloc) package
