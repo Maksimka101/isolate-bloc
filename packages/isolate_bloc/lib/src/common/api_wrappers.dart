@@ -1,23 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
-import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate/isolate_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/web/isolate_manager.dart';
+import 'package:isolate_bloc/src/common/isolate/initializer/isolate_initializer.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate/io_isolate_factory.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_manager/web/web_isolate_factory.dart';
+import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
-
-/// Starts creating [IsolateBlocBase] and returns [IsolateBlocWrapper].
-///
-/// Throws [BlocManagerUnInitialized] if [blocManager] is null or in another words if you
-/// didn't call [initialize] function before
-IsolateBlocWrapper<State> createBloc<BlocT extends IsolateBlocBase<Object?, State>, State>() {
-  final blocManager = BlocManager.instance;
-  if (blocManager == null) {
-    throw BlocManagerUnInitialized();
-  } else {
-    return blocManager.createBloc<BlocT, State>();
-  }
-}
 
 /// Initialize [Isolate], ServiceEventListener in both Isolates and run [Initializer].
 /// If already initialized and [recreate] is true kill previous [Isolate] and reinitialize everything.
@@ -27,20 +15,34 @@ Future<void> initialize(
   bool recreate = false,
 }) async {
   assert(
-    !recreate && BlocManager.instance == null,
+    !recreate && UIIsolateManager.instance == null,
     'You can initialize only once. '
     'Call `initialize(..., reCreate: true)` if you want to reinitialize.',
   );
-  return BlocManager.initialize(
+
+  return IsolateInitializer().initialize(
     userInitializer,
-    kIsWeb ? WebIsolateManagerFactory() : IOIsolateManagerFactory(),
+    kIsWeb ? WebIsolateFactory() : IOIsolateFactory(),
     platformChannelSetup.methodChannels,
   );
 }
 
-class BlocManagerUnInitialized implements Exception {
+/// Starts creating [IsolateBlocBase] and returns [IsolateBlocWrapper].
+///
+/// Throws [UIIsolateManagerUnInitialized] if [UIIsolateManager] is null or in another words if you
+/// didn't call [initialize] function before
+IsolateBlocWrapper<State> createBloc<BlocT extends IsolateBlocBase<Object?, State>, State>() {
+  final isolateManager = UIIsolateManager.instance;
+  if (isolateManager == null) {
+    throw UIIsolateManagerUnInitialized();
+  } else {
+    return isolateManager.createBloc<BlocT, State>();
+  }
+}
+
+class UIIsolateManagerUnInitialized implements Exception {
   @override
   String toString() {
-    return '$BlocManager must not be null. Call `await $initialize()`';
+    return '$UIIsolateManager must not be null. Call `await initialize()`';
   }
 }

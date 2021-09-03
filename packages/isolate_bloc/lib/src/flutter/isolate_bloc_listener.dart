@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:nested/nested.dart';
-import 'package:provider/provider.dart';
 
 /// Mixin which allows `MultiBlocListener` to infer the types
 /// of multiple [IsolateBlocListener]s.

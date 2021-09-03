@@ -8,7 +8,7 @@ Future<void> initializeMock(
   Initializer userInitializer, {
   PlatformChannelSetup platformChannelSetup = const PlatformChannelSetup(),
 }) {
-  return BlocManager.initialize(
+  return IsolateInitializer().initialize(
     userInitializer,
     MockIsolateManagerFactory(),
     platformChannelSetup.methodChannels,

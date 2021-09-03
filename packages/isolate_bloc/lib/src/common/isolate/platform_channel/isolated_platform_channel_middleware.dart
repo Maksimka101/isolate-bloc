@@ -20,7 +20,7 @@ class IsolatedPlatformChannelMiddleware {
   static IsolatedPlatformChannelMiddleware? instance;
   final BinaryMessenger platformMessenger;
   final String Function() generateId;
-  final void Function(ServiceEvent) sendEvent;
+  final void Function(IsolateBlocEvent) sendEvent;
   final _platformResponsesCompleter = <String, Completer<ByteData>>{};
 
   void _bindMessageHandlers(List<String> channels) {

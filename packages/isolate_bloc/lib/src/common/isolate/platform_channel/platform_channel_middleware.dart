@@ -19,7 +19,7 @@ class MethodChannelMiddleware {
 
   static MethodChannelMiddleware? instance;
   final BinaryMessenger binaryMessenger;
-  final void Function(ServiceEvent) sendEvent;
+  final void Function(IsolateBlocEvent) sendEvent;
   final String Function() generateId;
   final _messageHandlersCompleter = <String, Completer<ByteData>>{};
 

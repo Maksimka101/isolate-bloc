@@ -3,11 +3,11 @@ import 'dart:isolate';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_binding.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_manager.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate/io_isolate_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate_messenger.dart';
+import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/isolated_platform_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
@@ -28,9 +28,9 @@ class _IsolateSetup {
 }
 
 /// Creates and initializes [Isolate] and [IsolateMessenger].
-class IOIsolateManagerFactory implements IsolateManagerFactory {
+class IOIsolateFactory implements IsolateFactory {
   @override
-  Future<IsolateManager> create(
+  Future<IsolateCreateResult> create(
     IsolateRun isolateRun,
     Initializer initializer,
     MethodChannels methodChannels,
@@ -63,7 +63,7 @@ class IOIsolateManagerFactory implements IsolateManagerFactory {
     await subscription.cancel();
 
     final isolateMessenger = IsolateMessenger(
-      fromIsolateBlocStream.cast<Object>(),
+      fromIsolateBlocStream,
       toIsolate.send,
     );
 
@@ -72,11 +72,11 @@ class IOIsolateManagerFactory implements IsolateManagerFactory {
     MethodChannelMiddleware(
       generateId: const Uuid().v4,
       binaryMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
-      sendEvent: isolateMessenger.add,
+      sendEvent: isolateMessenger.send,
       channels: methodChannels,
     );
 
-    return IsolateManager(
+    return IsolateCreateResult(
       IOIsolateWrapper(isolate),
       isolateMessenger,
     );
@@ -87,7 +87,7 @@ class IOIsolateManagerFactory implements IsolateManagerFactory {
     final toUiIsolateStream = toUiIsolate.asBroadcastStream();
     setup.fromIsolateBloc.send(toUiIsolate.sendPort);
     final isolateMessenger = IsolateMessenger(
-      toUiIsolateStream.cast<Object>(),
+      toUiIsolateStream,
       setup.fromIsolateBloc.send,
     );
 
@@ -97,7 +97,7 @@ class IOIsolateManagerFactory implements IsolateManagerFactory {
       channels: setup.methodChannels,
       platformMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
       generateId: const Uuid().v4,
-      sendEvent: isolateMessenger.add,
+      sendEvent: isolateMessenger.send,
     );
     setup.task(isolateMessenger, setup.userInitializer);
   }

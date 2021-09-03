@@ -18,7 +18,7 @@ typedef IsolateBlocKiller = void Function(String? uuid);
 /// listen for origin bloc's state with `wrapperInstance.listen((state) { })` and add
 /// events as shown above.
 ///
-/// [createBloc] function creates [IsolateBloc] in [Isolate] and return this object.
+/// [_createBloc] function creates [IsolateBloc] in [Isolate] and return this object.
 class IsolateBlocWrapper<State> implements Sink<Object?> {
   /// Receives initialState, function which receive events and send them to the
   /// origin [IsolateBloc] and function which called in [close] and close origin bloc.
