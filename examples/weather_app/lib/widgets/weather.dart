@@ -48,8 +48,7 @@ class _WeatherState extends State<Weather> {
                 ),
               );
               if (city != null) {
-                IsolateBlocProvider.of<WeatherBloc, WeatherState>(context)
-                    .add(WeatherRequested(city: city));
+                context.isolateBloc<WeatherBloc, WeatherState>().add(WeatherRequested(city: city));
               }
             },
           )
@@ -75,9 +74,7 @@ class _WeatherState extends State<Weather> {
                       color: mapThemeStateToColor(themeState),
                       child: RefreshIndicator(
                         onRefresh: () {
-                          IsolateBlocProvider.of<WeatherBloc, WeatherState>(
-                                  context)
-                              .add(
+                          IsolateBlocProvider.of<WeatherBloc, WeatherState>(context).add(
                             WeatherRefreshRequested(city: weather.location),
                           );
                           return _refreshCompleter!.future;
