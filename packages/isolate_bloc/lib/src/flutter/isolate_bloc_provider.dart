@@ -31,16 +31,18 @@ mixin IsolateBlocProviderSingleChildWidget on SingleChildWidget {}
 /// );
 /// ```
 /// {@endtemplate}
-class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State>
-    extends SingleChildStatelessWidget with IsolateBlocProviderSingleChildWidget {
+class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State> extends SingleChildStatelessWidget
+    with IsolateBlocProviderSingleChildWidget {
   /// {@macro bloc_provider}
   IsolateBlocProvider({
     Key? key,
     Widget? child,
+    bool? lazy,
   }) : this._(
           key: key,
           create: (_) => null,
           dispose: (_, bloc) => bloc?.close(),
+          lazy: lazy,
           child: child,
         );
 
@@ -77,6 +79,7 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State>
     Key? key,
     required Create<IsolateBlocWrapper<Object?>?> create,
     Dispose<IsolateBlocWrapper?>? dispose,
+    this.lazy,
     this.child,
   })  : _dispose = dispose,
         _create = create,
@@ -84,6 +87,10 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State>
 
   /// [child] and its descendants which will have access to the `bloc`.
   final Widget? child;
+
+  /// Whether the [Bloc] or [Cubit] should be created lazily.
+  /// Defaults to `true`.
+  final bool? lazy;
 
   final Create<IsolateBlocWrapper<Object?>?> _create;
 
@@ -129,7 +136,7 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State>
       dispose: (context, infoHolder) {
         _dispose?.call(context, infoHolder.removeBloc<T>());
       },
-      lazy: false,
+      lazy: lazy,
       child: child,
     );
   }
