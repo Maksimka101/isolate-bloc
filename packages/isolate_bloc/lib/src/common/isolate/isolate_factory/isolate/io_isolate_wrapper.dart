@@ -1,6 +1,6 @@
 import 'dart:isolate';
 
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_wrapper.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/abstract_isolate_wrapper.dart';
 
 /// [IsolateWrapper] for native environment 
 /// Maintain a real [Isolate].

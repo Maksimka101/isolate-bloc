@@ -1,6 +1,4 @@
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_wrapper.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate/io_isolate_factory.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/web/web_isolate_factory.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/abstract_isolate_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 

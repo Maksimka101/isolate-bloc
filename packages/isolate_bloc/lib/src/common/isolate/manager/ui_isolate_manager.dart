@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/service_events.dart';
 

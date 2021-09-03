@@ -1,5 +1,4 @@
 import 'package:isolate_bloc/isolate_bloc.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/abstract_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 

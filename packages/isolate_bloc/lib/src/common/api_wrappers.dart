@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/initializer/isolate_initializer.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate/io_isolate_factory.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/web/web_isolate_factory.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate/io_isolate_factory.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/web/web_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 

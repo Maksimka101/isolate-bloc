@@ -1,6 +1,6 @@
 import 'package:isolate_bloc/isolate_bloc.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate/io_isolate_factory.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/web/web_isolate_factory.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate/io_isolate_factory.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/web/web_isolate_factory.dart';
 
 TestInitializePlatform? _testInitializePlatform;
 
