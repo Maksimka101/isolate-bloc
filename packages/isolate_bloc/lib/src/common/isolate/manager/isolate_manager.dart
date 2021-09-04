@@ -7,7 +7,14 @@ import 'package:isolate_bloc/src/common/isolate/platform_channel/isolated_platfo
 import 'package:isolate_bloc/src/common/isolate/service_events.dart';
 
 /// Signature for function which creates [IsolateCubit].
-typedef IsolateBlocCreator = IsolateBlocBase Function();
+typedef IsolateBlocCreator<E, S> = IsolateBlocBase<E, S> Function();
+
+class BlocUnregisteredException implements Exception {
+  @override
+  String toString() {
+    return 'You trying to create isolate bloc';
+  }
+}
 
 /// Manager which works in Isolate
 class IsolateManager {
@@ -30,6 +37,8 @@ class IsolateManager {
   final _freeBlocs = <Type, IsolateBlocBase>{};
   final _blocCreators = <Type, IsolateBlocCreator>{};
   final _createdBlocsSubscriptions = <String, StreamSubscription>{};
+  final _isolatedBlocWrappersSubscriptions = <IsolateBlocBase, List<StreamSubscription>>{};
+  final _isolatedBlocWrappers = <IsolateBlocBase, List<IsolateBlocWrapper>>{};
 
   final _initializeCompleter = Completer();
   StreamSubscription<IsolateBlocEvent>? _serviceEventsSubscription;
@@ -56,38 +65,56 @@ Stacktrace: $stacktrace''');
   /// Register [IsolateCubit].
   /// You can create [IsolateCubit] and get [IsolateBlocWrapper] from
   /// [BlocManager].createBloc only if you register this [IsolateCubit].
-  void register(IsolateBlocCreator creator) {
-    final bloc = creator();
-    _initialStates[bloc.runtimeType] = bloc.state;
-    _freeBlocs[bloc.runtimeType] = bloc;
-    _blocCreators[bloc.runtimeType] = creator;
+  ///
+  /// If [initialState] is not provided bloc will be created immediately.
+  /// So if you don't want to create bloc while initialization please provide [initialState]
+  void register<T extends IsolateBlocBase<Object?, S>, S>(IsolateBlocCreator creator, S? initialState) {
+    if (initialState == null) {
+      final bloc = creator();
+      _initialStates[T] = bloc.state;
+      _freeBlocs[T] = bloc;
+    } else {
+      _initialStates[T] = initialState;
+    }
+    _blocCreators[T] = creator;
   }
 
-  /// Use this function to get [IsolateCubit] in [Isolate].
+  /// Use this function to get [IsolateBlocBase] in [Isolate].
   ///
   /// To get bloc in UI [Isolate] use [IsolateBlocProvider] which returns [IsolateBlocWrapper].
+  ///
   /// This function works this way: firstly it is wait for user's [Initializer] function
   /// secondly it is looks for created bloc with type BlocA. If it is finds any, so it
   /// returns this bloc's [IsolateBlocWrapper]. Else it is creates a new bloc and
   /// add to the pull of free blocs. So when UI will call `create()`, it will not create a new bloc but
   /// return free bloc from pull.
-  IsolateBlocWrapper<State> getBlocWrapper<Bloc extends IsolateBlocBase<Object?, State>, State>() {
-    late IsolateBlocWrapper<State> wrapper;
-    Bloc? isolateBloc;
-    _getBloc<Bloc>().then((bloc) {
+  IsolateBlocWrapper<S> getBlocWrapper<B extends IsolateBlocBase<Object?, S>, S>() {
+    late IsolateBlocWrapper<S> wrapper;
+    B? isolateBloc;
+    _getBloc<B>().then((bloc) {
       isolateBloc = bloc;
+      final blocId = bloc.id;
 
+      if (blocId != null) {
+        // ignore: invalid_use_of_protected_member
+        _createdBlocsSubscriptions[blocId] = bloc.stream.listen(wrapper.stateReceiver);
+      } else {
+        _isolatedBlocWrappersSubscriptions[bloc] ??= [];
+        _isolatedBlocWrappers[bloc] ??= [];
+
+        // ignore: invalid_use_of_protected_member
+        _isolatedBlocWrappersSubscriptions[bloc]!.add(bloc.stream.listen(wrapper.stateReceiver));
+        _isolatedBlocWrappers[bloc]!.add(wrapper);
+      }
       // ignore: invalid_use_of_protected_member
-      _createdBlocsSubscriptions[bloc.id] = bloc.stream.listen(wrapper.stateReceiver);
-      // ignore: invalid_use_of_protected_member
-      wrapper.connectToBloc(bloc.id);
+      wrapper.onBlocCreated();
     });
     void onBLocClose(_) => isolateBloc?.close();
-    void eventReceiver(IsolateBlocTransitionEvent event) {
-      isolateBloc?.add(event.event);
+    void eventReceiver(Object? event) {
+      isolateBloc?.add(event);
     }
 
-    wrapper = IsolateBlocWrapper.noInitState(eventReceiver, onBLocClose);
+    wrapper = IsolateBlocWrapper.isolate(eventReceiver, onBLocClose);
     return wrapper;
   }
 
@@ -95,15 +122,15 @@ Stacktrace: $stacktrace''');
     switch (event.runtimeType) {
       case IsolateBlocTransitionEvent:
         event = event as IsolateBlocTransitionEvent;
-        _receiveBlocEvent(event.blocUuid, event.event);
+        _receiveBlocEvent(event.blocId, event.event);
         break;
       case CreateIsolateBlocEvent:
         event = event as CreateIsolateBlocEvent;
-        _createBloc(event.blocType);
+        _createBloc(event.blocType, event.blocId);
         break;
       case CloseIsolateBlocEvent:
         event = event as CloseIsolateBlocEvent;
-        _closeBloc(event.blocUuid);
+        _closeBloc(event.blocId);
         break;
       case PlatformChannelResponseEvent:
         event = event as PlatformChannelResponseEvent;
@@ -142,16 +169,18 @@ Stacktrace: $stacktrace''');
   }
 
   /// Creates [IsolateBlocBase] and connect it to the [IsolateBlocWrapper].
-  void _createBloc(Type blocType) {
+  void _createBloc(Type blocType, String id) {
     final bloc = _getFreeBlocByType(blocType);
     if (bloc != null) {
-      _createdBlocsSubscriptions[bloc.id] = bloc.stream.listen(
+      _createdBlocs[id] = bloc;
+      bloc.id = id;
+      _createdBlocsSubscriptions[id] = bloc.stream.listen(
         (state) => _messenger.send(
-          IsolateBlocTransitionEvent(bloc.id, state),
+          IsolateBlocTransitionEvent(id, state),
         ),
       );
 
-      _messenger.send(IsolateBlocCreatedEvent(bloc.runtimeType, bloc.id));
+      _messenger.send(IsolateBlocCreatedEvent(id));
     }
   }
 
@@ -162,29 +191,28 @@ Stacktrace: $stacktrace''');
       throw Exception("Failed to close bloc because it wasn't created yet.");
     } else {
       _createdBlocsSubscriptions[uuid]?.cancel();
+
+      for (final sub in _isolatedBlocWrappersSubscriptions[bloc] ?? <StreamSubscription>[]) {
+        sub.cancel();
+      }
+      for (final wrapper in _isolatedBlocWrappers[bloc] ?? <IsolateBlocWrapper>[]) {
+        wrapper.close();
+      }
       bloc.close();
     }
   }
 
   /// Returns new bloc from cached in [_freeBlocs] or create new one.
   IsolateBlocBase? _getFreeBlocByType(Type type) {
-    IsolateBlocBase? bloc;
     if (_freeBlocs.containsKey(type)) {
-      bloc = _freeBlocs.remove(type)!;
+      return _freeBlocs.remove(type)!;
     } else {
       final blocCreator = _blocCreators[type];
       if (blocCreator == null) {
-        print("Can't create IsolateBloc with type $type.\n"
-            "Maybe you forgot to register it?");
+        throw BlocUnregisteredException();
       } else {
-        bloc = blocCreator.call();
+        return blocCreator.call();
       }
-    }
-    if (bloc != null) {
-      _createdBlocs[bloc.id] = bloc;
-      return bloc;
-    } else {
-      return null;
     }
   }
 
@@ -198,7 +226,7 @@ Stacktrace: $stacktrace''');
     } else {
       final blocCreator = _blocCreators[T];
       if (blocCreator == null) {
-        throw Exception("Failed to find BlocCreator for $T. Maybe you forget to `register` it?");
+        throw BlocUnregisteredException();
       } else {
         return _freeBlocs[T] = blocCreator() as T;
       }

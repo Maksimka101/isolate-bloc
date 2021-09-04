@@ -1,14 +1,16 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/src/common/isolate/service_events.dart';
+import 'package:uuid/uuid.dart';
 
 /// Signature for event receiver function which takes an [IsolateBlocTransitionEvent]
 /// and send this event to the [IsolateBloc]
-typedef EventReceiver = void Function(IsolateBlocTransitionEvent event);
+typedef EventReceiver = void Function(Object? event);
 
 /// Signature for function which takes [IsolateBloc]'s uuid and close it
-typedef IsolateBlocKiller = void Function(String? uuid);
+typedef IsolateBlocKiller = void Function(String uuid);
 
 /// Takes a `Stream` of `Events` as input
 /// and transforms them into a `Stream` of `States` as output using [IsolateBloc].
@@ -29,12 +31,14 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
     required IsolateBlocKiller onBlocClose,
   })  : _eventReceiver = eventReceiver,
         _onBlocClose = onBlocClose,
-        _state = state {
+        _state = state,
+        isolateBlocId = Uuid().v4() {
     _bindEventsListener();
   }
 
-  /// Create object as default constructor do but without initialState.
-  IsolateBlocWrapper.noInitState(
+  /// Creates wrapper for bloc in isolate
+  @protected
+  IsolateBlocWrapper.isolate(
     this._eventReceiver,
     this._onBlocClose,
   ) : _state = null {
@@ -45,10 +49,16 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
   final _stateController = StreamController<State>.broadcast();
 
   /// Id of IsolateBloc. It's needed to find bloc in isolate.
-  String? _isolateBlocId;
+  ///
+  /// This id may be changed
+  @protected
+  String? isolateBlocId;
 
   State? _state;
-  final _unsentEvents = <Object?>[];
+
+  /// Used to sync unsent events
+  var _blocCreated = false;
+  final _unsentEvents = Queue<Object?>();
   final IsolateBlocKiller _onBlocClose;
   late StreamSubscription<Object?> _eventReceiverSubscription;
 
@@ -74,21 +84,22 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
   @override
   @mustCallSuper
   Future<void> close() async {
-    _onBlocClose(_isolateBlocId);
+    var id = isolateBlocId;
+    if (id != null) {
+      _onBlocClose(id);
+    }
     await _eventController.close();
     await _stateController.close();
     await _eventReceiverSubscription.cancel();
   }
 
   /// Connects this wrapper to the [IsolateBloc] and sends all unsent events.
+  // todo(maksim): maybe move unsent events synchronization to the [IsolateManager]
   @protected
-  void connectToBloc(String uuid) {
-    _isolateBlocId = uuid;
+  void onBlocCreated() {
+    _blocCreated = true;
     while (_unsentEvents.isNotEmpty) {
-      _eventReceiver(IsolateBlocTransitionEvent(
-        uuid,
-        _unsentEvents.removeAt(0),
-      ));
+      _eventReceiver(_unsentEvents.removeFirst());
     }
   }
 
@@ -104,9 +115,8 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
   /// Starts listening for new `events`
   void _bindEventsListener() {
     _eventReceiverSubscription = eventStream.listen((event) {
-      final uuid = _isolateBlocId;
-      if (uuid != null) {
-        _eventReceiver(IsolateBlocTransitionEvent(uuid, event));
+      if (_blocCreated) {
+        _eventReceiver(event);
       } else {
         _unsentEvents.add(event);
       }

@@ -6,25 +6,25 @@ abstract class IsolateBlocEvent {}
 
 /// Event with [IsolateBloc]'s state or or with event from [IsolateBlocWrapper]
 class IsolateBlocTransitionEvent extends IsolateBlocEvent {
-  IsolateBlocTransitionEvent(this.blocUuid, this.event);
+  IsolateBlocTransitionEvent(this.blocId, this.event);
 
-  final String blocUuid;
+  final String blocId;
   final Object? event;
 }
 
 /// Request to create new [IsolateBloc]
 class CreateIsolateBlocEvent extends IsolateBlocEvent {
-  CreateIsolateBlocEvent(this.blocType);
+  CreateIsolateBlocEvent(this.blocType, this.blocId);
 
   final Type blocType;
+  final String blocId;
 }
 
 /// Event to bind [IsolateBlocWrapper] to the [IsolateBloc] when second one is created
 class IsolateBlocCreatedEvent extends IsolateBlocEvent {
-  IsolateBlocCreatedEvent(this.blocType, this.blocUuid);
+  IsolateBlocCreatedEvent(this.blocId);
 
-  final String blocUuid;
-  final Type blocType;
+  final String blocId;
 }
 
 /// When every [IsolateBloc]s are initialized
@@ -36,9 +36,9 @@ class IsolateBlocsInitialized extends IsolateBlocEvent {
 
 /// Event to close IsolateBloc. Called by [IsolateBlocWrapper.close()]
 class CloseIsolateBlocEvent extends IsolateBlocEvent {
-  CloseIsolateBlocEvent(this.blocUuid);
+  CloseIsolateBlocEvent(this.blocId);
 
-  final String blocUuid;
+  final String blocId;
 }
 
 /// Event to invoke [MethodChannel] in main isolate.

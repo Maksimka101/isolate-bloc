@@ -1,6 +1,8 @@
 import 'dart:async';
 
-typedef SendToIsolate = void Function(Object message);
+import 'package:isolate_bloc/src/common/isolate/service_events.dart';
+
+typedef SendToIsolate = void Function(IsolateBlocEvent message);
 
 /// Class that help communicate between [Isolate]s.
 class IsolateMessenger {
@@ -10,8 +12,9 @@ class IsolateMessenger {
   final SendToIsolate _toIsolate;
 
   /// Send messages to the [Isolate]
-  void send(Object message) => _toIsolate(message);
+  void send(IsolateBlocEvent message) => _toIsolate(message);
 
   /// Stream with messages from [Isolate]
-  Stream get messagesStream => _fromIsolateStream;
+  Stream<IsolateBlocEvent> get messagesStream =>
+      _fromIsolateStream.where((event) => event is IsolateBlocEvent).cast<IsolateBlocEvent>();
 }

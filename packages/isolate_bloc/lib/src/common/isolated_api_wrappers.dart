@@ -5,18 +5,22 @@ import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart'
 
 /// Registers [IsolateBlocBase].
 ///
+/// If [initialState] is not provided bloc will be created immediately.
+/// So if you don't want to create bloc while initialization please provide [initialState]!
+///
 /// You can create [IsolateBlocBase] and get [IsolateBlocWrapper] using
 /// [_createBloc] only if you have registered this [IsolateBlocBase].
 ///
 /// Throws [IsolateManagerUnInitialized] if [IsolatedBlocManager] is null
-void register({
-  required IsolateBlocCreator create,
+void register<T extends IsolateBlocBase<Object?, S>, S>({
+  required IsolateBlocCreator<Object?, S> create,
+  S? initialState,
 }) {
   final isolateManager = IsolateManager.instance;
   if (isolateManager == null) {
     throw IsolateManagerUnInitialized();
   } else {
-    isolateManager.register(create);
+    isolateManager.register<T, S>(create, initialState);
   }
 }
 

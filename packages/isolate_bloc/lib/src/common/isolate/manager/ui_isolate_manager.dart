@@ -40,8 +40,6 @@ class UIIsolateManager {
 
   InitialStates _initialStates = {};
 
-  final _freeWrappers = <Type, List<IsolateBlocWrapper>>{};
-
   /// Map of [IsolateBlocWrapper] to it's id
   final _wrappers = <String, IsolateBlocWrapper>{};
   StreamSubscription<IsolateBlocEvent>? _serviceEventsSubscription;
@@ -50,33 +48,34 @@ class UIIsolateManager {
 
   /// Starts listening for [_isolateMessenger] and waits for [InitialStates]
   Future<void> initialize() async {
-    _serviceEventsSubscription = _isolateMessenger.messagesStream
-        .where((event) => event is IsolateBlocEvent)
-        .cast<IsolateBlocEvent>()
-        .listen(_listenForIsolateEvents);
+    _serviceEventsSubscription = _isolateMessenger.messagesStream.listen(_listenForIsolateEvents);
 
     _initialStates = await _initializeCompleter.future;
   }
 
   /// Start creating [IsolateBlocBase] and return [IsolateBlocWrapper].
-  IsolateBlocWrapper<State> createBloc<T extends IsolateBlocBase, State>() {
-    void onBlocClose(String? uuid) {
-      if (uuid != null) {
-        _isolateMessenger.send(CloseIsolateBlocEvent(uuid));
-      }
+  IsolateBlocWrapper<S> createBloc<T extends IsolateBlocBase, S>() {
+    void onBlocClose(String uuid) {
+      _isolateMessenger.send(CloseIsolateBlocEvent(uuid));
     }
 
     final initialState = _initialStates[T];
 
-    final blocWrapper = IsolateBlocWrapper<State>(
-      state: initialState as State,
-      eventReceiver: _isolateMessenger.send,
+    late IsolateBlocWrapper<S> blocWrapper;
+    blocWrapper = IsolateBlocWrapper<S>(
+      state: initialState as S,
+      eventReceiver: (event) => _isolateMessenger.send(
+        // ignore: invalid_use_of_protected_member
+        IsolateBlocTransitionEvent(blocWrapper.isolateBlocId!, event),
+      ),
       onBlocClose: onBlocClose,
     );
 
-    _freeWrappers[T] ??= [];
-    _freeWrappers[T]!.add(blocWrapper);
-    _isolateMessenger.send(CreateIsolateBlocEvent(T));
+    // ignore: invalid_use_of_protected_member
+    final blocId = blocWrapper.isolateBlocId!;
+
+    _wrappers[blocId] = blocWrapper;
+    _isolateMessenger.send(CreateIsolateBlocEvent(T, blocId));
 
     return blocWrapper;
   }
@@ -88,11 +87,11 @@ class UIIsolateManager {
         break;
       case IsolateBlocCreatedEvent:
         event = event as IsolateBlocCreatedEvent;
-        _bindFreeWrapper(event.blocType, event.blocUuid);
+        _onBlocCreated(event.blocId);
         break;
       case IsolateBlocTransitionEvent:
         event = event as IsolateBlocTransitionEvent;
-        _receiveBlocState(event.blocUuid, event.event);
+        _receiveBlocState(event.blocId, event.event);
         break;
       case InvokePlatformChannelEvent:
         final methodChannelMiddleware = MethodChannelMiddleware.instance;
@@ -120,12 +119,11 @@ class UIIsolateManager {
 
   /// Finish [IsolateBlocBase] creating which started by call [createBloc].
   /// Connect [IsolateBlocBase] to it's [IsolateBlocWrapper].
-  void _bindFreeWrapper(Type blocType, String id) {
-    if (_freeWrappers.containsKey(blocType) && _freeWrappers[blocType]!.isNotEmpty) {
+  void _onBlocCreated(String id) {
+    final wrapper = _wrappers[id];
+    if (wrapper != null) {
       // ignore: invalid_use_of_protected_member
-      _wrappers[id] = _freeWrappers[blocType]!.removeAt(0)..connectToBloc(id);
-    } else {
-      throw Exception('No free bloc wrapper for $blocType');
+      wrapper.onBlocCreated();
     }
   }
 

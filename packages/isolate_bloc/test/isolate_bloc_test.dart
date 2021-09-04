@@ -3,8 +3,8 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 
 import 'initializers/counter_bloc_initializer.dart';
 import 'initializers/simple_initializer.dart';
-import 'isolate_blocs/increment_bloc.dart';
-import 'isolate_blocs/simple_bloc.dart';
+import 'isolate_blocs/increment_cubit.dart';
+import 'isolate_blocs/simple_cubit.dart';
 import 'test_utils/initialize.dart';
 
 void main() {
@@ -33,7 +33,7 @@ void runTests() {
       "emit it's initial state and this state received.",
       () async {
         await testInitialize(simpleBlocInitializer);
-        final blocWrapper = createBloc<SimpleBloc, String>();
+        final blocWrapper = createBloc<SimpleCubit, String>();
         var valueReceived = false;
         blocWrapper.stream.listen((_) {
           valueReceived = true;
@@ -51,7 +51,7 @@ void runTests() {
 
     test("Test that bloc emits its initial state", () async {
       await testInitialize(simpleBlocInitializer);
-      final blocWrapper = createBloc<SimpleBloc, String>();
+      final blocWrapper = createBloc<SimpleCubit, String>();
       final initialState = await blocWrapper.stream.first;
       expect(
         initialState,
@@ -62,7 +62,7 @@ void runTests() {
 
     test("Test that bloc emits it's not initial state", () async {
       await testInitialize(simpleBlocInitializer);
-      final blocWrapper = createBloc<SimpleBloc, String>();
+      final blocWrapper = createBloc<SimpleCubit, String>();
       blocWrapper.add(Object());
       final stateFuture = blocWrapper.stream.skip(1).first;
       var stateReceived = false;
@@ -81,7 +81,7 @@ void runTests() {
 
     test("Test that bloc emits state with data on some event", () async {
       await testInitialize(simpleBlocInitializer);
-      final blocWrapper = createBloc<SimpleBloc, String>();
+      final blocWrapper = createBloc<SimpleCubit, String>();
       blocWrapper.add(Object());
       final state = await blocWrapper.stream.skip(1).first;
       expect(state, 'data', reason: "Bloc's not initial state is not right");
@@ -89,7 +89,7 @@ void runTests() {
 
     test("Test that state received on every event", () async {
       await testInitialize(counterBlocInitializer);
-      final blocWrapper = createBloc<CounterBloc, int>();
+      final blocWrapper = createBloc<CounterCubit, int>();
       const eventsCount = 4;
       var statesReceivedCount = 0;
       blocWrapper.stream.listen((state) {
@@ -110,7 +110,7 @@ void runTests() {
 
     test("Test that bloc's state received in right order", () async {
       await testInitialize(counterBlocInitializer);
-      final blocWrapper = createBloc<CounterBloc, int>();
+      final blocWrapper = createBloc<CounterCubit, int>();
       final expectOrder = [0, 1, 2, 1];
       // Point to the index of the next state to check
       var receivedStatePointer = 0;
@@ -130,7 +130,7 @@ void runTests() {
 
     test("Test that IsolateBlocWrapper closed when call close()", () async {
       await testInitialize(simpleBlocInitializer);
-      final blocWrapper = createBloc<SimpleBloc, String>();
+      final blocWrapper = createBloc<SimpleCubit, String>();
       var streamClosed = false;
       blocWrapper.stream.listen((_) {}, onDone: () {
         streamClosed = true;
@@ -147,8 +147,8 @@ void runTests() {
       "and emits different states",
       () async {
         await testInitialize(counterBlocInitializer);
-        final bloc1 = createBloc<CounterBloc, int>();
-        final bloc2 = createBloc<CounterBloc, int>();
+        final bloc1 = createBloc<CounterCubit, int>();
+        final bloc2 = createBloc<CounterCubit, int>();
         bloc1.add(true);
         bloc1.stream.skip(1).listen((state) {
           expect(
