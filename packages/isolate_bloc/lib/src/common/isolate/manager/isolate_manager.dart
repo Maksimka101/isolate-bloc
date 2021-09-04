@@ -10,9 +10,14 @@ import 'package:isolate_bloc/src/common/isolate/service_events.dart';
 typedef IsolateBlocCreator<E, S> = IsolateBlocBase<E, S> Function();
 
 class BlocUnregisteredException implements Exception {
+  BlocUnregisteredException(this.blocType);
+
+  final Type blocType;
+
   @override
   String toString() {
-    return 'You trying to create isolate bloc';
+    return 'You trying to create $blocType which is not registered.\n'
+        'Ensure that you call `register<$blocType, ${blocType}State>(...) in Initializer function';
   }
 }
 
