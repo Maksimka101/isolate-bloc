@@ -58,9 +58,12 @@ class IsolateManager {
     try {
       await _userInitializer();
     } catch (e, stacktrace) {
-      log('''Error in user's Initializer function.
+      // Throw exception only in debug mode
+      assert(() {
+        throw Exception('''Error in user's Initializer function.
 Error message: ${e.toString()}
 Stacktrace: $stacktrace''');
+      }());
     }
 
     _initializeCompleter.complete();
