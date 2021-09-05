@@ -75,3 +75,44 @@ linter:
     - use_function_type_syntax_for_parameters
     - use_rethrow_when_possible
     
+analyzer:
+   plugins:
+     - dart_code_metrics
+
+dart_code_metrics:
+  anti-patterns:
+    - long-method
+    - long-parameter-list
+  metrics:
+    cyclomatic-complexity: 20
+    maximum-nesting-level: 5
+    number-of-parameters: 4
+  metrics-exclude:
+    - test/**
+    - test_driver/**
+    - integration_test/**
+  rules:
+      - avoid-unused-parameters
+      - member-ordering:
+          order: 
+              - constructors
+              - public-fields
+              - private-fields
+              - public-getters
+              - public-setters
+              - private-getters
+              - private-setters
+              - public-methods
+              - private-methods
+      - newline-before-return
+      - no-equal-arguments 
+      - no-empty-block:
+          exclude: 
+              - test/**
+      - no-equal-then-else
+      - no-magic-number:
+          exclude: 
+              - test/**
+      - prefer-match-file-name:
+          exclude:          
+              - test/**

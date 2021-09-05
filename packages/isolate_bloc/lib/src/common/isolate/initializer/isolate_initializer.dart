@@ -5,7 +5,7 @@ import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart'
 class IsolateInitializer {
   Future<void> initialize(
     Initializer initializer,
-    IsolateFactory isolateFactory,
+    IIsolateFactory isolateFactory,
     MethodChannels platformChannels,
   ) async {
     // close current isolate

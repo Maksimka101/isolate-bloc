@@ -1,3 +1,4 @@
+// ignore_for_file: no-empty-bloc
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 

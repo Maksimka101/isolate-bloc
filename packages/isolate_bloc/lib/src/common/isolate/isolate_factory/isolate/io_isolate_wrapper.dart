@@ -1,10 +1,10 @@
 import 'dart:isolate';
 
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/abstract_isolate_wrapper.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_wrapper.dart';
 
-/// [IsolateWrapper] for native environment 
+/// [IIsolateWrapper] for native environment 
 /// Maintain a real [Isolate].
-class IOIsolateWrapper extends IsolateWrapper {
+class IOIsolateWrapper extends IIsolateWrapper {
   IOIsolateWrapper(this.isolate);
 
   final Isolate isolate;

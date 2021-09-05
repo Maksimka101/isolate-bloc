@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
-import 'package:isolate_bloc/src/common/isolate/service_events.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_bloc_event.dart';
 import 'package:uuid/uuid.dart';
 
 /// Signature for event receiver function which takes an [IsolateBlocTransitionEvent]
@@ -45,14 +45,14 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
     _bindEventsListener();
   }
 
-  final _eventController = StreamController<Object?>.broadcast();
-  final _stateController = StreamController<State>.broadcast();
-
   /// Id of IsolateBloc. It's needed to find bloc in isolate.
   ///
   /// This id may be changed
-  @protected
+  // @protected
   String? isolateBlocId;
+
+  final _eventController = StreamController<Object?>.broadcast();
+  final _stateController = StreamController<State>.broadcast();
 
   State? _state;
 
@@ -62,11 +62,11 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
   final IsolateBlocKiller _onBlocClose;
   late StreamSubscription<Object?> _eventReceiverSubscription;
 
-  /// Returns stream with `event`
-  Stream<Object?> get eventStream => _eventController.stream;
-
   /// Callback which receive events and send them to the IsolateBloc
   final EventReceiver _eventReceiver;
+
+  /// Returns stream with `event`
+  Stream<Object?> get eventStream => _eventController.stream;
 
   /// Returns the current [state] of the [bloc].
   State get state => _state!;

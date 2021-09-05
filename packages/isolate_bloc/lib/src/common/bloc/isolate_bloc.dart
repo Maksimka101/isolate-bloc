@@ -14,12 +14,12 @@ abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
     _bindEventsToStates();
   }
 
+  /// The current [IsolateBlocObserver] instance.
+  static IsolateBlocObserver observer = IsolateBlocObserver();
+
   StreamSubscription<Transition<Event, State>>? _transitionSubscription;
 
   final _eventController = StreamController<Event>.broadcast();
-
-  /// The current [IsolateBlocObserver] instance.
-  static IsolateBlocObserver observer = IsolateBlocObserver();
 
   /// Transforms the [events] stream along with a [transitionFn] function into
   /// a `Stream<Transition>`.
@@ -150,6 +150,7 @@ abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
   @mustCallSuper
   Future<void> close() async {
     await _transitionSubscription?.cancel();
+
     return super.close();
   }
 

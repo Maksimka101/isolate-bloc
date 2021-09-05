@@ -4,22 +4,22 @@ import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:provider/provider.dart';
 
 /// {@template bloc_consumer}
-/// [BlocConsumer] exposes a [builder] and [listener] in order react to new
+/// [IsolateBlocConsumer] exposes a [builder] and [listener] in order react to new
 /// states.
-/// [BlocConsumer] is analogous to a nested `BlocListener`
-/// and `BlocBuilder` but reduces the amount of boilerplate needed.
-/// [BlocConsumer] should only be used when it is necessary to both rebuild UI
+/// [IsolateBlocConsumer] is analogous to a nested `IsolateBlocListener`
+/// and `IsolateBlocBuilder` but reduces the amount of boilerplate needed.
+/// [IsolateBlocConsumer] should only be used when it is necessary to both rebuild UI
 /// and execute other reactions to state changes in the [bloc].
 ///
-/// [BlocConsumer] takes a required `BlocWidgetBuilder`
+/// [IsolateBlocConsumer] takes a required `BlocWidgetBuilder`
 /// and `BlocWidgetListener` and an optional [bloc],
 /// `BlocBuilderCondition`, and `BlocListenerCondition`.
 ///
-/// If the [bloc] parameter is omitted, [BlocConsumer] will automatically
-/// perform a lookup using `BlocProvider` and the current `BuildContext`.
+/// If the [bloc] parameter is omitted, [IsolateBlocConsumer] will automatically
+/// perform a lookup using `IsolateBlocProvider` and the current `BuildContext`.
 ///
 /// ```dart
-/// BlocConsumer<BlocA, BlocAState>(
+/// IsolateBlocConsumer<BlocA, BlocAState>(
 ///   listener: (context, state) {
 ///     // do stuff here based on BlocA's state
 ///   },
@@ -37,12 +37,12 @@ import 'package:provider/provider.dart';
 /// a [bool] which determines whether or not the [builder] and/or [listener]
 /// function will be invoked.
 /// The previous `state` will be initialized to the `state` of the [bloc] when
-/// the [BlocConsumer] is initialized.
+/// the [IsolateBlocConsumer] is initialized.
 /// [listenWhen] and [buildWhen] are optional and if they aren't implemented,
 /// they will default to `true`.
 ///
 /// ```dart
-/// BlocConsumer<BlocA, BlocAState>(
+/// IsolateBlocConsumer<BlocA, BlocAState>(
 ///   listenWhen: (previous, current) {
 ///     // return true/false to determine whether or not
 ///     // to invoke listener with state
@@ -60,9 +60,9 @@ import 'package:provider/provider.dart';
 /// )
 /// ```
 /// {@endtemplate}
-class BlocConsumer<B extends IsolateBlocBase<Object?, S>, S> extends StatefulWidget {
+class IsolateBlocConsumer<B extends IsolateBlocBase<Object?, S>, S> extends StatefulWidget {
   /// {@macro bloc_consumer}
-  const BlocConsumer({
+  const IsolateBlocConsumer({
     Key? key,
     required this.builder,
     required this.listener,
@@ -71,8 +71,8 @@ class BlocConsumer<B extends IsolateBlocBase<Object?, S>, S> extends StatefulWid
     this.listenWhen,
   }) : super(key: key);
 
-  /// The [bloc] that the [BlocConsumer] will interact with.
-  /// If omitted, [BlocConsumer] will automatically perform a lookup using
+  /// The [bloc] that the [IsolateBlocConsumer] will interact with.
+  /// If omitted, [IsolateBlocConsumer] will automatically perform a lookup using
   /// `BlocProvider` and the current `BuildContext`.
   final IsolateBlocWrapper? bloc;
 
@@ -93,14 +93,14 @@ class BlocConsumer<B extends IsolateBlocBase<Object?, S>, S> extends StatefulWid
 
   /// Takes the previous `state` and the current `state` and is responsible for
   /// returning a [bool] which determines whether or not to call [listener] of
-  /// [BlocConsumer] with the current `state`.
+  /// [IsolateBlocConsumer] with the current `state`.
   final BlocListenerCondition<S>? listenWhen;
 
   @override
-  State<BlocConsumer<B, S>> createState() => _BlocConsumerState<B, S>();
+  State<IsolateBlocConsumer<B, S>> createState() => _IsolateBlocConsumerState<B, S>();
 }
 
-class _BlocConsumerState<B extends IsolateBlocBase<Object?, S>, S> extends State<BlocConsumer<B, S>> {
+class _IsolateBlocConsumerState<B extends IsolateBlocBase<Object?, S>, S> extends State<IsolateBlocConsumer<B, S>> {
   late IsolateBlocWrapper _bloc;
 
   @override
@@ -110,7 +110,7 @@ class _BlocConsumerState<B extends IsolateBlocBase<Object?, S>, S> extends State
   }
 
   @override
-  void didUpdateWidget(BlocConsumer<B, S> oldWidget) {
+  void didUpdateWidget(IsolateBlocConsumer<B, S> oldWidget) {
     super.didUpdateWidget(oldWidget);
     final oldBloc = oldWidget.bloc ?? context.isolateBloc<B, S>();
     final currentBloc = widget.bloc ?? oldBloc;
@@ -127,6 +127,7 @@ class _BlocConsumerState<B extends IsolateBlocBase<Object?, S>, S> extends State
   @override
   Widget build(BuildContext context) {
     if (widget.bloc == null) context.select<B, int>(identityHashCode);
+    
     return IsolateBlocBuilder<B, S>(
       bloc: _bloc,
       builder: widget.builder,
@@ -134,6 +135,7 @@ class _BlocConsumerState<B extends IsolateBlocBase<Object?, S>, S> extends State
         if (widget.listenWhen?.call(previous, current) ?? true) {
           widget.listener(context, current);
         }
+
         return widget.buildWhen?.call(previous, current) ?? true;
       },
     );

@@ -6,7 +6,7 @@ import 'mock_isolate_wrapper.dart';
 
 /// [IsolateCreateResult] implementation for tests.
 /// Have all IO [IsolateCreateResult] restrictions.
-class MockIsolateManagerFactory extends IsolateFactory {
+class MockIsolateManagerFactory extends IIsolateFactory {
   /// Create mock [IsolateCreateResult] object.
   @override
   Future<IsolateCreateResult> create(IsolateRun isolateRun, Initializer initializer, MethodChannels methodChannels) async {

@@ -1,7 +1,7 @@
 /// Abstract layer for [Isolate]
-/// For example [MockIsolateWrapper] or [IsolateWrapper] do nothing but
+/// For example [MockIsolateWrapper] or [IIsolateWrapper] do nothing but
 /// [IsolateWrapperImpl] maintain a real [Isolate]
-abstract class IsolateWrapper {
+abstract class IIsolateWrapper {
   /// Kill [Isolate]
   void kill();
 }

@@ -2,28 +2,8 @@ import 'dart:async';
 
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
-import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_middleware.dart';
-import 'package:isolate_bloc/src/common/isolate/service_events.dart';
-
-/// Signature for initialization function which would be run in [Isolate] to
-/// initialize your blocs and repository.
-/// Initializer must be a global or static function.
-typedef Initializer = Function();
-
-typedef IsolateManagerCreator = Future<IsolateCreateResult> Function(
-  IsolateRun,
-  Initializer,
-  List<String> channels,
-);
-
-typedef InitialStates = Map<Type, Object?>;
-
-class MethodChannelUninitializedException implements Exception {
-  @override
-  String toString() {
-    return 'Method channel middleware is null. Maybe you forgot to call `await initialize(...)`?';
-  }
-}
+import 'package:isolate_bloc/src/common/isolate/platform_channel/method_channel_middleware.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_bloc_event.dart';
 
 /// Manager which works in UI Isolate
 class UIIsolateManager {
@@ -35,7 +15,7 @@ class UIIsolateManager {
 
   static UIIsolateManager? instance;
 
-  final IsolateWrapper _isolate;
+  final IIsolateWrapper _isolate;
   final IsolateMessenger _isolateMessenger;
 
   InitialStates _initialStates = {};
@@ -78,6 +58,12 @@ class UIIsolateManager {
     _isolateMessenger.send(CreateIsolateBlocEvent(T, blocId));
 
     return blocWrapper;
+  }
+
+  /// Free all resources and kill [Isolate] with [IsolateBlocBase]s.
+  Future<void> dispose() async {
+    _isolate.kill();
+    await _serviceEventsSubscription?.cancel();
   }
 
   void _listenForIsolateEvents(IsolateBlocEvent event) {
@@ -133,10 +119,24 @@ class UIIsolateManager {
     // ignore: invalid_use_of_protected_member
     _wrappers[blocId]?.stateReceiver(state);
   }
+}
 
-  /// Free all resources and kill [Isolate] with [IsolateBlocBase]s.
-  Future<void> dispose() async {
-    _isolate.kill();
-    await _serviceEventsSubscription?.cancel();
+/// Signature for initialization function which would be run in [Isolate] to
+/// initialize your blocs and repository.
+/// Initializer must be a global or static function.
+typedef Initializer = Function();
+
+typedef IsolateManagerCreator = Future<IsolateCreateResult> Function(
+  IsolateRun,
+  Initializer,
+  List<String> channels,
+);
+
+typedef InitialStates = Map<Type, Object?>;
+
+class MethodChannelUninitializedException implements Exception {
+  @override
+  String toString() {
+    return 'Method channel middleware is null. Maybe you forgot to call `await initialize(...)`?';
   }
 }

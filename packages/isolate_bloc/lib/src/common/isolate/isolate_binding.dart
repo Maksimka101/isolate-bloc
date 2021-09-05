@@ -1,3 +1,4 @@
+// ignore_for_file: no-empty-block
 import 'dart:developer';
 import 'dart:ui' as ui;
 

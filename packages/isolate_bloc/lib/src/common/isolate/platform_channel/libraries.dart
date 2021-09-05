@@ -1,4 +1,4 @@
-import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_plugin.dart';
+import 'package:isolate_bloc/src/common/isolate/platform_channel/library.dart';
 
 /// Standard flutter libraries
 const flutterLibraries = <Library>[

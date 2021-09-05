@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:isolate_bloc/src/common/isolate/service_events.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_bloc_event.dart';
 import 'package:uuid/uuid.dart';
 
 /// This class receive messages from [MethodChannel.send] and send them to the
@@ -23,18 +23,6 @@ class IsolatedPlatformChannelMiddleware {
   final void Function(IsolateBlocEvent) sendEvent;
   final _platformResponsesCompleter = <String, Completer<ByteData>>{};
 
-  void _bindMessageHandlers(List<String> channels) {
-    for (final channel in channels) {
-      platformMessenger.setMockMessageHandler(channel, (message) {
-        final completer = Completer<ByteData>();
-        final id = generateId();
-        _platformResponsesCompleter[id] = completer;
-        sendEvent(InvokePlatformChannelEvent(message, channel, id));
-        return completer.future;
-      });
-    }
-  }
-
   /// Handle platform messages and send them to it's [MessageChannel].
   void handlePlatformMessage(String channel, String id, ByteData? message) {
     platformMessenger.handlePlatformMessage(channel, message, (data) {
@@ -52,6 +40,19 @@ class IsolatedPlatformChannelMiddleware {
       );
     } else {
       completer.complete(response);
+    }
+  }
+
+  void _bindMessageHandlers(List<String> channels) {
+    for (final channel in channels) {
+      platformMessenger.setMockMessageHandler(channel, (message) {
+        final completer = Completer<ByteData>();
+        final id = generateId();
+        _platformResponsesCompleter[id] = completer;
+        sendEvent(InvokePlatformChannelEvent(message, channel, id));
+        
+        return completer.future;
+      });
     }
   }
 }

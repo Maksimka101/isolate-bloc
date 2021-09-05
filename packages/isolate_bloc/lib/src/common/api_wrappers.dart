@@ -1,3 +1,4 @@
+// ignore_for_file: prefer-match-file-name
 import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';

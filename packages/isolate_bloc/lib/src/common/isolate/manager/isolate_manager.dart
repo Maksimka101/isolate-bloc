@@ -1,25 +1,9 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/isolated_platform_channel_middleware.dart';
-import 'package:isolate_bloc/src/common/isolate/service_events.dart';
-
-/// Signature for function which creates [IsolateCubit].
-typedef IsolateBlocCreator<E, S> = IsolateBlocBase<E, S> Function();
-
-class BlocUnregisteredException implements Exception {
-  BlocUnregisteredException(this.blocType);
-
-  final Type blocType;
-
-  @override
-  String toString() {
-    return 'You trying to create $blocType which is not registered.\n'
-        'Ensure that you call `register<$blocType, ${blocType}State>(...) in Initializer function';
-  }
-}
+import 'package:isolate_bloc/src/common/isolate/isolate_bloc_event.dart';
 
 /// Manager which works in Isolate
 class IsolateManager {
@@ -123,7 +107,12 @@ Stacktrace: $stacktrace''');
     }
 
     wrapper = IsolateBlocWrapper.isolate(eventReceiver, onBLocClose);
+
     return wrapper;
+  }
+
+  Future<void> dispose() async {
+    await _serviceEventsSubscription?.cancel();
   }
 
   void _listenForMessagesFormUi(IsolateBlocEvent event) {
@@ -217,7 +206,7 @@ Stacktrace: $stacktrace''');
     } else {
       final blocCreator = _blocCreators[type];
       if (blocCreator == null) {
-        throw BlocUnregisteredException();
+        throw BlocUnregisteredException(type);
       } else {
         return blocCreator.call();
       }
@@ -234,14 +223,25 @@ Stacktrace: $stacktrace''');
     } else {
       final blocCreator = _blocCreators[T];
       if (blocCreator == null) {
-        throw BlocUnregisteredException();
+        throw BlocUnregisteredException(T);
       } else {
         return _freeBlocs[T] = blocCreator() as T;
       }
     }
   }
+}
 
-  Future<void> dispose() async {
-    await _serviceEventsSubscription?.cancel();
+/// Signature for function which creates [IsolateCubit].
+typedef IsolateBlocCreator<E, S> = IsolateBlocBase<E, S> Function();
+
+class BlocUnregisteredException implements Exception {
+  BlocUnregisteredException(this.blocType);
+
+  final Type blocType;
+
+  @override
+  String toString() {
+    return 'You trying to create $blocType which is not registered.\n'
+        'Ensure that you call `register<$blocType, ${blocType}State>(...) in Initializer function';
   }
 }

@@ -2,17 +2,14 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate/io_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/web/web_isolate_factory.dart';
 
-TestInitializePlatform? _testInitializePlatform;
+TestInitializePlatform _testInitializePlatform = TestInitializePlatform.native;
 
 void testInitializePlatform(TestInitializePlatform platform) {
   _testInitializePlatform = platform;
 }
 
 Future<void> testInitialize(Initializer userInitializer) async {
-  assert(
-    _testInitializePlatform != null,
-    "You are forget to set testInitializePlatform",
-  );
+
   return IsolateInitializer().initialize(
     userInitializer,
     _testFactory,
@@ -20,8 +17,8 @@ Future<void> testInitialize(Initializer userInitializer) async {
   );
 }
 
-IsolateFactory get _testFactory {
-  switch (_testInitializePlatform!) {
+IIsolateFactory get _testFactory {
+  switch (_testInitializePlatform) {
     case TestInitializePlatform.web:
       return WebIsolateFactory();
     case TestInitializePlatform.native:

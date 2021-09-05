@@ -1,8 +1,9 @@
+// ignore_for_file: no-empty-bloc
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_wrapper.dart';
 
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/abstract_isolate_wrapper.dart';
-
-/// [IsolateWrapper] for web environment
-class WebIsolateWrapper extends IsolateWrapper {
+/// [IIsolateWrapper] for web environment
+class WebIsolateWrapper extends IIsolateWrapper {
   @override
+  // ignore: no-empty-block
   void kill() {}
 }

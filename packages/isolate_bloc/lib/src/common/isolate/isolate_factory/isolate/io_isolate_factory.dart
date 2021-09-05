@@ -4,12 +4,12 @@ import 'dart:isolate';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_binding.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/abstract_isolate_factory.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate/io_isolate_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/isolated_platform_channel_middleware.dart';
-import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_middleware.dart';
+import 'package:isolate_bloc/src/common/isolate/platform_channel/method_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 import 'package:uuid/uuid.dart';
 
@@ -28,7 +28,7 @@ class _IsolateSetup {
 }
 
 /// Creates and initializes [Isolate] and [IsolateMessenger].
-class IOIsolateFactory implements IsolateFactory {
+class IOIsolateFactory implements IIsolateFactory {
   @override
   Future<IsolateCreateResult> create(
     IsolateRun isolateRun,
