@@ -113,6 +113,9 @@ void main() {
   });
 }
 
+/// Sets initial states to the `uiIsolateManager`
+///
+/// In `eventsStream` is provided yields them to the `isolatedMessenger.messagesStream`
 Future<void> setInitialStates({
   required UIIsolateManager uiIsolateManager,
   required IIsolateMessenger isolateMessenger,
