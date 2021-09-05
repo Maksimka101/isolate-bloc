@@ -53,12 +53,10 @@ class IsolateManager {
 
     try {
       await _userInitializer();
-    } catch (e, stacktrace) {
+    } catch (e, stackTrace) {
       // Throw exception only in debug mode
       assert(() {
-        throw Exception('''Error in user's Initializer function.
-Error message: ${e.toString()}
-Stacktrace: $stacktrace''');
+        throw InitializerException(e, stackTrace);
       }());
     }
 
@@ -72,7 +70,7 @@ Stacktrace: $stacktrace''');
   ///
   /// If [initialState] is not provided bloc will be created immediately.
   /// So if you don't want to create bloc while initialization please provide [initialState]
-  void register<T extends IsolateBlocBase<Object?, S>, S>(IsolateBlocCreator creator, S? initialState) {
+  void register<T extends IsolateBlocBase<Object?, S>, S>(IsolateBlocCreator creator, {S? initialState}) {
     if (initialState == null) {
       final bloc = creator();
       _initialStates[T] = bloc.state;
@@ -245,5 +243,19 @@ class BlocUnregisteredException implements Exception {
   String toString() {
     return 'You trying to create $blocType which is not registered.\n'
         'Ensure that you call `register<$blocType, ${blocType}State>(...) in Initializer function';
+  }
+}
+
+class InitializerException {
+  InitializerException(this.error, this.stackTrace);
+
+  final dynamic error;
+  final StackTrace stackTrace;
+
+  @override
+  String toString() {
+    return '''Error in user's Initializer function.
+Error message: ${error.toString()}
+Stacktrace: $stackTrace''';
   }
 }

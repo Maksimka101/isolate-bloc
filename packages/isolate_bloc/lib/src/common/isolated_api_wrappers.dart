@@ -21,7 +21,7 @@ void register<T extends IsolateBlocBase<Object?, S>, S>({
   if (isolateManager == null) {
     throw IsolateManagerUnInitialized();
   } else {
-    isolateManager.register<T, S>(create, initialState);
+    isolateManager.register<T, S>(create, initialState: initialState);
   }
 }
 

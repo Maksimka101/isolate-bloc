@@ -33,9 +33,9 @@ void main() {
   }
 
   setUp(() {
-    isolateBlocIdGenerator = Uuid().v4;
     isolateMessenger = MockIsolateMessenger();
     methodChannelMiddleware = MockMethodChannelMiddleware();
+    isolateBlocIdGenerator = Uuid().v4;
 
     registerFallbackValue(MockCreateIsolateBlocEvent());
     registerFallbackValue(MockIsolateBlocEvent());
@@ -67,6 +67,10 @@ void main() {
     });
   });
   group('Test IsolateBlocWrapper provided by createBloc method', () {
+    setUp(() {
+      isolateBlocIdGenerator = () => '';
+    });
+
     test('initial state', () async {
       await setDefaultInitialStates();
 
@@ -85,7 +89,6 @@ void main() {
     });
 
     test('send event when IsolateBlocBase is created', () async {
-      isolateBlocIdGenerator = () => '';
       final streamController = StreamController<IsolateBlocEvent>();
       await setDefaultInitialStates(eventsStream: streamController.stream);
 
@@ -99,7 +102,6 @@ void main() {
     });
 
     test('send unsent events', () async {
-      isolateBlocIdGenerator = () => '';
       final streamController = StreamController<IsolateBlocEvent>();
       await setDefaultInitialStates(eventsStream: streamController.stream);
 
@@ -109,6 +111,27 @@ void main() {
       await Future.delayed(Duration(milliseconds: 1));
 
       verify(() => isolateMessenger.send(IsolateBlocTransitionEvent('', 'test'))).called(1);
+    });
+
+    test('close IsolateBlocWrapper closes IsolateBlocBase', () async {
+      await setDefaultInitialStates();
+
+      final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
+      wrapper.close();
+      await Future.delayed(Duration(milliseconds: 1));
+
+      verify(() => isolateMessenger.send(CloseIsolateBlocEvent(''))).called(1);
+    });
+
+    test('receive state from IsolateBlocBase', () async {
+      final streamController = StreamController<IsolateBlocEvent>();
+      await setDefaultInitialStates(eventsStream: streamController.stream);
+
+      final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
+      streamController.add(IsolateBlocTransitionEvent('', 100));
+      await Future.delayed(Duration(milliseconds: 1));
+
+      expect(wrapper.state, 100);
     });
   });
 }

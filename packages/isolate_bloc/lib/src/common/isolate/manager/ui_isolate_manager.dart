@@ -130,7 +130,7 @@ class UIIsolateManager {
 /// Signature for initialization function which would be run in [Isolate] to
 /// initialize your blocs and repository.
 /// Initializer must be a global or static function.
-typedef Initializer = Function();
+typedef Initializer = FutureOr Function();
 
 typedef IsolateManagerCreator = Future<IsolateCreateResult> Function(
   IsolateRun,
