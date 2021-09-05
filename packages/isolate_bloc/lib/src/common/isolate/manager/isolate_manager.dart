@@ -1,25 +1,36 @@
 import 'dart:async';
 
 import 'package:isolate_bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/platform_channel/isolated_platform_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_event.dart';
+import 'package:isolate_bloc/src/common/isolate/method_channel/i_isolated_method_channel_middleware.dart';
 
 /// Manager which works in Isolate
 class IsolateManager {
-  IsolateManager._internal(this._messenger, this._userInitializer);
+  IsolateManager._internal(
+    this._messenger,
+    this._userInitializer,
+    this._methodChannelMiddleware,
+  );
 
   factory IsolateManager({
-    required IsolateMessenger messenger,
+    required IIsolateMessenger messenger,
     required Initializer userInitializer,
+    required IIsolatedMethodChannelMiddleware methodChannelMiddleware,
   }) {
-    return instance = IsolateManager._internal(messenger, userInitializer);
+    return instance = IsolateManager._internal(
+      messenger,
+      userInitializer,
+      methodChannelMiddleware,
+    );
   }
 
   static IsolateManager? instance;
 
-  final IsolateMessenger _messenger;
+  final IIsolateMessenger _messenger;
   final Initializer _userInitializer;
+  final IIsolatedMethodChannelMiddleware _methodChannelMiddleware;
 
   final InitialStates _initialStates = {};
   final _createdBlocs = <String, IsolateBlocBase>{};
@@ -131,25 +142,15 @@ Stacktrace: $stacktrace''');
         break;
       case PlatformChannelResponseEvent:
         event = event as PlatformChannelResponseEvent;
-        final middleware = IsolatedPlatformChannelMiddleware.instance;
-        if (middleware == null) {
-          throw MethodChannelUninitializedException();
-        } else {
-          middleware.platformChannelResponse(event.id, event.data);
-        }
+        _methodChannelMiddleware.platformChannelResponse(event.id, event.data);
         break;
       case InvokeMethodChannelEvent:
         event = event as InvokeMethodChannelEvent;
-        final middleware = IsolatedPlatformChannelMiddleware.instance;
-        if (middleware == null) {
-          throw MethodChannelUninitializedException();
-        } else {
-          middleware.handlePlatformMessage(
-            event.channel,
-            event.id,
-            event.data,
-          );
-        }
+        _methodChannelMiddleware.handlePlatformMessage(
+          event.channel,
+          event.id,
+          event.data,
+        );
         break;
     }
   }

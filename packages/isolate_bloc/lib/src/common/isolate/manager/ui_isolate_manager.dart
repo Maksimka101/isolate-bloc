@@ -2,21 +2,34 @@ import 'dart:async';
 
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
-import 'package:isolate_bloc/src/common/isolate/platform_channel/method_channel_middleware.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
+import 'package:isolate_bloc/src/common/isolate/method_channel/i_method_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_event.dart';
 
 /// Manager which works in UI Isolate
 class UIIsolateManager {
-  UIIsolateManager._internal(this._isolate, this._isolateMessenger);
+  UIIsolateManager._internal(
+    this._isolate,
+    this._isolateMessenger,
+    this._methodChannelMiddleware,
+  );
 
-  factory UIIsolateManager(IsolateCreateResult createResult) {
-    return instance = UIIsolateManager._internal(createResult.isolate, createResult.messenger);
+  factory UIIsolateManager(
+    IsolateCreateResult createResult,
+    IMethodChannelMiddleware methodChannelMiddleware,
+  ) {
+    return instance = UIIsolateManager._internal(
+      createResult.isolate,
+      createResult.messenger,
+      methodChannelMiddleware,
+    );
   }
 
   static UIIsolateManager? instance;
 
   final IIsolateWrapper _isolate;
-  final IsolateMessenger _isolateMessenger;
+  final IIsolateMessenger _isolateMessenger;
+  final IMethodChannelMiddleware _methodChannelMiddleware;
 
   InitialStates _initialStates = {};
 
@@ -80,22 +93,12 @@ class UIIsolateManager {
         _receiveBlocState(event.blocId, event.event);
         break;
       case InvokePlatformChannelEvent:
-        final methodChannelMiddleware = MethodChannelMiddleware.instance;
-        if (methodChannelMiddleware == null) {
-          throw MethodChannelUninitializedException();
-        } else {
-          event = event as InvokePlatformChannelEvent;
-          methodChannelMiddleware.send(event.channel, event.data, event.id);
-        }
+        event = event as InvokePlatformChannelEvent;
+        _methodChannelMiddleware.send(event.channel, event.data, event.id);
         break;
       case MethodChannelResponseEvent:
-        final methodChannelMiddleware = MethodChannelMiddleware.instance;
-        if (methodChannelMiddleware == null) {
-          throw MethodChannelUninitializedException();
-        } else {
-          event = event as MethodChannelResponseEvent;
-          methodChannelMiddleware.methodChannelResponse(event.id, event.data);
-        }
+        event = event as MethodChannelResponseEvent;
+        _methodChannelMiddleware.methodChannelResponse(event.id, event.data);
         break;
       default:
         throw Exception('This is internal error. If you face it please create issue\n'
@@ -133,10 +136,3 @@ typedef IsolateManagerCreator = Future<IsolateCreateResult> Function(
 );
 
 typedef InitialStates = Map<Type, Object?>;
-
-class MethodChannelUninitializedException implements Exception {
-  @override
-  String toString() {
-    return 'Method channel middleware is null. Maybe you forgot to call `await initialize(...)`?';
-  }
-}

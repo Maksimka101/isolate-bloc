@@ -3,14 +3,14 @@ import 'dart:isolate';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_binding.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate/io_isolate_wrapper.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate_messenger.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate_messenger/isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/platform_channel/isolated_platform_channel_middleware.dart';
-import 'package:isolate_bloc/src/common/isolate/platform_channel/method_channel_middleware.dart';
-import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
+import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_middleware/isolated_method_channel_middleware.dart';
+import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_middleware/method_channel_middleware.dart';
 import 'package:uuid/uuid.dart';
 
 class _IsolateSetup {
@@ -27,7 +27,7 @@ class _IsolateSetup {
   final MethodChannels methodChannels;
 }
 
-/// Creates and initializes [Isolate] and [IsolateMessenger].
+/// Creates and initializes [Isolate] and [IIsolateMessenger].
 class IOIsolateFactory implements IIsolateFactory {
   @override
   Future<IsolateCreateResult> create(
@@ -72,7 +72,7 @@ class IOIsolateFactory implements IIsolateFactory {
     MethodChannelMiddleware(
       generateId: const Uuid().v4,
       binaryMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
-      sendEvent: isolateMessenger.send,
+      isolateMessenger: isolateMessenger,
       channels: methodChannels,
     );
 
@@ -93,11 +93,11 @@ class IOIsolateFactory implements IIsolateFactory {
 
     // Initialize platform channel in isolate
     IsolateBinding();
-    IsolatedPlatformChannelMiddleware(
+    IsolatedMethodChannelMiddleware(
       channels: setup.methodChannels,
       platformMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
       generateId: const Uuid().v4,
-      sendEvent: isolateMessenger.send,
+      isolateMessenger: isolateMessenger,
     );
     setup.task(isolateMessenger, setup.userInitializer);
   }

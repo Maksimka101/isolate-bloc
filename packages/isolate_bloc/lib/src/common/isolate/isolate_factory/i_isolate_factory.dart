@@ -1,10 +1,9 @@
+import 'package:isolate_bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 
-import 'isolate_messenger.dart';
-
-/// Abstract factory to create [IIsolateWrapper] and [IsolateMessenger]
+/// Abstract factory to create [IIsolateWrapper] and [IIsolateMessenger]
 ///
 /// Implementations:
 ///  - [IOIsolateFactory]
@@ -16,7 +15,7 @@ abstract class IIsolateFactory {
 
 /// Signature for function which will run in isolate
 typedef IsolateRun = void Function(
-  IsolateMessenger messenger,
+  IIsolateMessenger messenger,
   Initializer initializer,
 );
 
@@ -24,5 +23,5 @@ class IsolateCreateResult {
   IsolateCreateResult(this.isolate, this.messenger);
 
   final IIsolateWrapper isolate;
-  final IsolateMessenger messenger;
+  final IIsolateMessenger messenger;
 }

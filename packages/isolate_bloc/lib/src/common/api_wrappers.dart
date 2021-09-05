@@ -6,13 +6,12 @@ import 'package:isolate_bloc/src/common/isolate/initializer/isolate_initializer.
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate/io_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/web/web_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 
 /// Initialize [Isolate], ServiceEventListener in both Isolates and run [Initializer].
 /// If already initialized and [recreate] is true kill previous [Isolate] and reinitialize everything.
 Future<void> initialize(
   Initializer userInitializer, {
-  PlatformChannelSetup platformChannelSetup = const PlatformChannelSetup(),
+  MethodChannelSetup platformChannelSetup = const MethodChannelSetup(),
   bool recreate = false,
 }) async {
   assert(

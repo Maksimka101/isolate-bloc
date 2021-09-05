@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:isolate';
 
+import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_factory.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate_messenger.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate_messenger/isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/web/web_isolate_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/platform_channel/platform_channel_setup.dart';
 
 /// Web [IIsolateFactory]'s implementation.
 /// It doesn't create [Isolate].
