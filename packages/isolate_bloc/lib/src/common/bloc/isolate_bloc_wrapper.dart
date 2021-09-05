@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_bloc_event.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
 import 'package:uuid/uuid.dart';
 
 /// Signature for event receiver function which takes an [IsolateBlocTransitionEvent]
@@ -32,7 +32,7 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
   })  : _eventReceiver = eventReceiver,
         _onBlocClose = onBlocClose,
         _state = state,
-        isolateBlocId = Uuid().v4() {
+        isolateBlocId = isolateBlocIdGenerator() {
     _bindEventsListener();
   }
 
@@ -123,3 +123,11 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
     });
   }
 }
+
+/// Signature for [IsolateBlocWrapper] id generator
+typedef IsolateBlocIdGenerator = String Function();
+
+/// This function is used to generate id for [IsolateBlocWrapper]
+///
+/// By default uses `uuid v4` generator
+IsolateBlocIdGenerator isolateBlocIdGenerator = Uuid().v4;

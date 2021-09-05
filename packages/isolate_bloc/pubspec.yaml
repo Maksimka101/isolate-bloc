@@ -13,9 +13,12 @@ dependencies:
     sdk: flutter
   provider: ^5.0.0
   uuid: ^3.0.4
+  equatable: ^2.0.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   lints: ^1.0.1
   dart_code_metrics: ^4.0.1
+  mocktail: ^0.1.4
+  

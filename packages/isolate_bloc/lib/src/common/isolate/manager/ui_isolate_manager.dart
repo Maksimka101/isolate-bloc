@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/method_channel/i_method_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_event.dart';
@@ -57,10 +58,12 @@ class UIIsolateManager {
     late IsolateBlocWrapper<S> blocWrapper;
     blocWrapper = IsolateBlocWrapper<S>(
       state: initialState as S,
-      eventReceiver: (event) => _isolateMessenger.send(
-        // ignore: invalid_use_of_protected_member
-        IsolateBlocTransitionEvent(blocWrapper.isolateBlocId!, event),
-      ),
+      eventReceiver: (event) {
+        _isolateMessenger.send(
+          // ignore: invalid_use_of_protected_member
+          IsolateBlocTransitionEvent(blocWrapper.isolateBlocId!, event),
+        );
+      },
       onBlocClose: onBlocClose,
     );
 

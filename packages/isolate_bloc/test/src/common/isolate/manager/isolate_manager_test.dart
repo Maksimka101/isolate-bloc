@@ -1,7 +1,8 @@
+
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('isolate manager ...', (tester) async {
+  test('isolate manager ...', () {
     // TODO: Implement test
   });
 }
