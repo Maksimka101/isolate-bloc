@@ -170,6 +170,27 @@ void main() {
       expect(simpleCubit.state, 1);
     });
 
+    test('receive unsent events', () async {
+      final controller = StreamController<IsolateBlocEvent>();
+      await initializeManager(eventsStream: controller.stream);
+
+      late CounterBloc bloc;
+      isolateManager.register<CounterBloc, int>(() => bloc = CounterBloc());
+
+      bloc.add(CounterEvent.increment);
+      bloc.add(CounterEvent.increment);
+
+      // state didn't changed because bloc didn't connected
+      expect(bloc.state, 0);
+
+      expect(bloc.stream, emitsInOrder([1, 2]));
+
+      controller.add(CreateIsolateBlocEvent(CounterBloc, 'id'));
+      await Future.delayed(Duration(milliseconds: 1));
+      
+      expect(bloc.state, 2);
+    });
+
     // TODO: write more tests
   });
 
