@@ -128,7 +128,7 @@ class _IsolateBlocBuilderBaseState<B extends IsolateBlocBase<Object?, S>, S>
   void initState() {
     super.initState();
     _bloc = widget.bloc ?? context.isolateBloc<B, S>();
-    _state = _bloc.state;
+    _state = _bloc.state!;
   }
 
   @override
@@ -138,7 +138,7 @@ class _IsolateBlocBuilderBaseState<B extends IsolateBlocBase<Object?, S>, S>
     final currentBloc = widget.bloc ?? oldBloc;
     if (oldBloc != currentBloc) {
       _bloc = currentBloc;
-      _state = _bloc.state;
+      _state = _bloc.state!;
     }
   }
 
@@ -148,7 +148,7 @@ class _IsolateBlocBuilderBaseState<B extends IsolateBlocBase<Object?, S>, S>
     final bloc = widget.bloc ?? context.isolateBloc<B, S>();
     if (_bloc != bloc) {
       _bloc = bloc;
-      _state = _bloc.state;
+      _state = _bloc.state!;
     }
   }
 

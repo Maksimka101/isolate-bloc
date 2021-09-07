@@ -170,7 +170,7 @@ void main() {
       expect(simpleCubit.state, 1);
     });
 
-    test('receive unsent events', () async {
+    test('emit unsent states', () async {
       final controller = StreamController<IsolateBlocEvent>();
       await initializeManager(eventsStream: controller.stream);
 
@@ -187,15 +187,52 @@ void main() {
 
       controller.add(CreateIsolateBlocEvent(CounterBloc, 'id'));
       await Future.delayed(Duration(milliseconds: 1));
-      
+
       expect(bloc.state, 2);
     });
-
-    // TODO: write more tests
   });
 
   group('Test getBlocWrapper method', () {
-    // TODO: write tests
+    test(
+      'get bloc wrapper for registered, unregistered '
+      'and registered with initial state bloc',
+      () async {
+        final controller = StreamController<IsolateBlocEvent>();
+
+        userInitializer = () {
+          var cubitWrapper = isolateManager.getBlocWrapper<SimpleCubit, int>();
+          expect(cubitWrapper, isNotNull);
+          // Bloc wrapper of unregistered bloc has no state
+          expect(cubitWrapper.state, isNull);
+
+          SimpleCubit? cubit;
+          isolateManager.register<SimpleCubit, int>(() => cubit = SimpleCubit());
+          expect(cubit, isNotNull);
+          cubitWrapper = isolateManager.getBlocWrapper<SimpleCubit, int>();
+          expect(cubitWrapper, isNotNull);
+          // Bloc wrapper of registered bloc has a state
+          expect(cubitWrapper.state, 0);
+
+          // test wit initial state
+          CounterBloc? bloc;
+          isolateManager.register<CounterBloc, int>(
+            () => bloc = CounterBloc(),
+            initialState: 0,
+          );
+          expect(bloc, isNull);
+
+          var blocWrapper = isolateManager.getBlocWrapper<CounterBloc, int>();
+          expect(blocWrapper, isNotNull);
+          expect(blocWrapper.state, 0);
+        };
+
+        await initializeManager(eventsStream: controller.stream);
+      },
+    );
+
+    group('Test IsolateBlocWrapper provided by getBlocWrapper', () {
+      // TODO: take tests from ui_isolate_manager_test
+    });
   });
 }
 

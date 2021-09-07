@@ -129,7 +129,7 @@ class _BlocListenerBaseState<B extends IsolateBlocBase<Object?, S>, S>
   void initState() {
     super.initState();
     _bloc = widget.bloc ?? context.isolateBloc<B, S>();
-    _previousState = _bloc.state;
+    _previousState = _bloc.state!;
     _subscribe();
   }
 
@@ -142,7 +142,7 @@ class _BlocListenerBaseState<B extends IsolateBlocBase<Object?, S>, S>
       if (_subscription != null) {
         _unsubscribe();
         _bloc = currentBloc;
-        _previousState = _bloc.state;
+        _previousState = _bloc.state!;
       }
       _subscribe();
     }
@@ -156,7 +156,7 @@ class _BlocListenerBaseState<B extends IsolateBlocBase<Object?, S>, S>
       if (_subscription != null) {
         _unsubscribe();
         _bloc = bloc;
-        _previousState = _bloc.state;
+        _previousState = _bloc.state!;
       }
       _subscribe();
     }

@@ -116,7 +116,11 @@ class IsolateManager {
       isolateBloc?.add(event);
     }
 
-    wrapper = IsolateBlocWrapper.isolate(eventReceiver, onBLocClose);
+    wrapper = IsolateBlocWrapper.isolate(
+      eventReceiver,
+      onBLocClose,
+      _initialStates[B] as S?,
+    );
 
     return wrapper;
   }

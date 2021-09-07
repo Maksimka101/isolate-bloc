@@ -40,8 +40,9 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
   @protected
   IsolateBlocWrapper.isolate(
     this._eventReceiver,
-    this._onBlocClose,
-  ) : _state = null {
+    this._onBlocClose, [
+    this._state,
+  ]) {
     _bindEventsListener();
   }
 
@@ -69,7 +70,10 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
   Stream<Object?> get eventStream => _eventController.stream;
 
   /// Returns the current [state] of the [bloc].
-  State get state => _state!;
+  /// 
+  /// It may be null only in wrapper provided by `getBlocWrapperFunction`
+  /// Can't be null in UI isolate
+  State? get state => _state;
 
   /// Returns the stream of states
   Stream<State> get stream => _stateController.stream;
