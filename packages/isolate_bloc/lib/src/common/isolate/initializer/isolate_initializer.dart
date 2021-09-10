@@ -12,7 +12,7 @@ class IsolateInitializer {
     MethodChannels platformChannels,
   ) async {
     // close current isolate
-    UIIsolateManager.instance?.dispose();
+    await UIIsolateManager.instance?.dispose();
 
     final createResult = await isolateFactory.create(
       _isolatedBlocRunner,

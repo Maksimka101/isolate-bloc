@@ -117,7 +117,7 @@ void main() {
       await setDefaultInitialStates();
 
       final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
-      wrapper.close();
+      await wrapper.close();
       await Future.delayed(Duration(milliseconds: 1));
 
       verify(() => isolateMessenger.send(CloseIsolateBlocEvent(''))).called(1);
@@ -154,7 +154,7 @@ Future<void> setInitialStates({
     },
   );
 
-  uiIsolateManager.initialize();
+  await uiIsolateManager.initialize();
 
   await Future.delayed(Duration(milliseconds: 1));
 }

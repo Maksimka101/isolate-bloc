@@ -90,6 +90,8 @@ class IsolateManager {
   /// returns this bloc's [IsolateBlocWrapper]. Else it is creates a new bloc and
   /// add to the pull of free blocs. So when UI will call `create()`, it will not create a new bloc but
   /// return free bloc from pull.
+  /// 
+  /// [IsolateBlocWrapper] returned by this function won't close it's [IsolateBloc] by [isolateBlocWrapper.close()]
   IsolateBlocWrapper<S> getBlocWrapper<B extends IsolateBlocBase<Object?, S>, S>() {
     late IsolateBlocWrapper<S> wrapper;
     B? isolateBloc;
@@ -111,7 +113,7 @@ class IsolateManager {
       // ignore: invalid_use_of_protected_member
       wrapper.onBlocCreated();
     });
-    void onBLocClose(_) => isolateBloc?.close();
+    void onBLocClose(_) => {};
     void eventReceiver(Object? event) {
       isolateBloc?.add(event);
     }

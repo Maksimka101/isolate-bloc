@@ -64,6 +64,7 @@ linter:
     - recursive_getters
     - slash_for_doc_comments
     - type_init_formals
+    - unawaited_futures
     - unnecessary_brace_in_string_interps
     - unnecessary_const
     - unnecessary_getters_setters
