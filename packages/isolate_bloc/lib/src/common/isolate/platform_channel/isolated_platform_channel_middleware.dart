@@ -26,7 +26,7 @@ class IsolatedPlatformChannelMiddleware {
 
   void _bindMessageHandlers(List<String> channels) {
     for (final channel in channels) {
-      platformMessenger.setMockMessageHandler(channel, (message) {
+      platformMessenger.setMessageHandler(channel, (message) {
         final completer = Completer<ByteData>();
         final id = generateId();
         _platformResponsesCompleter[id] = completer;
