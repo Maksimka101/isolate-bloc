@@ -1,22 +1,27 @@
+// ignore_for_file: prefer-match-file-name
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
-import 'package:isolate_bloc/src/common/isolate/bloc_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/isolated_bloc_manager.dart';
+import 'package:isolate_bloc/src/common/isolate/manager/isolate_manager.dart';
+import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 
 /// Registers [IsolateBlocBase].
 ///
-/// You can create [IsolateBlocBase] and get [IsolateBlocWrapper] using
-/// [createBloc] only if you have registered this [IsolateBlocBase].
+/// If [initialState] is not provided bloc will be created immediately.
+/// So if you don't want to create bloc while initialization please provide [initialState]!
 ///
-/// Throws [IsolatedBlocManagerUnInitialized] if [IsolatedBlocManager] is null
-void register({
-  required IsolateBlocCreator create,
+/// You can create [IsolateBlocBase] and get [IsolateBlocWrapper] using
+/// [_createBloc] only if you have registered this [IsolateBlocBase].
+///
+/// Throws [IsolateManagerUnInitialized] if [IsolatedBlocManager] is null
+void register<T extends IsolateBlocBase<Object?, S>, S>({
+  required IsolateBlocCreator<Object?, S> create,
+  S? initialState,
 }) {
-  final blocManager = IsolatedBlocManager.instance;
-  if (blocManager == null) {
-    throw IsolatedBlocManagerUnInitialized();
+  final isolateManager = IsolateManager.instance;
+  if (isolateManager == null) {
+    throw IsolateManagerUnInitialized();
   } else {
-    blocManager.register(create);
+    isolateManager.register<T, S>(create, initialState: initialState);
   }
 }
 
@@ -29,20 +34,20 @@ void register({
 /// add to the pull of free blocs. So when UI will call `create()`, it will not create a new bloc but
 /// return free bloc from pull.
 ///
-/// Throws [IsolatedBlocManagerUnInitialized] if [IsolatedBlocManager] is null
+/// Throws [IsolateManagerUnInitialized] if [IsolatedBlocManager] is null
 IsolateBlocWrapper<State> getBloc<Bloc extends IsolateBlocBase<Object, State>, State>() {
-  final blocManager = IsolatedBlocManager.instance;
-  if (blocManager == null) {
-    throw IsolatedBlocManagerUnInitialized();
+  final isolateManager = IsolateManager.instance;
+  if (isolateManager == null) {
+    throw IsolateManagerUnInitialized();
   } else {
-    return blocManager.getBlocWrapper<Bloc, State>();
+    return isolateManager.getBlocWrapper<Bloc, State>();
   }
 }
 
-class IsolatedBlocManagerUnInitialized implements Exception {
+class IsolateManagerUnInitialized implements Exception {
   @override
   String toString() {
-    return '$IsolatedBlocManager must not be null. '
+    return '$IsolateManager must not be null. '
         'Maybe you are calling this function in UI Isolate however '
         'it is possible only in $Initializer function context';
   }

@@ -1,35 +1,32 @@
 import 'package:isolate_bloc/isolate_bloc.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/isolate/isolate_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_manager/web/isolate_manager.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate/io_isolate_factory.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/web/web_isolate_factory.dart';
 
-TestInitializePlatform? _testInitializePlatform;
+TestInitializePlatform _testInitializePlatform = TestInitializePlatform.native;
 
 void testInitializePlatform(TestInitializePlatform platform) {
   _testInitializePlatform = platform;
 }
 
 Future<void> testInitialize(Initializer userInitializer) async {
-  assert(
-    _testInitializePlatform != null,
-    "You are forget to set testInitializePlatform",
-  );
-  return BlocManager.initialize(
+
+  return IsolateInitializer().initialize(
     userInitializer,
     _testFactory,
     [],
   );
 }
 
-IsolateManagerFactory get _testFactory {
-  switch (_testInitializePlatform!) {
+IIsolateFactory get _testFactory {
+  switch (_testInitializePlatform) {
     case TestInitializePlatform.web:
-      return WebIsolateManagerFactory();
+      return WebIsolateFactory();
     case TestInitializePlatform.native:
-      return IOIsolateManagerFactory();
+      return IOIsolateFactory();
   }
 }
 
-/// Platform which is used to determine which [IsolateManager] implementation to use in tests.
+/// Platform which is used to determine which [IsolateCreateResult] implementation to use in tests.
 /// Used to test both web and native backend.
 enum TestInitializePlatform {
   web,

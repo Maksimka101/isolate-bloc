@@ -120,6 +120,7 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State> exte
         ''',
       );
     }
+    
     return blocWrapper;
   }
 
@@ -131,6 +132,7 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State> exte
         blocWrapper ??= createBloc<T, State>();
         final blocInfoHolder = _getBlocInfoHolder(context) ?? BlocInfoHolder();
         blocInfoHolder.addBlocInfo<T>(blocWrapper);
+        
         return blocInfoHolder;
       },
       dispose: (context, infoHolder) {

@@ -5,7 +5,7 @@ Future<void> main(List<String> arguments) async {
   await initialize(isolatedFunc);
   runApp(
     MaterialApp(
-      home: IsolateBlocProvider<CounterBloc, int>(
+      home: IsolateBlocProvider<CounterCubit, int>(
         child: CounterScreen(),
       ),
     ),
@@ -20,9 +20,9 @@ class CounterScreen extends StatelessWidget {
         title: const Text('Counter'),
       ),
       body: Center(
-        child: IsolateBlocListener<CounterBloc, int>(
+        child: IsolateBlocListener<CounterCubit, int>(
           listener: (context, state) => print('New bloc state: $state'),
-          child: IsolateBlocBuilder<CounterBloc, int>(
+          child: IsolateBlocBuilder<CounterCubit, int>(
             builder: (context, state) {
               return Text('You tapped $state times');
             },
@@ -34,13 +34,13 @@ class CounterScreen extends StatelessWidget {
         children: [
           FloatingActionButton(
             heroTag: 'Increment',
-            onPressed: () => context.isolateBloc<CounterBloc, int>().add(CountEvent.increment),
+            onPressed: () => context.isolateBloc<CounterCubit, int>().add(CountEvent.increment),
             child: const Icon(Icons.add),
           ),
           const SizedBox(height: 10),
           FloatingActionButton(
             heroTag: 'Decrement',
-            onPressed: () => context.isolateBloc<CounterBloc, int>().add(CountEvent.decrement),
+            onPressed: () => context.isolateBloc<CounterCubit, int>().add(CountEvent.decrement),
             child: const Icon(Icons.remove),
           ),
         ],
@@ -51,11 +51,11 @@ class CounterScreen extends StatelessWidget {
 
 Future<void> isolatedFunc() async {
   IsolateBloc.observer = SimpleBlocObserver();
-  register(create: () => CounterBloc());
+  register<CounterCubit, int>(create: () => CounterCubit());
 }
 
-class CounterBloc extends IsolateCubit<CountEvent, int> {
-  CounterBloc() : super(0);
+class CounterCubit extends IsolateCubit<CountEvent, int> {
+  CounterCubit() : super(0);
 
   @override
   void onEventReceived(CountEvent event) {

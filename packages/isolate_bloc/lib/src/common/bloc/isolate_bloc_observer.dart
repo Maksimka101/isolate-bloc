@@ -1,3 +1,5 @@
+// ignore_for_file: avoid-unused-parameters
+// ignore_for_file: no-empty-block
 import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/src/common/bloc/change.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc.dart';

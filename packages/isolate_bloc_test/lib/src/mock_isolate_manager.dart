@@ -4,23 +4,23 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 
 import 'mock_isolate_wrapper.dart';
 
-/// [IsolateManager] implementation for tests.
-/// Have all IO [IsolateManager] restrictions.
-class MockIsolateManagerFactory extends IsolateManagerFactory {
-  /// Create mock [IsolateManager] object.
+/// [IsolateCreateResult] implementation for tests.
+/// Have all IO [IsolateCreateResult] restrictions.
+class MockIsolateManagerFactory extends IIsolateFactory {
+  /// Create mock [IsolateCreateResult] object.
   @override
-  Future<IsolateManager> create(IsolateRun isolateRun, Initializer initializer, MethodChannels methodChannels) async {
+  Future<IsolateCreateResult> create(IsolateRun isolateRun, Initializer initializer, MethodChannels methodChannels) async {
     var fromIsolate = ReceivePort();
     var toIsolate = ReceivePort();
     var sendFromIsolate = fromIsolate.sendPort.send;
     var sendToIsolate = toIsolate.sendPort.send;
-    var toIsolateStream = toIsolate.asBroadcastStream().cast<Object>();
-    var fromIsolateStream = fromIsolate.asBroadcastStream().cast<Object>();
+    var toIsolateStream = toIsolate.asBroadcastStream();
+    var fromIsolateStream = fromIsolate.asBroadcastStream();
 
     // this function run isolated function (IsolateRun)
     isolateRun(IsolateMessenger(toIsolateStream, sendFromIsolate), initializer);
 
-    return IsolateManager(
+    return IsolateCreateResult(
       MockIsolateWrapper(),
       IsolateMessenger(
         fromIsolateStream,

@@ -15,9 +15,9 @@ void isolateInitialization() {
     ),
   );
 
-  register(create: () => WeatherBloc(weatherRepository: weatherRepository));
-  register(create: () => SettingsCubit());
-  register(
+  register<WeatherBloc, WeatherState>(create: () => WeatherBloc(weatherRepository: weatherRepository));
+  register<SettingsCubit, SettingsState>(create: () => SettingsCubit());
+  register<ThemeCubit, ThemeState>(
     create: () => ThemeCubit(
       weatherBloc: getBloc<WeatherBloc, WeatherState>(),
     ),

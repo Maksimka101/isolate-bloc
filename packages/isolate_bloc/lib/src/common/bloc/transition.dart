@@ -21,6 +21,11 @@ class Transition<Event, State> extends Change<State> {
   final Event event;
 
   @override
+  int get hashCode {
+    return currentState.hashCode ^ event.hashCode ^ nextState.hashCode;
+  }
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Transition<Event, State> &&
@@ -28,12 +33,6 @@ class Transition<Event, State> extends Change<State> {
           currentState == other.currentState &&
           event == other.event &&
           nextState == other.nextState;
-
-  @override
-  int get hashCode {
-    return currentState.hashCode ^ event.hashCode ^ nextState.hashCode;
-  }
-
   @override
   String toString() {
     return "Transition { currentState: $currentState, "

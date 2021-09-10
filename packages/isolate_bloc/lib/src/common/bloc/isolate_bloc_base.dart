@@ -1,30 +1,11 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
+import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/change.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_cubit.dart';
-import 'package:uuid/uuid.dart';
-
-/// This is an exception which is thrown on exception in `add` function in debug mode
-class BlocUnhandledErrorException implements Exception {
-  BlocUnhandledErrorException(this.bloc, this.error, [this.stackTrace]);
-
-  /// The [bloc] in which the unhandled error occurred.
-  final IsolateBlocBase bloc;
-
-  /// The unhandled [error] object.
-  final Object error;
-
-  /// An optional [stackTrace] which accompanied the error.
-  final StackTrace? stackTrace;
-
-  @override
-  String toString() {
-    return 'Unhandled error $error occurred in bloc $bloc.\n'
-        '${stackTrace ?? ''}';
-  }
-}
 
 /// {@template bloc_stream}
 /// An interface for the core functionality implemented by
@@ -32,26 +13,28 @@ class BlocUnhandledErrorException implements Exception {
 /// {@endtemplate}
 abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
   /// {@macro bloc_stream}
-  IsolateBlocBase(this._state) : id = const Uuid().v4() {
+  // todo(maksim): maybe we should move initial state to the `register` function
+  IsolateBlocBase(this._state) {
     // ignore: invalid_use_of_protected_member
     IsolateBloc.observer.onCreate(this);
   }
 
+  final _unsentStates = Queue<State>();
+
   StreamController<State>? __stateController;
-  StreamController<State> get _stateController {
-    return __stateController ??= StreamController<State>.broadcast();
-  }
 
   State _state;
 
   bool _emitted = false;
-  
-  /// Whenever first emit is called
-  bool get emitted => _emitted;
 
   /// This is bloc's id. Every [IsolateBlocBase] have it's own unique id used to
   /// communicate with it's own [IsolateBlocWrapper].
-  final String id;
+  ///
+  /// It is not guaranteed that [_id] will be set after creation and before first event
+  String? _id;
+
+  /// Whether or not first emit is called
+  bool get emitted => _emitted;
 
   /// The current [state].
   State get state => _state;
@@ -64,6 +47,20 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
   /// A bloc is considered closed once [close] is called.
   /// Subsequent state changes cannot occur within a closed bloc.
   bool get isClosed => _stateController.isClosed;
+
+  String? get id => _id;
+
+  /// Sets [_id] and emits all [_unsentStates]
+  set id(String? id) {
+    _id = id;
+    while (_unsentStates.isNotEmpty) {
+      emit(_unsentStates.removeFirst());
+    }
+  }
+
+  StreamController<State> get _stateController {
+    return __stateController ??= StreamController<State>.broadcast();
+  }
 
   /// Notifies the [IsolateBlocBase] of a new event and calls [onEventReceived]
   @override
@@ -90,6 +87,14 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
     if (_stateController.isClosed || state == _state && _emitted) {
       return;
     }
+
+    if (_id == null) {
+      // this state will be emitted when [_id] will be set
+      _unsentStates.add(state);
+      
+      return;
+    }
+
     onChange(Change<State>(currentState: this.state, nextState: state));
     _state = state;
     _stateController.add(_state);
@@ -189,5 +194,25 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
     // ignore: invalid_use_of_protected_member
     IsolateBloc.observer.onClose(this);
     await _stateController.close();
+  }
+}
+
+/// This is an exception which is thrown on exception in `add` function in debug mode
+class BlocUnhandledErrorException implements Exception {
+  BlocUnhandledErrorException(this.bloc, this.error, [this.stackTrace]);
+
+  /// The [bloc] in which the unhandled error occurred.
+  final IsolateBlocBase bloc;
+
+  /// The unhandled [error] object.
+  final Object error;
+
+  /// An optional [stackTrace] which accompanied the error.
+  final StackTrace? stackTrace;
+
+  @override
+  String toString() {
+    return 'Unhandled error $error occurred in bloc $bloc.\n'
+        '${stackTrace ?? ''}';
   }
 }

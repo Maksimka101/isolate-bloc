@@ -3,20 +3,16 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/flutter/isolate_bloc_builder.dart';
 
-/// Signature for the `selector` function which
-/// is responsible for returning a selected value, [T], based on [state].
-typedef BlocWidgetSelector<S, T> = T Function(S state);
-
 /// {@template bloc_selector}
-/// [BlocSelector] is analogous to [BlocBuilder] but allows developers to
+/// [IsolateBlocSelector] is analogous to [BlocBuilder] but allows developers to
 /// filter updates by selecting a new value based on the bloc state.
 /// Unnecessary builds are prevented if the selected value does not change.
 ///
-/// **Note**: the selected value must be immutable in order for [BlocSelector]
+/// **Note**: the selected value must be immutable in order for [IsolateBlocSelector]
 /// to accurately determine whether [builder] should be called again.
 ///
 /// ```dart
-/// BlocSelector<BlocA, BlocAState, SelectedState>(
+/// IsolateBlocSelector<BlocA, BlocAState, SelectedState>(
 ///   selector: (state) {
 ///     // return selected state based on the provided state.
 ///   },
@@ -26,17 +22,17 @@ typedef BlocWidgetSelector<S, T> = T Function(S state);
 /// )
 /// ```
 /// {@endtemplate}
-class BlocSelector<B extends IsolateBlocBase<Object?, S>, S, T> extends StatefulWidget {
+class IsolateBlocSelector<B extends IsolateBlocBase<Object?, S>, S, T> extends StatefulWidget {
   /// {@macro bloc_selector}
-  const BlocSelector({
+  const IsolateBlocSelector({
     Key? key,
     required this.selector,
     required this.builder,
     this.bloc,
   }) : super(key: key);
 
-  /// The [bloc] that the [BlocSelector] will interact with.
-  /// If omitted, [BlocSelector] will automatically perform a lookup using
+  /// The [bloc] that the [IsolateBlocSelector] will interact with.
+  /// If omitted, [IsolateBlocSelector] will automatically perform a lookup using
   /// [BlocProvider] and the current [BuildContext].
   final IsolateBlocWrapper? bloc;
 
@@ -53,11 +49,10 @@ class BlocSelector<B extends IsolateBlocBase<Object?, S>, S, T> extends Stateful
   final BlocWidgetSelector<S, T> selector;
 
   @override
-  State<BlocSelector<B, S, T>> createState() => _BlocSelectorState<B, S, T>();
+  State<IsolateBlocSelector<B, S, T>> createState() => _IsolateBlocSelectorState<B, S, T>();
 }
 
-class _BlocSelectorState<B extends IsolateBlocBase<Object?, S>, S, T>
-    extends State<BlocSelector<B, S, T>> {
+class _IsolateBlocSelectorState<B extends IsolateBlocBase<Object?, S>, S, T> extends State<IsolateBlocSelector<B, S, T>> {
   late IsolateBlocWrapper _bloc;
   late T _state;
 
@@ -65,17 +60,17 @@ class _BlocSelectorState<B extends IsolateBlocBase<Object?, S>, S, T>
   void initState() {
     super.initState();
     _bloc = widget.bloc ?? context.isolateBloc<B, S>();
-    _state = widget.selector(_bloc.state);
+    _state = widget.selector(_bloc.state!);
   }
 
   @override
-  void didUpdateWidget(BlocSelector<B, S, T> oldWidget) {
+  void didUpdateWidget(IsolateBlocSelector<B, S, T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     final oldBloc = oldWidget.bloc ?? context.isolateBloc<B, S>();
     final currentBloc = widget.bloc ?? oldBloc;
     if (oldBloc != currentBloc) {
       _bloc = currentBloc;
-      _state = widget.selector(_bloc.state);
+      _state = widget.selector(_bloc.state!);
     }
   }
 
@@ -85,7 +80,7 @@ class _BlocSelectorState<B extends IsolateBlocBase<Object?, S>, S, T>
     final bloc = widget.bloc ?? context.isolateBloc<B, S>();
     if (_bloc != bloc) {
       _bloc = bloc;
-      _state = widget.selector(_bloc.state);
+      _state = widget.selector(_bloc.state!);
     }
   }
 
@@ -103,3 +98,7 @@ class _BlocSelectorState<B extends IsolateBlocBase<Object?, S>, S, T>
     );
   }
 }
+
+/// Signature for the `selector` function which
+/// is responsible for returning a selected value, [T], based on [state].
+typedef BlocWidgetSelector<S, T> = T Function(S state);

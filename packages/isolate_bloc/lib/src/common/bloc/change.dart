@@ -16,15 +16,15 @@ class Change<State> {
   final State nextState;
 
   @override
+  int get hashCode => currentState.hashCode ^ nextState.hashCode;
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Change<State> &&
           runtimeType == other.runtimeType &&
           currentState == other.currentState &&
           nextState == other.nextState;
-
-  @override
-  int get hashCode => currentState.hashCode ^ nextState.hashCode;
 
   @override
   String toString() {

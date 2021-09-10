@@ -4,22 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:nested/nested.dart';
-import 'package:provider/provider.dart';
-
-/// Mixin which allows `MultiBlocListener` to infer the types
-/// of multiple [IsolateBlocListener]s.
-mixin BlocListenerSingleChildWidget on SingleChildWidget {}
-
-/// Signature for the `listener` function which takes the `BuildContext` along
-/// with the `state` and is responsible for executing in response to
-/// `state` changes.
-typedef BlocWidgetListener<S> = void Function(BuildContext context, S state);
-
-/// Signature for the `listenWhen` function which takes the previous `state`
-/// and the current `state` and is responsible for returning a [bool] which
-/// determines whether or not to call [BlocWidgetListener] of [IsolateBlocListener]
-/// with the current `state`.
-typedef BlocListenerCondition<S> = bool Function(S previous, S current);
 
 /// {@template bloc_listener}
 /// Takes a [BlocWidgetListener] and an optional [bloc] and invokes
@@ -145,7 +129,7 @@ class _BlocListenerBaseState<B extends IsolateBlocBase<Object?, S>, S>
   void initState() {
     super.initState();
     _bloc = widget.bloc ?? context.isolateBloc<B, S>();
-    _previousState = _bloc.state;
+    _previousState = _bloc.state!;
     _subscribe();
   }
 
@@ -158,7 +142,7 @@ class _BlocListenerBaseState<B extends IsolateBlocBase<Object?, S>, S>
       if (_subscription != null) {
         _unsubscribe();
         _bloc = currentBloc;
-        _previousState = _bloc.state;
+        _previousState = _bloc.state!;
       }
       _subscribe();
     }
@@ -172,7 +156,7 @@ class _BlocListenerBaseState<B extends IsolateBlocBase<Object?, S>, S>
       if (_subscription != null) {
         _unsubscribe();
         _bloc = bloc;
-        _previousState = _bloc.state;
+        _previousState = _bloc.state!;
       }
       _subscribe();
     }
@@ -182,7 +166,7 @@ class _BlocListenerBaseState<B extends IsolateBlocBase<Object?, S>, S>
   Widget buildWithChild(BuildContext context, Widget? child) {
     // todo: uncomment
     // if (widget.bloc == null) context.select<B, int>(identityHashCode);
-    return child!;
+    return child ?? const SizedBox.shrink();
   }
 
   @override
@@ -205,3 +189,18 @@ class _BlocListenerBaseState<B extends IsolateBlocBase<Object?, S>, S>
     _subscription = null;
   }
 }
+
+/// Mixin which allows `MultiBlocListener` to infer the types
+/// of multiple [IsolateBlocListener]s.
+mixin BlocListenerSingleChildWidget on SingleChildWidget {}
+
+/// Signature for the `listener` function which takes the `BuildContext` along
+/// with the `state` and is responsible for executing in response to
+/// `state` changes.
+typedef BlocWidgetListener<S> = void Function(BuildContext context, S state);
+
+/// Signature for the `listenWhen` function which takes the previous `state`
+/// and the current `state` and is responsible for returning a [bool] which
+/// determines whether or not to call [BlocWidgetListener] of [IsolateBlocListener]
+/// with the current `state`.
+typedef BlocListenerCondition<S> = bool Function(S previous, S current);
