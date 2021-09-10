@@ -33,7 +33,7 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
   /// It is not guaranteed that [_id] will be set after creation and before first event
   String? _id;
 
-  /// Whenever first emit is called
+  /// Whether or not first emit is called
   bool get emitted => _emitted;
 
   /// The current [state].
