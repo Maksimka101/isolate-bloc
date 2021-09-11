@@ -69,6 +69,12 @@ enum CountEvent {
 }
 
 class SimpleBlocObserver extends IsolateBlocObserver {
+@override
+  void onClose(IsolateBlocBase bloc) {
+    print('New instance of ${bloc.runtimeType}');
+    super.onClose(bloc);
+  }
+  
   @override
   void onEvent(IsolateBlocBase bloc, Object? event) {
     print('New $event for $bloc');
