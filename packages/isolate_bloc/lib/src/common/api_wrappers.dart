@@ -15,9 +15,9 @@ Future<void> initialize(
   bool recreate = false,
 }) async {
   assert(
-    !recreate && UIIsolateManager.instance == null,
+    !recreate && UIIsolateManager.instance == null || recreate,
     'You can initialize only once. '
-    'Call `initialize(..., reCreate: true)` if you want to reinitialize.',
+    'Call `initialize(..., recreate: true)` if you want to reinitialize.',
   );
 
   return IsolateInitializer().initialize(

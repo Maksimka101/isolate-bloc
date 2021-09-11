@@ -4,25 +4,21 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
-import 'package:isolate_bloc/src/common/isolate/method_channel/i_method_channel_middleware.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_bloc_event.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 
 /// Manager which works in UI Isolate
 class UIIsolateManager {
   UIIsolateManager._internal(
     this._isolate,
     this._isolateMessenger,
-    this._methodChannelMiddleware,
   );
 
   factory UIIsolateManager(
     IsolateCreateResult createResult,
-    IMethodChannelMiddleware methodChannelMiddleware,
   ) {
     return instance = UIIsolateManager._internal(
       createResult.isolate,
       createResult.messenger,
-      methodChannelMiddleware,
     );
   }
 
@@ -30,19 +26,21 @@ class UIIsolateManager {
 
   final IIsolateWrapper _isolate;
   final IIsolateMessenger _isolateMessenger;
-  final IMethodChannelMiddleware _methodChannelMiddleware;
 
   InitialStates _initialStates = {};
 
   /// Map of [IsolateBlocWrapper] to it's id
   final _wrappers = <String, IsolateBlocWrapper>{};
-  StreamSubscription<IsolateBlocEvent>? _serviceEventsSubscription;
+  StreamSubscription<IsolateEvent>? _serviceEventsSubscription;
 
   final _initializeCompleter = Completer<InitialStates>();
 
   /// Starts listening for [_isolateMessenger] and waits for [InitialStates]
   Future<void> initialize() async {
-    _serviceEventsSubscription = _isolateMessenger.messagesStream.listen(_listenForIsolateEvents);
+    _serviceEventsSubscription = _isolateMessenger.messagesStream
+        .where((event) => event is IsolateBlocEvent)
+        .cast<IsolateBlocEvent>()
+        .listen(_listenForIsolateBlocEvents);
 
     _initialStates = await _initializeCompleter.future;
   }
@@ -82,7 +80,7 @@ class UIIsolateManager {
     await _serviceEventsSubscription?.cancel();
   }
 
-  void _listenForIsolateEvents(IsolateBlocEvent event) {
+  void _listenForIsolateBlocEvents(IsolateBlocEvent event) {
     switch (event.runtimeType) {
       case IsolateBlocsInitialized:
         _initializeCompleter.complete((event as IsolateBlocsInitialized).initialStates);
@@ -95,14 +93,7 @@ class UIIsolateManager {
         event = event as IsolateBlocTransitionEvent;
         _receiveBlocState(event.blocId, event.event);
         break;
-      case InvokePlatformChannelEvent:
-        event = event as InvokePlatformChannelEvent;
-        _methodChannelMiddleware.send(event.channel, event.data, event.id);
-        break;
-      case MethodChannelResponseEvent:
-        event = event as MethodChannelResponseEvent;
-        _methodChannelMiddleware.methodChannelResponse(event.id, event.data);
-        break;
+
       default:
         throw Exception('This is internal error. If you face it please create issue\n'
             'Unknown `ServiceEvent` with type ${event.runtimeType}');

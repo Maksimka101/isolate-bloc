@@ -1,39 +1,70 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/method_channel_events.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
-import 'package:isolate_bloc/src/common/isolate/method_channel/i_isolated_method_channel_middleware.dart';
 import 'package:uuid/uuid.dart';
 
-/// This class receive messages from [MethodChannel.send] and sends them to the
+/// This class receive messages from [MethodChannel._send] and sends them to the
 /// main Isolate.
-class IsolatedMethodChannelMiddleware extends IIsolatedMethodChannelMiddleware {
+class IsolatedMethodChannelMiddleware {
   IsolatedMethodChannelMiddleware({
     required List<String> channels,
     required this.platformMessenger,
-    required IIsolateMessenger isolateMessenger,
+    required this.isolateMessenger,
     String Function()? generateId,
-  })  : generateId = generateId ?? const Uuid().v4,
-        super(isolateMessenger: isolateMessenger) {
+  }) : generateId = generateId ?? const Uuid().v4 {
+    instance = this;
     _bindMessageHandlers(channels);
   }
 
+  static IsolatedMethodChannelMiddleware? instance;
+  final IIsolateMessenger isolateMessenger;
   final BinaryMessenger platformMessenger;
   final String Function() generateId;
   final _platformResponsesCompleter = <String, Completer<ByteData>>{};
+  StreamSubscription<MethodChannelEvent>? _methodChannelEventsSubscription;
+
+  /// Starts listening for [MethodChannelEvent]s from ui
+  void initialize() {
+    _methodChannelEventsSubscription = isolateMessenger.messagesStream
+        .where((event) => event is MethodChannelEvent)
+        .cast<MethodChannelEvent>()
+        .listen(_listenForMethodChannelEvents);
+  }
+
+  /// Free all resources
+  Future<void> dispose() async {
+    await _methodChannelEventsSubscription?.cancel();
+  }
+
+  void _listenForMethodChannelEvents(MethodChannelEvent event) {
+    switch (event.runtimeType) {
+      case PlatformChannelResponseEvent:
+        event = event as PlatformChannelResponseEvent;
+        _platformChannelResponse(event.id, event.data);
+        break;
+      case InvokeMethodChannelEvent:
+        event = event as InvokeMethodChannelEvent;
+        _handlePlatformMessage(
+          event.channel,
+          event.id,
+          event.data,
+        );
+        break;
+    }
+  }
 
   /// Handle platform messages and send them to it's [MessageChannel].
-  @override
-  void handlePlatformMessage(String channel, String id, ByteData? message) {
+  void _handlePlatformMessage(String channel, String id, ByteData? message) {
     platformMessenger.handlePlatformMessage(channel, message, (data) {
       isolateMessenger.send(MethodChannelResponseEvent(data, id));
     });
   }
 
   /// Sends response from platform channel to it's message handler.
-  @override
-  void platformChannelResponse(String id, ByteData? response) {
+  void _platformChannelResponse(String id, ByteData? response) {
     final completer = _platformResponsesCompleter.remove(id);
     if (completer == null) {
       print(

@@ -1,13 +1,13 @@
-import 'package:isolate_bloc/src/common/isolate/method_channel/i_isolated_method_channel_middleware.dart';
-import 'package:isolate_bloc/src/common/isolate/method_channel/i_method_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/method_channel/library.dart';
+import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_middleware/isolated_method_channel_middleware.dart';
+import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_middleware/ui_method_channel_middleware.dart';
 
 import 'libraries.dart';
 
 /// Signature for List of string which is used as List of method channel names
 typedef MethodChannels = List<String>;
 
-/// Settings for [IMethodChannelMiddleware] and [IIsolatedMethodChannelMiddleware]
+/// Settings for [UIMethodChannelMiddleware] and [IsolatedMethodChannelMiddleware]
 /// In [_methodChannelNames] stored all known MethodChannel plugin names.
 /// They are used to receive platform message responses and requests.
 class MethodChannelSetup {

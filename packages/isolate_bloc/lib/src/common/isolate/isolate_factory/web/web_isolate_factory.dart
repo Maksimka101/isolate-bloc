@@ -8,7 +8,7 @@ import 'package:isolate_bloc/src/common/isolate/isolate_factory/web/web_isolate_
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 
 /// Web [IIsolateFactory]'s implementation.
-/// It doesn't create [Isolate].
+/// It doesn't create [Isolate]
 class WebIsolateFactory implements IIsolateFactory {
   @override
   Future<IsolateCreateResult> create(
