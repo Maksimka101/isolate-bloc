@@ -2,9 +2,7 @@ name: isolate_bloc action
 
 on:
   push:
-    paths-ignore: 
-      - "**/*README*.md"
-    paths: 
+    paths:
       - "packages/isolate_bloc/**"
   workflow_dispatch:
 
