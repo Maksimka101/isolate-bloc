@@ -20,6 +20,7 @@ jobs:
         with:
           channel: 'stable'
       - run: cd  packages/isolate_bloc
+      - run: ls
       - run: flutter pub get
       - run: flutter analyze
       
@@ -35,6 +36,8 @@ jobs:
         with:
           channel: 'stable'
       - run: cd  packages/isolate_bloc
+      - run: ls
+      - run: flutter pub get
       - run: flutter test --coverage
       - uses: codecov/codecov-action@v2
         with:
