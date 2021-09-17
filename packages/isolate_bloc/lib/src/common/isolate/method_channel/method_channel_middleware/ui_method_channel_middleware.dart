@@ -11,13 +11,12 @@ import 'package:uuid/uuid.dart';
 /// registered in [MethodChannelSetup] and sends messages from [IsolateBloc]'s Isolate.
 class UIMethodChannelMiddleware {
   UIMethodChannelMiddleware({
-    required List<String> channels,
+    required this.methodChannels,
     required this.binaryMessenger,
     required this.isolateMessenger,
-    String Function()? generateId,
-  }) : generateId = generateId ?? const Uuid().v4 {
+    IdGenerator? idGenerator,
+  }) : generateId = idGenerator ?? const Uuid().v4 {
     instance = this;
-    _bindPlatformMessageHandlers(channels);
   }
 
   static UIMethodChannelMiddleware? instance;
@@ -25,11 +24,13 @@ class UIMethodChannelMiddleware {
   final BinaryMessenger binaryMessenger;
   final String Function() generateId;
   final IIsolateMessenger isolateMessenger;
+  final MethodChannels methodChannels;
   final _messageHandlersCompleter = <String, Completer<ByteData>>{};
   StreamSubscription<MethodChannelEvent>? _methodChannelEventsSubscription;
 
   /// Starts listening for [MethodChannelEvent]
   void initialize() {
+    _bindPlatformMessageHandlers();
     _methodChannelEventsSubscription = isolateMessenger.messagesStream
         .where((event) => event is MethodChannelEvent)
         .cast<MethodChannelEvent>()
@@ -39,6 +40,7 @@ class UIMethodChannelMiddleware {
   /// Free all resources
   Future<void> dispose() async {
     await _methodChannelEventsSubscription?.cancel();
+    _unbindPlatformMessageHandlers();
   }
 
   void _listenForMethodChannelEvents(MethodChannelEvent event) {
@@ -54,29 +56,26 @@ class UIMethodChannelMiddleware {
     }
   }
 
-  /// Send response from [IsolateBloc]'s MessageChannel to the main
+  /// Send response from IsolateBloc's MessageChannel to the main
   /// Isolate's platform channel.
   void _methodChannelResponse(String id, ByteData? response) {
     final completer = _messageHandlersCompleter.remove(id);
     if (completer == null) {
-      print(
-        "Failed to send response from IsolateBloc's MessageChannel "
-        "to the main Isolate's platform channel.",
-      );
+      throw _UnexpectedMethodChannelResponse();
     } else {
       completer.complete(response);
     }
   }
 
-  /// Send event to the platform and send response to the [IsolateBloc]'s Isolate.
+  /// Send event to the platform and send response to the IsolateBloc's Isolate.
   void _send(String channel, ByteData? message, String id) {
     binaryMessenger
         .send(channel, message)
         ?.then((response) => isolateMessenger.send(PlatformChannelResponseEvent(response, id)));
   }
 
-  void _bindPlatformMessageHandlers(List<String> channels) {
-    for (final channel in channels) {
+  void _bindPlatformMessageHandlers() {
+    for (final channel in methodChannels) {
       binaryMessenger.setMessageHandler(channel, (message) {
         final completer = Completer<ByteData>();
         final id = generateId();
@@ -86,5 +85,20 @@ class UIMethodChannelMiddleware {
         return completer.future;
       });
     }
+  }
+
+  void _unbindPlatformMessageHandlers() {
+    for (final channel in methodChannels) {
+      binaryMessenger.setMessageHandler(channel, null);
+    }
+  }
+}
+
+class _UnexpectedMethodChannelResponse implements Exception {
+  @override
+  String toString() {
+    return "Failed to send response from IsolateBloc's MessageChannel "
+        "to the main Isolate's platform channel.\n"
+        "This is internal error";
   }
 }

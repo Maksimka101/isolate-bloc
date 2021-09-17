@@ -9,9 +9,9 @@ environment:
   flutter: ">=2.0.0 <3.0.0"
 
 dependencies:
-  # isolate_bloc: ^2.0.0
-  isolate_bloc: 
-    path: ../isolate_bloc/
+  isolate_bloc: ^2.0.0
+  # isolate_bloc: 
+    # path: ../isolate_bloc/
   flutter:
     sdk: flutter
 

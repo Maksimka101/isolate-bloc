@@ -40,7 +40,7 @@ void main() {
       isolated();
       eventsController.add(IsolateBlocsInitialized({CounterBloc: 0}));
     }, isolateFactory, []);
-    await Future.delayed(Duration(milliseconds: 1));
+    await Future.delayed(const Duration(milliseconds: 1));
   }
 
   test('test initializing stages', () async {

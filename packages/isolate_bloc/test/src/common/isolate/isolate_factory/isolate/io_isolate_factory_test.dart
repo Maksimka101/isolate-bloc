@@ -37,7 +37,7 @@ void main() {
   test('test isolate creating', () async {
     await isolateFactory.create(isolateRun, initializer, methodChannels);
 
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1));
     var map = await _readSyncFile();
 
     expect(map['isolate_run'], isTrue);

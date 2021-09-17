@@ -39,7 +39,7 @@ void main() {
 
     await uiIsolateManager.initialize();
 
-    await Future.delayed(Duration(milliseconds: 1));
+    await Future.delayed(const Duration(milliseconds: 1));
   }
 
   Future<void> setDefaultInitialStates({
@@ -55,7 +55,7 @@ void main() {
 
   setUp(() {
     isolateMessenger = MockIsolateMessenger();
-    isolateBlocIdGenerator = Uuid().v4;
+    isolateBlocIdGenerator = const Uuid().v4;
     isolateWrapper = MockIsolateWrapper();
 
     registerFallbackValue(MockCreateIsolateBlocEvent());
@@ -69,7 +69,7 @@ void main() {
   group('Test public methods', () {
     test('initialize method', () {
       when(() => isolateMessenger.messagesStream).thenAnswer(
-        (_) => Stream.empty(),
+        (_) => const Stream.empty(),
       );
       // Test initialize doesn't throw exceptions
       uiIsolateManager.initialize();
@@ -113,7 +113,7 @@ void main() {
       final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
       wrapper.add('test');
 
-      await Future.delayed(Duration(milliseconds: 1));
+      await Future.delayed(const Duration(milliseconds: 1));
       verifyNever(() => isolateMessenger.send(MockIsolateBlocTransitionEvent()));
     });
 
@@ -123,9 +123,9 @@ void main() {
 
       final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
       streamController.add(IsolateBlocCreatedEvent(''));
-      await Future.delayed(Duration(milliseconds: 1));
+      await Future.delayed(const Duration(milliseconds: 1));
       wrapper.add('test');
-      await Future.delayed(Duration(milliseconds: 1));
+      await Future.delayed(const Duration(milliseconds: 1));
 
       verify(() => isolateMessenger.send(IsolateBlocTransitionEvent('', 'test'))).called(1);
     });
@@ -137,7 +137,7 @@ void main() {
       final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
       wrapper.add('test');
       streamController.add(IsolateBlocCreatedEvent(''));
-      await Future.delayed(Duration(milliseconds: 1));
+      await Future.delayed(const Duration(milliseconds: 1));
 
       verify(() => isolateMessenger.send(IsolateBlocTransitionEvent('', 'test'))).called(1);
     });
@@ -147,7 +147,7 @@ void main() {
 
       final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
       await wrapper.close();
-      await Future.delayed(Duration(milliseconds: 1));
+      await Future.delayed(const Duration(milliseconds: 1));
 
       verify(() => isolateMessenger.send(CloseIsolateBlocEvent(''))).called(1);
     });
@@ -158,7 +158,7 @@ void main() {
 
       final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
       streamController.add(IsolateBlocTransitionEvent('', 100));
-      await Future.delayed(Duration(milliseconds: 1));
+      await Future.delayed(const Duration(milliseconds: 1));
 
       expect(wrapper.state, 100);
     });
@@ -175,7 +175,7 @@ void main() {
       exception = e;
     });
 
-    await Future.delayed(Duration(milliseconds: 1));
+    await Future.delayed(const Duration(milliseconds: 1));
 
     expect(exception, isA<Exception>());
   });

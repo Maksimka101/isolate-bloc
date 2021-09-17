@@ -8,6 +8,8 @@ import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart'
 import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_middleware/isolated_method_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_middleware/ui_method_channel_middleware.dart';
 
+import '../../../../../blocs/counter_bloc.dart';
+
 void main() {
   late WebIsolateFactory isolateFactory;
   late MethodChannels methodChannels;
@@ -28,6 +30,10 @@ void main() {
 
     expect(UIMethodChannelMiddleware.instance, isNull);
     expect(IsolatedMethodChannelMiddleware.instance, isNull);
+    expect(isolateRunCallTime, 0);
+
+    await Future.delayed(Duration.zero);
+
     expect(isolateRunCallTime, 1);
   });
 
@@ -36,6 +42,7 @@ void main() {
     isolateRun = (messenger, _) => isolateMessenger = messenger;
 
     var createResult = await isolateFactory.create(isolateRun, initializer, methodChannels);
+    await Future.delayed(Duration.zero);
     expect(isolateMessenger, isNotNull);
 
     isolateMessenger?.messagesStream.listen((event) {
@@ -48,5 +55,13 @@ void main() {
     var answer = createResult.messenger.messagesStream.firstWhere((element) => element is IsolateBlocTransitionEvent);
 
     expect(await answer, IsolateBlocTransitionEvent('from_isolate', 'answer'));
+  });
+
+  test('test messages from `IIsolateMessenger` are not disappear', () async {
+    final initialStates = {CounterBloc: 1};
+    isolateRun = (messenger, _) => messenger.send(IsolateBlocsInitialized(initialStates));
+
+    final createResult = await isolateFactory.create(isolateRun, initializer, methodChannels);
+    expect(await createResult.messenger.messagesStream.first, IsolateBlocsInitialized(initialStates));
   });
 }

@@ -129,9 +129,9 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
 }
 
 /// Signature for [IsolateBlocWrapper] id generator
-typedef IsolateBlocIdGenerator = String Function();
+typedef IdGenerator = String Function();
 
 /// This function is used to generate id for [IsolateBlocWrapper]
 ///
 /// By default uses `uuid v4` generator
-IsolateBlocIdGenerator isolateBlocIdGenerator = Uuid().v4;
+IdGenerator isolateBlocIdGenerator = const Uuid().v4;

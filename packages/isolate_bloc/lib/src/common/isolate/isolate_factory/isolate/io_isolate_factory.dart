@@ -70,10 +70,10 @@ class IOIsolateFactory implements IIsolateFactory {
     // Initialize platform channel
     WidgetsFlutterBinding.ensureInitialized();
     UIMethodChannelMiddleware(
-      generateId: const Uuid().v4,
+      idGenerator: const Uuid().v4,
       binaryMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
       isolateMessenger: isolateMessenger,
-      channels: methodChannels,
+      methodChannels: methodChannels,
     ).initialize();
 
     return IsolateCreateResult(
@@ -94,9 +94,9 @@ class IOIsolateFactory implements IIsolateFactory {
     // Initialize platform channel in isolate
     IsolateBinding();
     IsolatedMethodChannelMiddleware(
-      channels: setup.methodChannels,
-      platformMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
-      generateId: const Uuid().v4,
+      methodChannels: setup.methodChannels,
+      binaryMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
+      idGenerator: const Uuid().v4,
       isolateMessenger: isolateMessenger,
     ).initialize();
     

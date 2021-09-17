@@ -32,6 +32,7 @@ void main() {
       }
 
       expect(error, isA<UIIsolateManagerUnInitialized>());
+      error.toString();
     });
   });
 

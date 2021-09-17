@@ -31,6 +31,7 @@ void main() {
       }
 
       expect(error, isA<IsolateManagerUnInitialized>());
+      error.toString();
     });
   });
 

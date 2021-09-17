@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:isolate';
 
 import 'package:isolate_bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_factory.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate_messenger/isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/web/web_isolate_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
@@ -12,7 +14,7 @@ import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart'
 class WebIsolateFactory implements IIsolateFactory {
   @override
   Future<IsolateCreateResult> create(
-    IsolateRun run,
+    IsolateRun isolateRun,
     Initializer initializer,
     MethodChannels methodChannels,
   ) async {
@@ -26,11 +28,28 @@ class WebIsolateFactory implements IIsolateFactory {
     final isolateMessenger = IsolateMessenger(fromIsolateStream, sendToIsolate);
 
     // this function run isolated function (IsolateRun)
-    run(IsolateMessenger(toIsolateStream, sendFromIsolate), initializer);
+    // ignore: unawaited_futures
+    _isolateRun(
+      IsolateMessenger(toIsolateStream, sendFromIsolate),
+      isolateRun,
+      initializer,
+    );
 
     return IsolateCreateResult(
       WebIsolateWrapper(),
       isolateMessenger,
     );
+  }
+
+  /// Schedules [isolateRun] to run after [UIIsolateManager] is created
+  ///
+  /// Otherwise [IsolateBlocsInitialized] event won't be handled by [UIIsolateManager]
+  Future<void> _isolateRun(
+    IIsolateMessenger isolateMessenger,
+    IsolateRun isolateRun,
+    Initializer initializer,
+  ) async {
+    await Future.delayed(Duration.zero);
+    isolateRun(isolateMessenger, initializer);
   }
 }
