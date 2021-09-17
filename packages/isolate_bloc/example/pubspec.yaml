@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # isolate_bloc: ^2.0.0
   isolate_bloc:
     path: ../
 

@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
-import 'package:provider/provider.dart';
 
 /// {@template bloc_consumer}
 /// [IsolateBlocConsumer] exposes a [builder] and [listener] in order react to new
@@ -126,8 +125,6 @@ class _IsolateBlocConsumerState<B extends IsolateBlocBase<Object?, S>, S> extend
 
   @override
   Widget build(BuildContext context) {
-    if (widget.bloc == null) context.select<B, int>(identityHashCode);
-    
     return IsolateBlocBuilder<B, S>(
       bloc: _bloc,
       builder: widget.builder,

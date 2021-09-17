@@ -76,3 +76,5 @@ examples/counter/ios/Runner/GeneratedPluginRegistrant.*
 !examples/counter/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 .vscode/settings.json
+packages/isolate_bloc/common
+packages/isolate_bloc/coverage

@@ -10,7 +10,7 @@ import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate/io_isola
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate_messenger/isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_middleware/isolated_method_channel_middleware.dart';
-import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_middleware/method_channel_middleware.dart';
+import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_middleware/ui_method_channel_middleware.dart';
 import 'package:uuid/uuid.dart';
 
 class _IsolateSetup {
@@ -69,12 +69,12 @@ class IOIsolateFactory implements IIsolateFactory {
 
     // Initialize platform channel
     WidgetsFlutterBinding.ensureInitialized();
-    MethodChannelMiddleware(
-      generateId: const Uuid().v4,
+    UIMethodChannelMiddleware(
+      idGenerator: const Uuid().v4,
       binaryMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
       isolateMessenger: isolateMessenger,
-      channels: methodChannels,
-    );
+      methodChannels: methodChannels,
+    ).initialize();
 
     return IsolateCreateResult(
       IOIsolateWrapper(isolate),
@@ -94,11 +94,12 @@ class IOIsolateFactory implements IIsolateFactory {
     // Initialize platform channel in isolate
     IsolateBinding();
     IsolatedMethodChannelMiddleware(
-      channels: setup.methodChannels,
-      platformMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
-      generateId: const Uuid().v4,
+      methodChannels: setup.methodChannels,
+      binaryMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
+      idGenerator: const Uuid().v4,
       isolateMessenger: isolateMessenger,
-    );
-    setup.task(isolateMessenger, setup.userInitializer);
+    ).initialize();
+    
+    await setup.task(isolateMessenger, setup.userInitializer);
   }
 }

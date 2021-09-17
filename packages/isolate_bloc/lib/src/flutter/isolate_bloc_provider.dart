@@ -18,7 +18,7 @@ mixin IsolateBlocProviderSingleChildWidget on SingleChildWidget {}
 /// {@template bloc_provider}
 /// Takes a `ValueBuilder` that is responsible for creating the `bloc` and
 /// a [child] which will have access to the `bloc` via
-/// `BlocProvider.of(context)`.
+/// `IsolateBlocProvider.of(context)`.
 /// It is used as a dependency injection (DI) widget so that a single instance
 /// of a `bloc` can be provided to multiple widgets within a subtree.
 ///
@@ -36,15 +36,10 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State> exte
   /// {@macro bloc_provider}
   IsolateBlocProvider({
     Key? key,
-    Widget? child,
-    bool? lazy,
-  }) : this._(
-          key: key,
-          create: (_) => null,
-          dispose: (_, bloc) => bloc?.close(),
-          lazy: lazy,
-          child: child,
-        );
+    this.child,
+    this.lazy,
+  })  : _value = null,
+        super(key: key, child: child);
 
   /// Takes a `bloc` and a [child] which will have access to the `bloc` via
   /// `IsolateBlocProvider.of(context)`.
@@ -66,23 +61,9 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State> exte
   IsolateBlocProvider.value({
     Key? key,
     required IsolateBlocWrapper<Object?> value,
-    Widget? child,
-  }) : this._(
-          key: key,
-          create: (_) => value,
-          child: child,
-        );
-
-  /// Internal constructor responsible for creating the [IsolateBlocProvider].
-  /// Used by the [IsolateBlocProvider] default and value constructors.
-  IsolateBlocProvider._({
-    Key? key,
-    required Create<IsolateBlocWrapper<Object?>?> create,
-    Dispose<IsolateBlocWrapper?>? dispose,
-    this.lazy,
     this.child,
-  })  : _dispose = dispose,
-        _create = create,
+  })  : _value = value,
+        lazy = null,
         super(key: key, child: child);
 
   /// [child] and its descendants which will have access to the `bloc`.
@@ -92,9 +73,7 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State> exte
   /// Defaults to `true`.
   final bool? lazy;
 
-  final Create<IsolateBlocWrapper<Object?>?> _create;
-
-  final Dispose<IsolateBlocWrapper?>? _dispose;
+  final IsolateBlocWrapper<Object?>? _value;
 
   /// Method that allows widgets to access a `cubit` instance as long as their
   /// `BuildContext` contains a [IsolateBlocProvider] instance.
@@ -120,27 +99,41 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State> exte
         ''',
       );
     }
-    
+
     return blocWrapper;
   }
 
   @override
   Widget buildWithChild(BuildContext context, Widget? child) {
-    return InheritedProvider<BlocInfoHolder>(
-      create: (context) {
-        var blocWrapper = _create.call(context);
-        blocWrapper ??= createBloc<T, State>();
-        final blocInfoHolder = _getBlocInfoHolder(context) ?? BlocInfoHolder();
-        blocInfoHolder.addBlocInfo<T>(blocWrapper);
-        
-        return blocInfoHolder;
-      },
-      dispose: (context, infoHolder) {
-        _dispose?.call(context, infoHolder.removeBloc<T>());
-      },
-      lazy: lazy,
-      child: child,
-    );
+    final value = _value;
+    if (value != null) {
+      return InheritedProvider.value(
+        value: () {
+          final blocInfoHolder = _getBlocInfoHolder(context) ?? BlocInfoHolder();
+          blocInfoHolder.addBlocInfo<T>(value);
+
+          return blocInfoHolder;
+        }(),
+        child: child,
+      );
+    } else {
+      return InheritedProvider<BlocInfoHolder>(
+        create: (context) {
+          final blocWrapper = createBloc<T, State>();
+          final blocInfoHolder = _getBlocInfoHolder(context) ?? BlocInfoHolder();
+          blocInfoHolder.addBlocInfo<T>(blocWrapper);
+
+          return blocInfoHolder;
+        },
+        dispose: (context, infoHolder) {
+          var blocWrapper = infoHolder.removeBloc<T>();
+          assert(blocWrapper != null);
+          blocWrapper?.close();
+        },
+        lazy: lazy,
+        child: child,
+      );
+    }
   }
 
   static BlocInfoHolder? _getBlocInfoHolder(BuildContext context) {

@@ -154,7 +154,6 @@ class _IsolateBlocBuilderBaseState<B extends IsolateBlocBase<Object?, S>, S>
 
   @override
   Widget build(BuildContext context) {
-    // if (widget.bloc == null) context.select<B, int>(identityHashCode);
     return IsolateBlocListener<B, S>(
       bloc: _bloc,
       listenWhen: widget.buildWhen,
