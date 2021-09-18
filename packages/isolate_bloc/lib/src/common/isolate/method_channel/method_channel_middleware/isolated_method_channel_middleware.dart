@@ -7,36 +7,42 @@ import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
 import 'package:uuid/uuid.dart';
 
-/// This class receive messages from [MethodChannel._send] and sends them to the
-/// main Isolate.
+/// This class receive messages from [MethodChannel] and sends them to the
+/// UI Isolate.
 class IsolatedMethodChannelMiddleware {
+  /// Creates new middleware and sets [instance].
   IsolatedMethodChannelMiddleware({
-    required this.methodChannels,
-    required this.binaryMessenger,
-    required this.isolateMessenger,
+    required MethodChannels methodChannels,
+    required BinaryMessenger binaryMessenger,
+    required IIsolateMessenger isolateMessenger,
     IdGenerator? idGenerator,
-  }) : generateId = idGenerator ?? const Uuid().v4 {
+  })  : _generateId = idGenerator ?? const Uuid().v4,
+        _methodChannels = methodChannels,
+        _binaryMessenger = binaryMessenger,
+        _isolateMessenger = isolateMessenger {
     instance = this;
   }
 
+  /// Last created middleware
   static IsolatedMethodChannelMiddleware? instance;
-  final IIsolateMessenger isolateMessenger;
-  final BinaryMessenger binaryMessenger;
-  final String Function() generateId;
-  final MethodChannels methodChannels;
+
+  final IIsolateMessenger _isolateMessenger;
+  final BinaryMessenger _binaryMessenger;
+  final String Function() _generateId;
+  final MethodChannels _methodChannels;
   final _platformResponsesCompleter = <String, Completer<ByteData>>{};
   StreamSubscription<MethodChannelEvent>? _methodChannelEventsSubscription;
 
-  /// Starts listening for [MethodChannelEvent]s from ui
+  /// Starts listening for [MethodChannelEvent]s from UI Isolate and sets middleware for [MethodChannel].
   void initialize() {
     _bindMessageHandlers();
-    _methodChannelEventsSubscription = isolateMessenger.messagesStream
+    _methodChannelEventsSubscription = _isolateMessenger.messagesStream
         .where((event) => event is MethodChannelEvent)
         .cast<MethodChannelEvent>()
         .listen(_listenForMethodChannelEvents);
   }
 
-  /// Free all resources
+  /// Free all resources and remove middleware from [MethodChannel]
   Future<void> dispose() async {
     await _methodChannelEventsSubscription?.cancel();
     _unbindMessageHandlers();
@@ -61,8 +67,8 @@ class IsolatedMethodChannelMiddleware {
 
   /// Handle platform messages and send them to it's [MessageChannel].
   void _handlePlatformMessage(String channel, String id, ByteData? message) {
-    binaryMessenger.handlePlatformMessage(channel, message, (data) {
-      isolateMessenger.send(MethodChannelResponseEvent(data, id));
+    _binaryMessenger.handlePlatformMessage(channel, message, (data) {
+      _isolateMessenger.send(MethodChannelResponseEvent(data, id));
     });
   }
 
@@ -77,12 +83,13 @@ class IsolatedMethodChannelMiddleware {
   }
 
   void _bindMessageHandlers() {
-    for (final channel in methodChannels) {
-      binaryMessenger.setMessageHandler(channel, (message) {
+    for (final channel in _methodChannels) {
+      _binaryMessenger.setMessageHandler(channel, (message) {
         final completer = Completer<ByteData>();
-        final id = generateId();
+        final id = _generateId();
         _platformResponsesCompleter[id] = completer;
-        isolateMessenger.send(InvokePlatformChannelEvent(message, channel, id));
+        _isolateMessenger
+            .send(InvokePlatformChannelEvent(message, channel, id));
 
         return completer.future;
       });
@@ -90,8 +97,8 @@ class IsolatedMethodChannelMiddleware {
   }
 
   void _unbindMessageHandlers() {
-    for (final channel in methodChannels) {
-      binaryMessenger.setMessageHandler(channel, null);
+    for (final channel in _methodChannels) {
+      _binaryMessenger.setMessageHandler(channel, null);
     }
   }
 }

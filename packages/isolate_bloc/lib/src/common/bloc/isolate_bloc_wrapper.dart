@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
+import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
 import 'package:uuid/uuid.dart';
 
@@ -13,17 +14,25 @@ typedef EventReceiver = void Function(Object? event);
 typedef IsolateBlocKiller = void Function(String uuid);
 
 /// Takes a `Stream` of `Events` as input
-/// and transforms them into a `Stream` of `States` as output using [IsolateBloc].
+/// and transforms them into a `Stream` of `States` as output using [IsolateBlocBase].
 ///
-/// It works like a client for [IsolateBloc]. It receives [IsolateBloc]'s
-/// states and send events added by `wrapperInstance.add(YourEvent())`. So you can
+/// It works like a client for [IsolateBlocBase]. It receives [IsolateBlocBase]'s
+/// states and sends events added by `wrapperInstance.add(YourEvent())`. So you can
 /// listen for origin bloc's state with `wrapperInstance.listen((state) { })` and add
 /// events as shown above.
 ///
-/// [_createBloc] function creates [IsolateBloc] in [Isolate] and return this object.
+/// It may be created:
+///   * by [createBloc] function which creates [IsolateBlocBase] in [Isolate]
+///     and returns the instance of this class.
+///   * by [getBloc] function which creates the instance of this class
+///     and connects it to the [IsolateBlocBase]
+///
+/// Don't create this manually!
 class IsolateBlocWrapper<State> implements Sink<Object?> {
-  /// Receives initialState, function which receive events and send them to the
-  /// origin [IsolateBloc] and function which called in [close] and close origin bloc.
+  /// Takes initialState ([state]), function which receives events
+  /// and sends them to the [IsolateBlocBase]
+  /// and function which called on [close] and closes [IsolateBlocBase]
+  /// which is connected to this wrapper.
   @protected
   IsolateBlocWrapper({
     State? state,
@@ -36,7 +45,7 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
     _bindEventsListener();
   }
 
-  /// Creates wrapper for bloc in isolate
+  /// Creates wrapper for [getBloc] functionality
   @protected
   IsolateBlocWrapper.isolate(
     this._eventReceiver,
@@ -49,7 +58,7 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
   /// Id of IsolateBloc. It's needed to find bloc in isolate.
   ///
   /// This id may be changed
-  // @protected
+  @protected
   String? isolateBlocId;
 
   final _eventController = StreamController<Object?>.broadcast();
@@ -63,14 +72,11 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
   final IsolateBlocKiller _onBlocClose;
   late StreamSubscription<Object?> _eventReceiverSubscription;
 
-  /// Callback which receive events and send them to the IsolateBloc
+  /// Callback which receives events and sends them to the IsolateBloc
   final EventReceiver _eventReceiver;
 
-  /// Returns stream with `event`
-  Stream<Object?> get eventStream => _eventController.stream;
-
   /// Returns the current [state] of the [bloc].
-  /// 
+  ///
   /// It may be null only in wrapper provided by `getBlocWrapperFunction`
   /// Can't be null in UI isolate
   State? get state => _state;
@@ -78,13 +84,16 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
   /// Returns the stream of states
   Stream<State> get stream => _stateController.stream;
 
+  /// Returns stream of `event`
+  Stream<Object?> get _eventStream => _eventController.stream;
+
   /// As a result, call original [IsolateBloc]'s add function.
   @override
   void add(Object? event) {
     _eventController.add(event);
   }
 
-  /// Closes the `event` stream and request to close [IsolateBloc]
+  /// Closes the `event` stream and requests to close connected [IsolateBlocBase]
   @override
   @mustCallSuper
   Future<void> close() async {
@@ -97,7 +106,7 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
     await _eventReceiverSubscription.cancel();
   }
 
-  /// Connects this wrapper to the [IsolateBloc] and sends all unsent events.
+  /// Connects this wrapper to the [IsolateBlocBase] and sends all unsent events.
   // todo(maksim): maybe move unsent events synchronization to the [IsolateManager]
   @protected
   void onBlocCreated() {
@@ -107,7 +116,7 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
     }
   }
 
-  /// Receives [IsolateBloc]'s state and add to the state Stream.
+  /// Receives [IsolateBlocBase]'s states and adds them to the state Stream.
   @protected
   void stateReceiver(State nextState) {
     if (nextState != _state) {
@@ -118,7 +127,7 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
 
   /// Starts listening for new `events`
   void _bindEventsListener() {
-    _eventReceiverSubscription = eventStream.listen((event) {
+    _eventReceiverSubscription = _eventStream.listen((event) {
       if (_blocCreated) {
         _eventReceiver(event);
       } else {

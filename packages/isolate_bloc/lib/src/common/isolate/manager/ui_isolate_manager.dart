@@ -6,13 +6,15 @@ import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 
-/// Manager which works in UI Isolate
+/// Manager which is works in UI Isolate, responds on [IsolateBlocEvent]s from Isolate,
+/// manages [IsolateBlocWrapper]s and implements [createBloc] global function.
 class UIIsolateManager {
   UIIsolateManager._internal(
     this._isolate,
     this._isolateMessenger,
   );
 
+  /// Creates new manager and sets [instance].
   factory UIIsolateManager(
     IsolateCreateResult createResult,
   ) {
@@ -22,6 +24,7 @@ class UIIsolateManager {
     );
   }
 
+  /// Instance of the last created manager.
   static UIIsolateManager? instance;
 
   final IIsolateWrapper _isolate;
@@ -29,13 +32,13 @@ class UIIsolateManager {
 
   InitialStates _initialStates = {};
 
-  /// Map of [IsolateBlocWrapper] to it's id
+  /// Map of [IsolateBlocWrapper] to it's id.
   final _wrappers = <String, IsolateBlocWrapper>{};
   StreamSubscription<IsolateEvent>? _serviceEventsSubscription;
 
   final _initializeCompleter = Completer<InitialStates>();
 
-  /// Starts listening for [_isolateMessenger] and waits for [InitialStates]
+  /// Starts listening for [_isolateMessenger] and waits for [InitialStates].
   Future<void> initialize() async {
     _serviceEventsSubscription = _isolateMessenger.messagesStream
         .where((event) => event is IsolateBlocEvent)
@@ -45,8 +48,8 @@ class UIIsolateManager {
     _initialStates = await _initializeCompleter.future;
   }
 
-  /// Start creating [IsolateBlocBase] and return [IsolateBlocWrapper].
-  IsolateBlocWrapper<S> createBloc<T extends IsolateBlocBase, S>() {
+  /// {@macro create_bloc}
+  IsolateBlocWrapper<S> createIsolateBloc<T extends IsolateBlocBase, S>() {
     void onBlocClose(String uuid) {
       _isolateMessenger.send(CloseIsolateBlocEvent(uuid));
     }
@@ -74,16 +77,19 @@ class UIIsolateManager {
     return blocWrapper;
   }
 
-  /// Free all resources and kill [Isolate] with [IsolateBlocBase]s.
+  /// Free all resources and kills [Isolate].
   Future<void> dispose() async {
     _isolate.kill();
     await _serviceEventsSubscription?.cancel();
   }
 
+  /// Listens and respond on [IsolateBlocEvent]s from [IsolateManager].
   void _listenForIsolateBlocEvents(IsolateBlocEvent event) {
     switch (event.runtimeType) {
       case IsolateBlocsInitialized:
-        _initializeCompleter.complete((event as IsolateBlocsInitialized).initialStates);
+        _initializeCompleter.complete(
+          (event as IsolateBlocsInitialized).initialStates,
+        );
         break;
       case IsolateBlocCreatedEvent:
         event = event as IsolateBlocCreatedEvent;
@@ -95,13 +101,14 @@ class UIIsolateManager {
         break;
 
       default:
-        throw Exception('This is internal error. If you face it please create issue\n'
+        throw Exception(
+            'This is internal error. If you face it please create issue\n'
             'Unknown `ServiceEvent` with type ${event.runtimeType}');
     }
   }
 
-  /// Finish [IsolateBlocBase] creating which started by call [createBloc].
-  /// Connect [IsolateBlocBase] to it's [IsolateBlocWrapper].
+  /// Finishes [IsolateBlocBase] creating which started by call [createIsolateBloc].
+  /// Connects [IsolateBlocWrapper] to it's [IsolateBlocBase].
   void _onBlocCreated(String id) {
     final wrapper = _wrappers[id];
     if (wrapper != null) {
@@ -110,8 +117,7 @@ class UIIsolateManager {
     }
   }
 
-  /// Call when new state from [IsolateBlocBase] received.
-  /// Find wrapper by bloc id and add new state to it.
+  /// Finds wrapper by bloc id and adds new state to it.
   void _receiveBlocState(String blocId, Object? state) {
     // ignore: invalid_use_of_protected_member
     _wrappers[blocId]?.stateReceiver(state);
@@ -123,10 +129,5 @@ class UIIsolateManager {
 /// Initializer must be a global or static function.
 typedef Initializer = FutureOr Function();
 
-typedef IsolateManagerCreator = Future<IsolateCreateResult> Function(
-  IsolateRun,
-  Initializer,
-  List<String> channels,
-);
-
+/// Signature for map with [IsolateBlocBase]s and their initial states.
 typedef InitialStates = Map<Type, Object?>;

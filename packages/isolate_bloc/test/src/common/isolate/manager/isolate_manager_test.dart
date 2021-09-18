@@ -4,13 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/mock_isolate_bloc_events.dart';
+import '../../../../mock/mock_isolate_bloc_events.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/mock/mock_isolate_messenger.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../blocs/counter_bloc.dart';
 import '../../../../blocs/simple_cubit.dart';
+import '../../../../mock/mock_isolate_messenger.dart';
 import '../../../../test_utils/messenger_utils.dart';
 
 void main() {
@@ -35,7 +35,7 @@ void main() {
     String? id,
   }) async {
     late B createdCubit;
-    isolateManager.register<B, S>(() => createdCubit = create());
+    isolateManager.registerBloc<B, S>(() => createdCubit = create());
 
     controller.add(CreateIsolateBlocEvent(SimpleCubit, id ?? 'id'));
     await Future.delayed(const Duration(milliseconds: 1));
@@ -68,17 +68,20 @@ void main() {
         expect(initialized, isTrue);
       });
 
-      test('catch exception in user initializer function while initialization', () async {
+      test('catch exception in user initializer function while initialization',
+          () async {
         userInitializer = () => throw Exception();
 
         // Throws exception in debug mode
         expect(initializeManager(), throwsA(isA<InitializerException>()));
       });
 
-      test('IsolateBlocInitialized event is sent after initialization', () async {
+      test('IsolateBlocInitialized event is sent after initialization',
+          () async {
         await initializeManager();
 
-        verify(() => isolateMessenger.send(IsolateBlocsInitialized({}))).called(1);
+        verify(() => isolateMessenger.send(IsolateBlocsInitialized({})))
+            .called(1);
       });
     });
 
@@ -88,7 +91,8 @@ void main() {
         await initializeManager(eventsStream: controller.stream);
 
         SimpleCubit? createdCubit;
-        isolateManager.register<SimpleCubit, int>(() => createdCubit = SimpleCubit());
+        isolateManager
+            .registerBloc<SimpleCubit, int>(() => createdCubit = SimpleCubit());
         expect(createdCubit, isNotNull);
 
         controller.add(CreateIsolateBlocEvent(SimpleCubit, 'id'));
@@ -102,7 +106,7 @@ void main() {
         await initializeManager(eventsStream: controller.stream);
 
         SimpleCubit? createdCubit;
-        isolateManager.register<SimpleCubit, int>(
+        isolateManager.registerBloc<SimpleCubit, int>(
           () => createdCubit = SimpleCubit(),
           initialState: 0,
         );
@@ -117,8 +121,8 @@ void main() {
       test('all initial states are registered', () async {
         final controller = StreamController<IsolateEvent>();
 
-        isolateManager.register<CounterBloc, int>(() => CounterBloc());
-        isolateManager.register<SimpleCubit, int>(
+        isolateManager.registerBloc<CounterBloc, int>(() => CounterBloc());
+        isolateManager.registerBloc<SimpleCubit, int>(
           () => SimpleCubit(),
           initialState: 500,
         );
@@ -171,7 +175,8 @@ void main() {
       simpleCubit.add('');
       await Future.delayed(const Duration(milliseconds: 1));
 
-      verify(() => isolateMessenger.send(IsolateBlocTransitionEvent('id', 1))).called(1);
+      verify(() => isolateMessenger.send(IsolateBlocTransitionEvent('id', 1)))
+          .called(1);
     });
 
     test('receive event', () async {
@@ -195,7 +200,7 @@ void main() {
       await initializeManager(eventsStream: controller.stream);
 
       late CounterBloc bloc;
-      isolateManager.register<CounterBloc, int>(() => bloc = CounterBloc());
+      isolateManager.registerBloc<CounterBloc, int>(() => bloc = CounterBloc());
 
       bloc.add(CounterEvent.increment);
       bloc.add(CounterEvent.increment);
@@ -244,7 +249,7 @@ void main() {
           // Bloc wrapper of unregistered bloc has no state
           expect(cubitWrapper.state, isNull);
 
-          isolateManager.register<SimpleCubit, int>(() {
+          isolateManager.registerBloc<SimpleCubit, int>(() {
             cubitsCreated++;
 
             return cubit = SimpleCubit();
@@ -259,7 +264,7 @@ void main() {
           expect(cubitsCreated, 1);
 
           // test wit initial state
-          isolateManager.register<CounterBloc, int>(
+          isolateManager.registerBloc<CounterBloc, int>(
             () {
               blocsCreated++;
 
@@ -305,10 +310,12 @@ void main() {
         wrapper.add('test');
 
         await Future.delayed(const Duration(milliseconds: 1));
-        verifyNever(() => isolateMessenger.send(MockIsolateBlocTransitionEvent()));
+        verifyNever(
+            () => isolateMessenger.send(MockIsolateBlocTransitionEvent()));
       });
 
-      test('send event when IsolateBlocBase is created and receive state', () async {
+      test('send event when IsolateBlocBase is created and receive state',
+          () async {
         final streamController = StreamController<IsolateEvent>();
         await initializeManager(eventsStream: streamController.stream);
         register<SimpleCubit, int>(create: () => SimpleCubit());
@@ -346,7 +353,8 @@ void main() {
         expect(cubit.isClosed, isFalse);
       });
 
-      test('receive state from IsolateBlocBase only when it is created', () async {
+      test('receive state from IsolateBlocBase only when it is created',
+          () async {
         final streamController = StreamController<IsolateEvent>();
         await initializeManager(eventsStream: streamController.stream);
 

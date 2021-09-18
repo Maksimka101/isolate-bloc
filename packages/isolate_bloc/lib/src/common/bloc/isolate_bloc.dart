@@ -7,9 +7,12 @@ import 'package:isolate_bloc/src/common/bloc/transition.dart';
 
 /// Signature for a mapper function which takes an [Event] as input
 /// and outputs a [Stream] of [Transition] objects.
-typedef TransitionFunction<Event, State> = Stream<Transition<Event, State>> Function(Event);
+typedef TransitionFunction<Event, State> = Stream<Transition<Event, State>>
+    Function(Event);
 
+/// {@macro isolate_cubit_description}
 abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
+  /// {@macro isolate_cubit_description}
   IsolateBloc(State state) : super(state) {
     _bindEventsToStates();
   }
@@ -83,7 +86,7 @@ abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
     }
   }
 
-  /// Must be implemented when a class extends [Bloc].
+  /// Must be implemented when a class extends [IsolateBloc].
   /// [mapEventToState] is called whenever an [event] is [add]ed
   /// and is responsible for converting that [event] into a new [state].
   /// [mapEventToState] can `yield` zero, one, or multiple states for an event.
@@ -92,8 +95,8 @@ abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
   /// Called whenever a [transition] occurs with the given [transition].
   /// A [transition] occurs when a new `event` is [add]ed and [mapEventToState]
   /// executed.
-  /// [onTransition] is called before a [Bloc]'s [state] has been updated.
-  /// A great spot to add logging/analytics at the individual [Bloc] level.
+  /// [onTransition] is called before a [IsolateBloc]'s [state] has been updated.
+  /// A great spot to add logging/analytics at the individual [IsolateBloc] level.
   ///
   /// **Note: `super.onTransition` should always be called first.**
   /// ```dart
@@ -108,7 +111,7 @@ abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
   ///
   /// See also:
   ///
-  /// * [BlocObserver.onTransition] for observing transitions globally.
+  /// * [IsolateBlocObserver.onTransition] for observing transitions globally.
   ///
   @protected
   @mustCallSuper
@@ -141,11 +144,11 @@ abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
   }
 
   /// Closes the `event` and `state` `Streams`.
-  /// This method should be called when a [Bloc] is no longer needed.
+  /// This method should be called when a [IsolateBloc] is no longer needed.
   /// Once [close] is called, `events` that are [add]ed will not be
   /// processed.
   /// In addition, if [close] is called while `events` are still being
-  /// processed, the [Bloc] will finish processing the pending `events`.
+  /// processed, the [IsolateBloc] will finish processing the pending `events`.
   @override
   @mustCallSuper
   Future<void> close() async {

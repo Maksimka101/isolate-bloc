@@ -7,10 +7,10 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/method_channel_events.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/mock/mock_isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_middleware/isolated_method_channel_middleware.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../../../../mock/mock_isolate_messenger.dart';
 import '../../../../../test_utils/messenger_utils.dart';
 import 'mock_binary_messenger.dart';
 
@@ -42,7 +42,8 @@ void main() {
   });
 
   void initializeManager(Stream<IsolateEvent> stream) {
-    initializeMessenger(isolateMessenger: isolateMessenger, eventsStream: stream);
+    initializeMessenger(
+        isolateMessenger: isolateMessenger, eventsStream: stream);
 
     methodChannelMiddleware.initialize();
   }
@@ -57,23 +58,28 @@ void main() {
 
       initializeManager(controller.stream);
 
-      verify(() => binaryMessenger.setMessageHandler(any(), any())).called(methodChannels.length);
+      verify(() => binaryMessenger.setMessageHandler(any(), any()))
+          .called(methodChannels.length);
     });
 
     test('subscribe on messages stream', () async {
       final controller = StreamController<IsolateEvent>();
-      initializeMessenger(isolateMessenger: isolateMessenger, eventsStream: controller.stream);
+      initializeMessenger(
+          isolateMessenger: isolateMessenger, eventsStream: controller.stream);
 
-      controller.add(InvokeMethodChannelEvent(null, methodChannels.first, 'id'));
+      controller
+          .add(InvokeMethodChannelEvent(null, methodChannels.first, 'id'));
       await Future.delayed(const Duration(milliseconds: 1));
 
       verifyNever(
-        () => binaryMessenger.handlePlatformMessage(methodChannels.first, null, any()),
+        () => binaryMessenger.handlePlatformMessage(
+            methodChannels.first, null, any()),
       );
 
       methodChannelMiddleware.initialize();
 
-      controller.add(InvokeMethodChannelEvent(null, methodChannels.first, 'id'));
+      controller
+          .add(InvokeMethodChannelEvent(null, methodChannels.first, 'id'));
       await Future.delayed(const Duration(milliseconds: 1));
 
       verify(
@@ -89,7 +95,8 @@ void main() {
 
     await methodChannelMiddleware.dispose();
 
-    controller.add(InvokePlatformChannelEvent(null, methodChannels.first, 'id'));
+    controller
+        .add(InvokePlatformChannelEvent(null, methodChannels.first, 'id'));
     await Future.delayed(const Duration(milliseconds: 1));
 
     verifyNever(() => binaryMessenger.send(methodChannels.first, null));

@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
-import 'package:nested/nested.dart';
+import 'package:provider/single_child_widget.dart';
+
 
 /// {@template bloc_listener}
 /// Takes a [BlocWidgetListener] and an optional [bloc] and invokes
@@ -63,8 +64,8 @@ import 'package:nested/nested.dart';
 /// )
 /// ```
 /// {@endtemplate}
-class IsolateBlocListener<B extends IsolateBlocBase<Object?, S>, S> extends IsolateBlocListenerBase<B, S>
-    with BlocListenerSingleChildWidget {
+class IsolateBlocListener<B extends IsolateBlocBase<Object?, S>, S>
+    extends IsolateBlocListenerBase<B, S> with BlocListenerSingleChildWidget {
   /// {@macro bloc_listener}
   /// {@macro bloc_listener_listen_when}
   const IsolateBlocListener({
@@ -89,7 +90,8 @@ class IsolateBlocListener<B extends IsolateBlocBase<Object?, S>, S> extends Isol
 /// The type of the state and what happens with each state change
 /// is defined by sub-classes.
 /// {@endtemplate}
-abstract class IsolateBlocListenerBase<B extends IsolateBlocBase<Object?, S>, S> extends SingleChildStatefulWidget {
+abstract class IsolateBlocListenerBase<B extends IsolateBlocBase<Object?, S>, S>
+    extends SingleChildStatefulWidget {
   /// {@macro bloc_listener_base}
   const IsolateBlocListenerBase({
     Key? key,
@@ -116,7 +118,8 @@ abstract class IsolateBlocListenerBase<B extends IsolateBlocBase<Object?, S>, S>
   final BlocListenerCondition<S>? listenWhen;
 
   @override
-  SingleChildState<IsolateBlocListenerBase<B, S>> createState() => _BlocListenerBaseState<B, S>();
+  SingleChildState<IsolateBlocListenerBase<B, S>> createState() =>
+      _BlocListenerBaseState<B, S>();
 }
 
 class _BlocListenerBaseState<B extends IsolateBlocBase<Object?, S>, S>

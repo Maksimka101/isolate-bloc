@@ -5,10 +5,10 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/mock/mock_isolate_factory.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/mock/mock_isolate_messenger.dart';
 
 import '../../../../blocs/counter_bloc.dart';
+import '../../../../mock/mock_isolate_factory.dart';
+import '../../../../mock/mock_isolate_messenger.dart';
 import '../../../../test_utils/messenger_utils.dart';
 
 void main() {
@@ -33,9 +33,11 @@ void main() {
     required void Function() isolated,
     required StreamController<IsolateEvent> eventsController,
   }) async {
-    initializeMessenger(isolateMessenger: uiIsolateMessenger, eventsStream: eventsController.stream);
+    initializeMessenger(
+        isolateMessenger: uiIsolateMessenger,
+        eventsStream: eventsController.stream);
     initializeMessenger(isolateMessenger: isolatedMessenger);
-  
+
     await initializer.initialize(() {
       isolated();
       eventsController.add(IsolateBlocsInitialized({CounterBloc: 0}));

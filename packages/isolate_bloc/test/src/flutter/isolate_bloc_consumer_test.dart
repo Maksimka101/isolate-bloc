@@ -70,7 +70,9 @@ void main() {
       expect(listenerStates, [1]);
     });
 
-    testWidgets('accesses the bloc via context and passes initial state to builder', (tester) async {
+    testWidgets(
+        'accesses the bloc via context and passes initial state to builder',
+        (tester) async {
       final counterCubit = createBloc<CounterBloc, int>();
       final listenerStates = <int>[];
       await tester.pumpWidget(
@@ -95,7 +97,9 @@ void main() {
       expect(listenerStates, isEmpty);
     });
 
-    testWidgets('accesses the bloc via context and passes multiple states to builder', (tester) async {
+    testWidgets(
+        'accesses the bloc via context and passes multiple states to builder',
+        (tester) async {
       final counterCubit = createBloc<CounterBloc, int>();
       final listenerStates = <int>[];
       await tester.pumpWidget(
@@ -122,7 +126,8 @@ void main() {
       expect(listenerStates, [1]);
     });
 
-    testWidgets('does not trigger rebuilds when buildWhen evaluates to false', (tester) async {
+    testWidgets('does not trigger rebuilds when buildWhen evaluates to false',
+        (tester) async {
       final counterCubit = createBloc<CounterBloc, int>();
       final listenerStates = <int>[];
       final builderStates = <int>[];
@@ -213,7 +218,8 @@ void main() {
       expect(listenerStates, [1, 2]);
     });
 
-    testWidgets('updates when cubit/bloc reference has changed', (tester) async {
+    testWidgets('updates when cubit/bloc reference has changed',
+        (tester) async {
       const buttonKey = Key('__button__');
       var counterCubit = createBloc<CounterBloc, int>();
       final listenerStates = <int>[];
@@ -264,7 +270,8 @@ void main() {
       expect(listenerStates, [1]);
     });
 
-    testWidgets('does not trigger listen when listenWhen evaluates to false', (tester) async {
+    testWidgets('does not trigger listen when listenWhen evaluates to false',
+        (tester) async {
       final counterCubit = createBloc<CounterBloc, int>();
       final listenerStates = <int>[];
       final builderStates = <int>[];
@@ -307,7 +314,9 @@ void main() {
       expect(listenerStates, [2]);
     });
 
-    testWidgets('calls buildWhen/listenWhen and builder/listener with correct states', (tester) async {
+    testWidgets(
+        'calls buildWhen/listenWhen and builder/listener with correct states',
+        (tester) async {
       final buildWhenPreviousState = <int>[];
       final buildWhenCurrentState = <int>[];
       final buildStates = <int>[];

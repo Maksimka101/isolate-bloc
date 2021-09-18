@@ -10,9 +10,9 @@ import 'transition.dart';
 
 /// An interface for observing the behavior of [IsolateBloc] and [IsolateCubit] instances.
 class IsolateBlocObserver {
-  /// Called whenever a [Bloc] is instantiated.
-  /// In many cases, a cubit may be lazily instantiated and
-  /// [onCreate] can be used to observe exactly when the cubit
+  /// Called whenever a [IsolateBlocBase] is instantiated.
+  /// In many cases, a bloc may be lazily instantiated and
+  /// [onCreate] can be used to observe exactly when the bloc
   /// instance is created.
   @protected
   @mustCallSuper
@@ -40,15 +40,15 @@ class IsolateBlocObserver {
   @mustCallSuper
   void onTransition(IsolateBloc bloc, Transition transition) {}
 
-  /// Called whenever an [error] is thrown in any [Bloc] or [Cubit].
+  /// Called whenever an [error] is thrown in any [IsolateBloc] or [IsolateCubit].
   /// The [stackTrace] argument may be [StackTrace.empty] if an error
   /// was received without a stack trace.
   @protected
   @mustCallSuper
   void onError(IsolateBlocBase bloc, Object error, StackTrace stackTrace) {}
 
-  /// Called whenever a [Bloc] is closed.
-  /// [onClose] is called just before the [Bloc] is closed
+  /// Called whenever a [IsolateBlocBase] is closed.
+  /// [onClose] is called just before the bloc is closed
   /// and indicates that the particular instance will no longer
   /// emit new states.
   @protected

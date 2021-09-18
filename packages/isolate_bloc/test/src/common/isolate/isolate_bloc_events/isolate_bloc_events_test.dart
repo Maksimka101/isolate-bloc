@@ -22,8 +22,10 @@ void main() {
 
     expect(IsolateBlocCreatedEvent(''), IsolateBlocCreatedEvent(''));
 
-    expect(CreateIsolateBlocEvent(Object, ''), CreateIsolateBlocEvent(Object, ''));
+    expect(
+        CreateIsolateBlocEvent(Object, ''), CreateIsolateBlocEvent(Object, ''));
 
-    expect(IsolateBlocTransitionEvent('', ''), IsolateBlocTransitionEvent('', ''));
+    expect(
+        IsolateBlocTransitionEvent('', ''), IsolateBlocTransitionEvent('', ''));
   });
 }

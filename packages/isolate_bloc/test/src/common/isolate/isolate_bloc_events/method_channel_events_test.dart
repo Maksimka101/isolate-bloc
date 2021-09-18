@@ -14,12 +14,16 @@ void main() {
   });
 
   test('test equality', () {
-    expect(InvokePlatformChannelEvent(null, '', ''), InvokePlatformChannelEvent(null, '', ''));
+    expect(InvokePlatformChannelEvent(null, '', ''),
+        InvokePlatformChannelEvent(null, '', ''));
 
-    expect(PlatformChannelResponseEvent(null, ''), PlatformChannelResponseEvent(null, ''));
+    expect(PlatformChannelResponseEvent(null, ''),
+        PlatformChannelResponseEvent(null, ''));
 
-    expect(InvokeMethodChannelEvent(null, '', ''), InvokeMethodChannelEvent(null, '', ''));
+    expect(InvokeMethodChannelEvent(null, '', ''),
+        InvokeMethodChannelEvent(null, '', ''));
 
-    expect(MethodChannelResponseEvent(null, ''), MethodChannelResponseEvent(null, ''));
+    expect(MethodChannelResponseEvent(null, ''),
+        MethodChannelResponseEvent(null, ''));
   });
 }

@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:isolate_bloc/src/flutter/isolate_bloc_provider.dart';
 import 'package:provider/provider.dart';
 
-
 /// {@template multi_bloc_provider}
 /// Merges multiple [IsolateBlocProvider] widgets into one widget tree.
 ///

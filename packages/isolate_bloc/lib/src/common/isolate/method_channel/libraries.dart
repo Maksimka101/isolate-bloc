@@ -1,7 +1,7 @@
-
 import 'package:isolate_bloc/src/common/isolate/method_channel/library.dart';
 
 /// Standard flutter libraries
+// TODO(maksim): update them
 const flutterLibraries = <Library>[
   Library(
     name: 'flutter_assets',
@@ -108,6 +108,7 @@ const flutterLibraries = <Library>[
 ];
 
 /// Firebase flutter libraries
+// TODO(maksim): update them
 const flutterFire = <Library>[
   Library(
     name: 'firebase_admob',
@@ -208,6 +209,8 @@ const flutterFire = <Library>[
   ),
 ];
 
+/// Popular community libraries
+// TODO(maksim): update them
 const communityLibraries = <Library>[
   Library(
     name: 'location',

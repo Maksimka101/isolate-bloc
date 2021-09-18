@@ -9,7 +9,6 @@ void testInitializePlatform(TestInitializePlatform platform) {
 }
 
 Future<void> testInitialize(Initializer userInitializer) async {
-
   return IsolateInitializer().initialize(
     userInitializer,
     _testFactory,

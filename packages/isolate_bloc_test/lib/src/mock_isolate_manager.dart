@@ -9,7 +9,8 @@ import 'mock_isolate_wrapper.dart';
 class MockIsolateManagerFactory extends IIsolateFactory {
   /// Create mock [IsolateCreateResult] object.
   @override
-  Future<IsolateCreateResult> create(IsolateRun isolateRun, Initializer initializer, MethodChannels methodChannels) async {
+  Future<IsolateCreateResult> create(IsolateRun isolateRun,
+      Initializer initializer, MethodChannels methodChannels) async {
     var fromIsolate = ReceivePort();
     var toIsolate = ReceivePort();
     var sendFromIsolate = fromIsolate.sendPort.send;

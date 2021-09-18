@@ -34,13 +34,17 @@ class CounterScreen extends StatelessWidget {
         children: [
           FloatingActionButton(
             heroTag: 'Increment',
-            onPressed: () => context.isolateBloc<CounterCubit, int>().add(CountEvent.increment),
+            onPressed: () => context
+                .isolateBloc<CounterCubit, int>()
+                .add(CountEvent.increment),
             child: const Icon(Icons.add),
           ),
           const SizedBox(height: 10),
           FloatingActionButton(
             heroTag: 'Decrement',
-            onPressed: () => context.isolateBloc<CounterCubit, int>().add(CountEvent.decrement),
+            onPressed: () => context
+                .isolateBloc<CounterCubit, int>()
+                .add(CountEvent.decrement),
             child: const Icon(Icons.remove),
           ),
         ],
@@ -69,12 +73,12 @@ enum CountEvent {
 }
 
 class SimpleBlocObserver extends IsolateBlocObserver {
-@override
+  @override
   void onClose(IsolateBlocBase bloc) {
     print('New instance of ${bloc.runtimeType}');
     super.onClose(bloc);
   }
-  
+
   @override
   void onEvent(IsolateBlocBase bloc, Object? event) {
     print('New $event for $bloc');

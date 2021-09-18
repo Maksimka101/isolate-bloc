@@ -4,14 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/mock_isolate_bloc_events.dart';
+import '../../../../mock/mock_isolate_bloc_events.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/mock/mock_isolate_messenger.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/mock/mock_isolate_wrapper.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../blocs/simple_cubit.dart';
+import '../../../../mock/mock_isolate_messenger.dart';
+import '../../../../mock/mock_isolate_wrapper.dart';
 
 void main() {
   late IIsolateMessenger isolateMessenger;
@@ -82,7 +82,7 @@ void main() {
     test('createBlock method', () async {
       await setDefaultInitialStates();
 
-      uiIsolateManager.createBloc<SimpleCubit, int>();
+      uiIsolateManager.createIsolateBloc<SimpleCubit, int>();
       verify(() => isolateMessenger.send(any())).called(1);
     });
 
@@ -103,49 +103,54 @@ void main() {
     test('initial state', () async {
       await setDefaultInitialStates();
 
-      final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
+      final wrapper = uiIsolateManager.createIsolateBloc<SimpleCubit, int>();
       expect(wrapper.state, 0);
     });
 
     test('do not send event when IsolateBlocBase is not created', () async {
       await setDefaultInitialStates();
 
-      final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
+      final wrapper = uiIsolateManager.createIsolateBloc<SimpleCubit, int>();
       wrapper.add('test');
 
       await Future.delayed(const Duration(milliseconds: 1));
-      verifyNever(() => isolateMessenger.send(MockIsolateBlocTransitionEvent()));
+      verifyNever(
+          () => isolateMessenger.send(MockIsolateBlocTransitionEvent()));
     });
 
     test('send event when IsolateBlocBase is created', () async {
       final streamController = StreamController<IsolateEvent>();
       await setDefaultInitialStates(eventsStream: streamController.stream);
 
-      final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
+      final wrapper = uiIsolateManager.createIsolateBloc<SimpleCubit, int>();
       streamController.add(IsolateBlocCreatedEvent(''));
       await Future.delayed(const Duration(milliseconds: 1));
       wrapper.add('test');
       await Future.delayed(const Duration(milliseconds: 1));
 
-      verify(() => isolateMessenger.send(IsolateBlocTransitionEvent('', 'test'))).called(1);
+      verify(() =>
+              isolateMessenger.send(IsolateBlocTransitionEvent('', 'test')))
+          .called(1);
     });
 
     test('send unsent events', () async {
       final streamController = StreamController<IsolateEvent>();
       await setDefaultInitialStates(eventsStream: streamController.stream);
 
-      final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
+      final wrapper = uiIsolateManager.createIsolateBloc<SimpleCubit, int>();
       wrapper.add('test');
       streamController.add(IsolateBlocCreatedEvent(''));
       await Future.delayed(const Duration(milliseconds: 1));
 
-      verify(() => isolateMessenger.send(IsolateBlocTransitionEvent('', 'test'))).called(1);
+      verify(() =>
+              isolateMessenger.send(IsolateBlocTransitionEvent('', 'test')))
+          .called(1);
     });
 
     test('close IsolateBlocWrapper closes IsolateBlocBase', () async {
       await setDefaultInitialStates();
 
-      final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
+      final wrapper = uiIsolateManager.createIsolateBloc<SimpleCubit, int>();
       await wrapper.close();
       await Future.delayed(const Duration(milliseconds: 1));
 
@@ -156,7 +161,7 @@ void main() {
       final streamController = StreamController<IsolateEvent>();
       await setDefaultInitialStates(eventsStream: streamController.stream);
 
-      final wrapper = uiIsolateManager.createBloc<SimpleCubit, int>();
+      final wrapper = uiIsolateManager.createIsolateBloc<SimpleCubit, int>();
       streamController.add(IsolateBlocTransitionEvent('', 100));
       await Future.delayed(const Duration(milliseconds: 1));
 

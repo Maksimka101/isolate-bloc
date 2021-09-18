@@ -52,8 +52,10 @@ void main() {
       methodChannels,
     );
 
-    isolateCreateResult.messenger.send(IsolateBlocTransitionEvent('', 'test message'));
-    final answer = await isolateCreateResult.messenger.messagesStream.firstWhere(
+    isolateCreateResult.messenger
+        .send(IsolateBlocTransitionEvent('', 'test message'));
+    final answer =
+        await isolateCreateResult.messenger.messagesStream.firstWhere(
       (element) => element is IsolateBlocTransitionEvent,
     ) as IsolateBlocTransitionEvent;
 
@@ -63,7 +65,9 @@ void main() {
 
   test('throw exception with not global or static Initializer', () async {
     initializer = () {};
-    await expectLater(isolateFactory.create(isolateRun, initializer, methodChannels), throwsA(isNotNull));
+    await expectLater(
+        isolateFactory.create(isolateRun, initializer, methodChannels),
+        throwsA(isNotNull));
   });
 }
 
@@ -82,12 +86,15 @@ Future<void> _isolateRun(
 
   var map = await _readSyncFile();
   map['isolate_run'] = true;
-  map['method_channel_initialized'] = IsolatedMethodChannelMiddleware.instance != null;
+  map['method_channel_initialized'] =
+      IsolatedMethodChannelMiddleware.instance != null;
   await _writeSyncFile(map);
 }
 
 Future<Map<String, dynamic>> _readSyncFile() {
-  return _syncFile.readAsString().then((value) => jsonDecode(value) as Map<String, dynamic>);
+  return _syncFile
+      .readAsString()
+      .then((value) => jsonDecode(value) as Map<String, dynamic>);
 }
 
 Future<void> _writeSyncFile(Map<String, dynamic> map) async {

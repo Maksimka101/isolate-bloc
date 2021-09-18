@@ -2,15 +2,15 @@ import 'dart:isolate';
 
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_wrapper.dart';
 
-/// [IIsolateWrapper] for native environment 
+/// [IIsolateWrapper] for native environment
 /// Maintain a real [Isolate].
 class IOIsolateWrapper extends IIsolateWrapper {
-  IOIsolateWrapper(this.isolate);
+  IOIsolateWrapper(this._isolate);
 
-  final Isolate isolate;
+  final Isolate _isolate;
 
   @override
   void kill() {
-    isolate.kill();
+    _isolate.kill();
   }
 }

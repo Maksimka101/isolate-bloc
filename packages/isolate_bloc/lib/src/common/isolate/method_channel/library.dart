@@ -5,6 +5,9 @@ class Library {
     required this.methodChannels,
   });
 
+  /// Library name.
+  ///
+  /// It is necessary only for conveniences when reading.
   final String name;
 
   /// MethodChannel names that use this plugin.

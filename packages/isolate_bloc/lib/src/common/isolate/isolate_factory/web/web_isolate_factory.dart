@@ -10,8 +10,10 @@ import 'package:isolate_bloc/src/common/isolate/isolate_factory/web/web_isolate_
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 
 /// Web [IIsolateFactory]'s implementation.
-/// It doesn't create [Isolate]
+/// Used in web environment because it doesn't create [Isolate]
 class WebIsolateFactory implements IIsolateFactory {
+  /// Simply creates two [IsolateMessenger]s, runs [isolateRun] 
+  /// and returns [WebIsolateWrapper] 
   @override
   Future<IsolateCreateResult> create(
     IsolateRun isolateRun,

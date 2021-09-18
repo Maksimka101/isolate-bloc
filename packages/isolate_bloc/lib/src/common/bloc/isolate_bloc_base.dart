@@ -12,8 +12,8 @@ import 'package:isolate_bloc/src/common/bloc/isolate_cubit.dart';
 /// both [IsolateCubit] and [IsolateBloc].
 /// {@endtemplate}
 abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
-  /// {@macro bloc_stream}
   // todo(maksim): maybe we should move initial state to the `register` function
+  /// {@macro bloc_stream}
   IsolateBlocBase(this._state) {
     // ignore: invalid_use_of_protected_member
     IsolateBloc.observer.onCreate(this);
@@ -27,19 +27,21 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
 
   bool _emitted = false;
 
+  /// {@template bloc_id_description}
   /// This is bloc's id. Every [IsolateBlocBase] have it's own unique id used to
   /// communicate with it's own [IsolateBlocWrapper].
+  /// {@endtemplate}
   ///
   /// It is not guaranteed that [_id] will be set after creation and before first event
   String? _id;
 
-  /// Whether or not first emit is called
+  /// Whether or not first [emit] is called
   bool get emitted => _emitted;
 
   /// The current [state].
   State get state => _state;
 
-  /// The current state stream.
+  /// The current [state] stream.
   Stream<State> get stream => _stateController.stream;
 
   /// Whether the bloc is closed.
@@ -48,9 +50,10 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
   /// Subsequent state changes cannot occur within a closed bloc.
   bool get isClosed => _stateController.isClosed;
 
+  /// {@macro bloc_id_description}
   String? get id => _id;
 
-  /// Sets [_id] and emits all [_unsentStates]
+  /// Sets [_id] and emits all [_unsentStates].
   set id(String? id) {
     _id = id;
     while (_unsentStates.isNotEmpty) {
@@ -62,7 +65,7 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
     return __stateController ??= StreamController<State>.broadcast();
   }
 
-  /// Notifies the [IsolateBlocBase] of a new event and calls [onEventReceived]
+  /// Notifies the [IsolateBlocBase] of a new event and calls [onEventReceived].
   @override
   void add(Event event) {
     try {
@@ -73,7 +76,9 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
     }
   }
 
-  /// This function receive events from UI.
+  /// This function receives events from UI.
+  ///
+  /// To respond to the [event] use [emit] function.
   void onEventReceived(Event event);
 
   /// Updates the [state] to the provided [state].
@@ -91,7 +96,7 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
     if (_id == null) {
       // this state will be emitted when [_id] will be set
       _unsentStates.add(state);
-      
+
       return;
     }
 
@@ -117,7 +122,7 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
   ///
   /// See also:
   ///
-  /// * [BlocObserver.onEvent] for observing events globally.
+  /// * [IsolateBlocObserver.onEvent] for observing events globally.
   ///
   @protected
   @mustCallSuper
@@ -144,7 +149,7 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
   ///
   /// See also:
   ///
-  /// * [BlocObserver] for observing [Cubit] behavior globally.
+  /// * [IsolateBlocObserver] for observing [Cubit] behavior globally.
   @mustCallSuper
   void onChange(Change<State> change) {
     // ignore: invalid_use_of_protected_member
@@ -157,13 +162,13 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
     onError(error, stackTrace ?? StackTrace.current);
   }
 
-  /// Called whenever an [error] occurs and notifies [BlocObserver.onError].
+  /// Called whenever an [error] occurs and notifies [IsolateBlocObserver.onError].
   ///
   /// In debug mode, [onError] throws a [BlocUnhandledErrorException] for
   /// improved visibility.
   ///
   /// In release mode, [onError] does not throw and will instead only report
-  /// the error to [BlocObserver.onError].
+  /// the error to [IsolateBlocObserver.onError].
   ///
   /// **Note: `super.onError` should always be called last.**
   /// ```dart
