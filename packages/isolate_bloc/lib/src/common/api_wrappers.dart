@@ -25,12 +25,12 @@ import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart'
 /// ```
 Future<void> initialize(
   Initializer userInitializer, {
-  MethodChannelSetup platformChannelSetup = const MethodChannelSetup(),
+  MethodChannelSetup methodChannelSetup = const MethodChannelSetup(),
 }) async {
   return IsolateInitializer().initialize(
     userInitializer,
     kIsWeb ? WebIsolateFactory() : IOIsolateFactory(),
-    platformChannelSetup.methodChannels,
+    methodChannelSetup.methodChannels,
   );
 }
 
