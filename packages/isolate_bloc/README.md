@@ -31,14 +31,14 @@ Now Dart team is working on [new Isolates](https://github.com/dart-lang/sdk/issu
 
 
 ## Bloc and Cubit
-In the Bloc, events are processed strictly in turn. It gets an event and responds to it with a stream of states in `mapEventToState`. Until the stream ends, the processing of a new event will not begin. 
+In Bloc, events are processed strictly in turn. It gets an event and responds to it with a stream of states in `mapEventToState`. Until the stream ends, the processing of a new event will not begin. 
 
-In Cubit, events are received in `onEventReceived` and processed in parallel, and the state is returned by the `emit` function.
+In Cubit, events are received in `onEventReceived` and processed asynchronously, and the state is returned by the `emit` function.
 
 ## Creating
 ### IsolateCubit
 ```dart
-/// Counter Cubit in which event type is `CounterEvent` and state type is `int`
+/// Cubit for counter with `CounterEvent` and `int` state.
 class CounterCubit extends IsolateCubit<CountEvent, int> {
   /// The initial state of the `CounterCubit` is 0.
   CounterCubit() : super(0);
@@ -69,7 +69,7 @@ class CounterBloc extends IsolateBloc<CountEvent, int> {
 ```
 
 ## Registering a Bloc or Cubit
-To be able to create Bloc you need to register it. You can do with `register` function.
+To be able to create Bloc you need to register it. You can do with the `register` function.
 
 ```dart
 void main() async {
@@ -167,7 +167,7 @@ wrapper.listen((state) => print('CounterBloc state: $state'));
 ```
 
 ## Initialization
-To create Isolate and register Blocs you need to call `initialize` and provide initialization (isolated) function. This function will be launched in Isolate and it MUST be a GLOBAL or STATIC. 
+To create Isolate and register Blocs you need to call `initialize` and provide initialization (isolated) function. This function will be executed in Isolate and it MUST be a GLOBAL or STATIC. 
 
 ```dart
 void main() async {
@@ -311,14 +311,14 @@ class SimpleBlocObserver extends IsolateBlocObserver {
 ```
 
 ## Use Bloc in another Bloc
-You can use Bloc in another Bloc. You need to use `getBloc<BlocA, BlocAState>()` 
-function which returns `IsolateBlocWrapper<BlocAState>` to do this.
+You can use Bloc in another Bloc. To do this you need to use `getBloc<BlocA, BlocAState>()` 
+function which returns `IsolateBlocWrapper<BlocAState>` .
 
 This function works this way:
   * waits for user's [Initializer] function
   * looks for created bloc with BlocA type
     * if it finds any, so returns this bloc's [IsolateBlocWrapper]
-    * else it creates a new bloc and adds to the pull of free blocs.
+    * otherwise it creates a new bloc and adds to the pull of free blocs.
       So when UI will call `create()`, it won't create a new bloc but return free bloc from pull.
 
 ```dart
