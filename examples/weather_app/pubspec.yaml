@@ -11,9 +11,9 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.0
-  # isolate_bloc: ^2.0.0
-  isolate_bloc:
-    path: ../../packages/isolate_bloc/
+  isolate_bloc: ^2.0.0
+  # isolate_bloc:
+    # path: ../../packages/isolate_bloc/
   equatable: 2.0.3
   http: 0.13.3
 

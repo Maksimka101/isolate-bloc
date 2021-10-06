@@ -10,9 +10,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # isolate_bloc: ^2.0.0
-  isolate_bloc:
-    path: ../
+  isolate_bloc: ^2.0.0
+  # isolate_bloc:
+    # path: ../
 
 dev_dependencies:
   flutter_test:
