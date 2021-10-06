@@ -1,13 +1,14 @@
 import 'package:flutter/widgets.dart';
-import 'package:nested/nested.dart';
+import 'package:isolate_bloc/src/common/api_wrappers.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
+import 'package:isolate_bloc/src/flutter/bloc_info_holder.dart';
+import 'package:provider/single_child_widget.dart';
 import 'package:provider/provider.dart';
-import '../common/api_wrappers.dart';
-import '../common/bloc/isolate_bloc.dart';
-import '../common/bloc/isolate_bloc_wrapper.dart';
-import './bloc_info_holder.dart';
 
 /// A function that creates a `Bloc` of type [T].
-typedef CreateIsolateBloc<T extends IsolateBloc<Object, Object>> = T Function(
+typedef CreateIsolateBloc<T extends IsolateBlocBase<Object?, Object?>> = T
+    Function(
   BuildContext context,
 );
 
@@ -18,7 +19,7 @@ mixin IsolateBlocProviderSingleChildWidget on SingleChildWidget {}
 /// {@template bloc_provider}
 /// Takes a `ValueBuilder` that is responsible for creating the `bloc` and
 /// a [child] which will have access to the `bloc` via
-/// `BlocProvider.of(context)`.
+/// `IsolateBlocProvider.of(context)`.
 /// It is used as a dependency injection (DI) widget so that a single instance
 /// of a `bloc` can be provided to multiple widgets within a subtree.
 ///
@@ -31,19 +32,16 @@ mixin IsolateBlocProviderSingleChildWidget on SingleChildWidget {}
 /// );
 /// ```
 /// {@endtemplate}
-class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State>
+class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State>
     extends SingleChildStatelessWidget
     with IsolateBlocProviderSingleChildWidget {
   /// {@macro bloc_provider}
   IsolateBlocProvider({
-    Key key,
-    Widget child,
-  }) : this._(
-          key: key,
-          create: (_) => null,
-          dispose: (_, bloc) => bloc?.close(),
-          child: child,
-        );
+    Key? key,
+    this.child,
+    this.lazy,
+  })  : _value = null,
+        super(key: key, child: child);
 
   /// Takes a `bloc` and a [child] which will have access to the `bloc` via
   /// `IsolateBlocProvider.of(context)`.
@@ -63,32 +61,21 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State>
   /// );
   /// ```
   IsolateBlocProvider.value({
-    Key key,
-    @required IsolateBlocWrapper value,
-    Widget child,
-  }) : this._(
-          key: key,
-          create: (_) => value,
-          child: child,
-        );
-
-  /// Internal constructor responsible for creating the [IsolateBlocProvider].
-  /// Used by the [IsolateBlocProvider] default and value constructors.
-  IsolateBlocProvider._({
-    Key key,
-    @required Create<IsolateBlocWrapper> create,
-    Dispose<IsolateBlocWrapper<Object>> dispose,
+    Key? key,
+    required IsolateBlocWrapper<Object?> value,
     this.child,
-  })  : _dispose = dispose,
-        _create = create,
+  })  : _value = value,
+        lazy = null,
         super(key: key, child: child);
 
   /// [child] and its descendants which will have access to the `bloc`.
-  final Widget child;
+  final Widget? child;
 
-  final Create<IsolateBlocWrapper<Object>> _create;
+  /// Whether the [Bloc] or [Cubit] should be created lazily.
+  /// Defaults to `true`.
+  final bool? lazy;
 
-  final Dispose<IsolateBlocWrapper<Object>> _dispose;
+  final IsolateBlocWrapper<Object?>? _value;
 
   /// Method that allows widgets to access a `cubit` instance as long as their
   /// `BuildContext` contains a [IsolateBlocProvider] instance.
@@ -100,10 +87,11 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State>
   /// IsolateBlocProvider.of<BlocA, BlocAState>(context)
   /// ```
   static IsolateBlocWrapper<State>
-      of<T extends IsolateBloc<Object, State>, State>(BuildContext context) {
+      of<T extends IsolateBlocBase<Object?, State>, State>(
+          BuildContext context) {
     final blocInfoHolder = _getBlocInfoHolder(context);
-    if (blocInfoHolder == null ||
-        blocInfoHolder.getWrapperByType<T, State>() == null) {
+    final blocWrapper = blocInfoHolder?.getWrapperByType<T, State>();
+    if (blocWrapper == null) {
       throw FlutterError(
         '''
         IsolateBlocProvider.of() called with a context that does not contain a IsolateBlocWrapper for $T.
@@ -115,28 +103,46 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State>
         ''',
       );
     }
-    return blocInfoHolder.getWrapperByType<T, State>();
+
+    return blocWrapper;
   }
 
   @override
-  Widget buildWithChild(BuildContext context, Widget child) {
-    return InheritedProvider<BlocInfoHolder>(
-      create: (context) {
-        var blocWrapper = _create?.call(context);
-        blocWrapper ??= createBloc<T, State>();
-        final blocInfoHolder = _getBlocInfoHolder(context) ?? BlocInfoHolder();
-        blocInfoHolder.addBlocInfo<T>(blocWrapper);
-        return blocInfoHolder;
-      },
-      dispose: (context, infoHolder) {
-        _dispose?.call(context, infoHolder.removeBloc<T>());
-      },
-      child: child,
-      lazy: false,
-    );
+  Widget buildWithChild(BuildContext context, Widget? child) {
+    final value = _value;
+    if (value != null) {
+      return InheritedProvider.value(
+        value: () {
+          final blocInfoHolder =
+              _getBlocInfoHolder(context) ?? BlocInfoHolder();
+          blocInfoHolder.addBlocInfo<T>(value);
+
+          return blocInfoHolder;
+        }(),
+        child: child,
+      );
+    } else {
+      return InheritedProvider<BlocInfoHolder>(
+        create: (context) {
+          final blocWrapper = createBloc<T, State>();
+          final blocInfoHolder =
+              _getBlocInfoHolder(context) ?? BlocInfoHolder();
+          blocInfoHolder.addBlocInfo<T>(blocWrapper);
+
+          return blocInfoHolder;
+        },
+        dispose: (context, infoHolder) {
+          var blocWrapper = infoHolder.removeBloc<T>();
+          assert(blocWrapper != null);
+          blocWrapper?.close();
+        },
+        lazy: lazy,
+        child: child,
+      );
+    }
   }
 
-  static BlocInfoHolder _getBlocInfoHolder(BuildContext context) {
+  static BlocInfoHolder? _getBlocInfoHolder(BuildContext context) {
     try {
       return Provider.of<BlocInfoHolder>(context, listen: false);
     } catch (_) {
@@ -146,7 +152,7 @@ class IsolateBlocProvider<T extends IsolateBloc<Object, State>, State>
 }
 
 /// Extends the `BuildContext` class with the ability
-/// to perform a lookup based on a `Bloc` type.
+/// to perform a lookup based on a `IsolateBlocBase` type.
 extension IsolateBlocProviderExtension on BuildContext {
   /// Performs a lookup using the `BuildContext` to obtain
   /// the nearest ancestor `Cubit` of type [C].
@@ -154,9 +160,10 @@ extension IsolateBlocProviderExtension on BuildContext {
   /// Calling this method is equivalent to calling:
   ///
   /// ```dart
-  /// BlocProvider.of<C>(context)
+  /// IsolateBlocProvider.of<C>(context)
   /// ```
   IsolateBlocWrapper<State>
-      isolateBloc<C extends IsolateBloc<Object, State>, State>() =>
-          IsolateBlocProvider.of<C, State>(this);
+      isolateBloc<C extends IsolateBlocBase<Object?, State>, State>() {
+    return IsolateBlocProvider.of<C, State>(this);
+  }
 }

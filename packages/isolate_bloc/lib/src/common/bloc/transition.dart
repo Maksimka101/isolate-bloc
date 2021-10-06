@@ -12,13 +12,18 @@ import 'change.dart';
 class Transition<Event, State> extends Change<State> {
   /// {@macro transition}
   const Transition({
-    @required State currentState,
-    @required this.event,
-    @required State nextState,
+    required State currentState,
+    required this.event,
+    required State nextState,
   }) : super(currentState: currentState, nextState: nextState);
 
   /// The [Event] which triggered the current [Transition].
   final Event event;
+
+  @override
+  int get hashCode {
+    return currentState.hashCode ^ event.hashCode ^ nextState.hashCode;
+  }
 
   @override
   bool operator ==(Object other) =>
@@ -28,14 +33,9 @@ class Transition<Event, State> extends Change<State> {
           currentState == other.currentState &&
           event == other.event &&
           nextState == other.nextState;
-
-  @override
-  int get hashCode {
-    return currentState.hashCode ^ event.hashCode ^ nextState.hashCode;
-  }
-
   @override
   String toString() {
-    return '''Transition { currentState: $currentState, event: $event, nextState: $nextState }''';
+    return "Transition { currentState: $currentState, "
+        "event: $event, nextState: $nextState }";
   }
 }

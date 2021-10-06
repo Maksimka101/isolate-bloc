@@ -1,70 +1,68 @@
+// ignore_for_file: prefer-match-file-name
 import 'package:flutter/foundation.dart';
+import 'package:isolate_bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
+import 'package:isolate_bloc/src/common/isolate/initializer/isolate_initializer.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate/io_isolate_factory.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/web/web_isolate_factory.dart';
+import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 
-import 'bloc/isolate_bloc.dart';
-import 'bloc/isolate_bloc_wrapper.dart';
-import 'isolate/bloc_manager.dart';
-import 'isolate/isolate_manager/isolate/isolate_manager.dart'
-    if (dart.library.html) 'isolate/isolate_manager/web/isolate_manager.dart';
-import 'isolate/isolated_bloc_manager.dart';
-import 'isolate/platform_channel/platform_channel_setup.dart';
-
-/// Register [IsolateBloc].
-/// You can create [IsolateBloc] and get [IsolateBlocWrapper] from
-/// [createBloc] only if you register this [IsolateBloc].
-void register<Event, State>({
-  @required IsolateBlocCreator<Event, State> create,
-}) =>
-    IsolatedBlocManager.instance.register<Event, State>(create);
-
-/// Start creating [IsolateBloc] and return [IsolateBlocWrapper].
-IsolateBlocWrapper<State>
-    createBloc<BlocT extends IsolateBloc<Object, State>, State>() {
-  final blocManager = BlocManager.instance;
-  assert(
-      blocManager != null,
-      '$BlocManager must not be null. '
-      'Call `await $initialize()` and call this function');
-  return blocManager.createBloc<BlocT, State>();
-}
-
-/// Initialize [Isolate], ServiceEventListener in both Isolates and run [Initializer].
-/// If already initialized and [reCreate] is true kill previous [Isolate] and reinitialize everything.
+/// Initializes [UIIsolateManager] and [IsolateManager] in [Isolate] and runs [userInitializer].
+///
+/// If already initialized kills previous [Isolate] and creates new one.
+///
+/// Simply call this function at the start of main:
+/// ```
+/// Future<void> main() async {
+///   await initialize(initializerFunc);
+///
+///   runApp(...);
+/// }
+///
+/// void initializerFunc() {
+///   register<Bloc, State>(create: () => Bloc());
+/// }
+/// ```
 Future<void> initialize(
   Initializer userInitializer, {
-  PlatformChannelSetup platformChannelSetup,
-  bool reCreate = false,
+  MethodChannelSetup methodChannelSetup = const MethodChannelSetup(),
 }) async {
-  platformChannelSetup ??= PlatformChannelSetup();
-  if (!reCreate) {
-    assert(
-        BlocManager.instance == null,
-        'You can initialize only once. '
-        'Call `initialize(..., reCreate: true)` if you want to reinitialize.');
-  }
-  return BlocManager.initialize(
+  return IsolateInitializer().initialize(
     userInitializer,
-    IsolateManagerImpl.createIsolate,
-    platformChannelSetup.methodChannels,
+    kIsWeb ? WebIsolateFactory() : IOIsolateFactory(),
+    methodChannelSetup.methodChannels,
   );
 }
 
-/// Signature for [IsolateBlocWrapper] injection.
-typedef BlocInjector<Bloc extends IsolateBloc<Object, State>, State>
-    = IsolateBlocWrapper<State> Function<Bloc extends IsolateBloc, State>();
+/// {@template create_bloc}
+/// Starts creating [IsolateBlocBase] and returns [IsolateBlocWrapper].
+///
+/// Throws [UIIsolateManagerUnInitialized] if [UIIsolateManager] is null or in another words if you
+/// didn't call [initialize] function before
+///
+/// How to use:
+/// ```
+/// // Create bloc.
+/// final counterBloc = createBloc<CounterBloc, int>();
+/// // Add event
+/// counterBloc.add(CounterEvent.increment);
+/// // Receive states.
+/// counterBloc.stream.listen((state) => print('New state: $state')) // Prints "New state: 1".
+/// ```
+/// {@endtemplate}
+IsolateBlocWrapper<S> createBloc<B extends IsolateBlocBase<Object?, S>, S>() {
+  final isolateManager = UIIsolateManager.instance;
+  if (isolateManager == null) {
+    throw UIIsolateManagerUnInitialized();
+  } else {
+    return isolateManager.createIsolateBloc<B, S>();
+  }
+}
 
-/// Use this function to get [IsolateBloc] in [Isolate].
-/// To get bloc in UI Isolate use IsolateBlocProvider which returns [IsolateBlocWrapper].
-/// This function works this way: firstly it is wait for user's [Initializer] function
-/// secondly it is looks for created bloc with type BlocA. If it is finds any, so it
-/// returns this bloc's [IsolateBlocWrapper]. Else it is creates a new bloc and
-/// add to the pull of free blocs. So when UI will call `create()`, it will not create a new bloc but
-/// return free bloc from pull.
-IsolateBlocWrapper<State>
-    getBloc<Bloc extends IsolateBloc<Object, State>, State>() {
-  assert(
-    IsolatedBlocManager.instance != null,
-    '$IsolatedBlocManager instance is null. '
-    'Make sure that you call this function from $Initializer.',
-  );
-  return IsolatedBlocManager.instance.getBlocWrapper<Bloc, State>();
+/// This exception indicates that [initialize] function wasn't called
+class UIIsolateManagerUnInitialized implements Exception {
+  @override
+  String toString() {
+    return '$UIIsolateManager must not be null. Call `await initialize()`';
+  }
 }

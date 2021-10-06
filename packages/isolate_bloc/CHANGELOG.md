@@ -1,3 +1,11 @@
+## [2.0.0]
+ - **BREAKING**: update `register` function. 
+   - Now it requires registered bloc generic parameters. For example `register(create: () => CounterBloc())` changed to `register<CounterBloc, CounterEvent>(create: () => CounterBloc())`
+   - You can set bloc's initial state `register<CounterBloc, CounterEvent>(create: () => CounterBloc(), initialState: InitialCounterEvent())`
+ - **BREAKING**: `PlatformChannelSetup` renamed to `MethodChannelSetup` so  `initialize(initializer,`**`platformChannelSetup: PlatformChannelSetup()`**`)` changed to `initialize(initializer,`**`methodChannelSetup: MethodChannelSetup()`**`)`
+ - **BREAKING**: `IsolateCubit` is introduced and `IsolateBloc`'s api moved to the `IsolateCubit`. You can just rename your old IsolateBlocs to IsolateCubit
+ - `IsolateBlocProvider` now has `lazy` parameter
+
 ## [1.0.4]
  - Add tests and fix bug.
 

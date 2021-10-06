@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 
-import 'package:meta/meta.dart';
-import 'package:weather_app/blocs/settings_bloc.dart';
+import 'package:weather_app/blocs/settings_cubit.dart';
 
 import '../models/models.dart' as model;
 import '../widgets/widgets.dart';
@@ -11,10 +10,9 @@ class CombinedWeatherTemperature extends StatelessWidget {
   final model.Weather weather;
 
   CombinedWeatherTemperature({
-    Key key,
-    @required this.weather,
-  })  : assert(weather != null),
-        super(key: key);
+    Key? key,
+    required this.weather,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +27,7 @@ class CombinedWeatherTemperature extends StatelessWidget {
             ),
             Padding(
               padding: EdgeInsets.all(20.0),
-              child: IsolateBlocBuilder<SettingsBloc, SettingsState>(
+              child: IsolateBlocBuilder<SettingsCubit, SettingsState>(
                 builder: (context, state) {
                   return Temperature(
                     temperature: weather.temp,

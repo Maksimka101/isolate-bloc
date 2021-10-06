@@ -1,7 +1,7 @@
 import 'package:isolate_bloc/isolate_bloc.dart';
 
-/// [IsolateWrapper] for [MockIsolateManager]
-class MockIsolateWrapper extends IsolateWrapper {
+/// [IIsolateWrapper] for mock [IsolateCreateResult]
+class MockIsolateWrapper extends IIsolateWrapper {
   @override
   void kill() {}
 }

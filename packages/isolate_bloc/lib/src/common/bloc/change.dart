@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 @immutable
 class Change<State> {
   /// {@macro change}
-  const Change({@required this.currentState, @required this.nextState});
+  const Change({required this.currentState, required this.nextState});
 
   /// The current [State] at the time of the [Change].
   final State currentState;
@@ -16,15 +16,15 @@ class Change<State> {
   final State nextState;
 
   @override
+  int get hashCode => currentState.hashCode ^ nextState.hashCode;
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Change<State> &&
           runtimeType == other.runtimeType &&
           currentState == other.currentState &&
           nextState == other.nextState;
-
-  @override
-  int get hashCode => currentState.hashCode ^ nextState.hashCode;
 
   @override
   String toString() {

@@ -6,12 +6,11 @@ import 'mock_isolate_manager.dart';
 /// Work like common initialize but doesn't create [Isolate]
 Future<void> initializeMock(
   Initializer userInitializer, {
-  PlatformChannelSetup platformChannelSetup,
+  MethodChannelSetup platformChannelSetup = const MethodChannelSetup(),
 }) {
-  platformChannelSetup ??= PlatformChannelSetup();
-  return BlocManager.initialize(
+  return IsolateInitializer().initialize(
     userInitializer,
-    MockIsolateManager.createIsolate,
+    MockIsolateManagerFactory(),
     platformChannelSetup.methodChannels,
   );
 }
