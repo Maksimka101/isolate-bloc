@@ -1,7 +1,8 @@
 /// Abstract layer for [Isolate]
-/// For example [MockIsolateWrapper] or [IIsolateWrapper] do nothing but
-/// [IsolateWrapperImpl] maintain a real [Isolate]
+///
+/// For example [WebIsolateWrapper] do nothing
+/// however [IOIsolateWrapper] maintains a real [Isolate]
 abstract class IIsolateWrapper {
-  /// Kill [Isolate]
+  /// Kills [Isolate]
   void kill();
 }

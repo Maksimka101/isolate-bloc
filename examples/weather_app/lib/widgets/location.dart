@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class Location extends StatelessWidget {
   final String location;
 

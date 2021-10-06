@@ -5,6 +5,8 @@ import 'package:mocktail/mocktail.dart';
 
 class MockIsolateBlocEvent extends Fake implements IsolateEvent {}
 
-class MockCreateIsolateBlocEvent extends Fake implements CreateIsolateBlocEvent {}
+class MockCreateIsolateBlocEvent extends Fake
+    implements CreateIsolateBlocEvent {}
 
-class MockIsolateBlocTransitionEvent extends Fake implements IsolateBlocTransitionEvent {}
+class MockIsolateBlocTransitionEvent extends Fake
+    implements IsolateBlocTransitionEvent {}

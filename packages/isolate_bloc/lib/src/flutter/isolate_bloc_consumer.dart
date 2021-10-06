@@ -59,7 +59,8 @@ import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 /// )
 /// ```
 /// {@endtemplate}
-class IsolateBlocConsumer<B extends IsolateBlocBase<Object?, S>, S> extends StatefulWidget {
+class IsolateBlocConsumer<B extends IsolateBlocBase<Object?, S>, S>
+    extends StatefulWidget {
   /// {@macro bloc_consumer}
   const IsolateBlocConsumer({
     Key? key,
@@ -96,10 +97,12 @@ class IsolateBlocConsumer<B extends IsolateBlocBase<Object?, S>, S> extends Stat
   final BlocListenerCondition<S>? listenWhen;
 
   @override
-  State<IsolateBlocConsumer<B, S>> createState() => _IsolateBlocConsumerState<B, S>();
+  State<IsolateBlocConsumer<B, S>> createState() =>
+      _IsolateBlocConsumerState<B, S>();
 }
 
-class _IsolateBlocConsumerState<B extends IsolateBlocBase<Object?, S>, S> extends State<IsolateBlocConsumer<B, S>> {
+class _IsolateBlocConsumerState<B extends IsolateBlocBase<Object?, S>, S>
+    extends State<IsolateBlocConsumer<B, S>> {
   late IsolateBlocWrapper _bloc;
 
   @override

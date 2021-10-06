@@ -2,7 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 
 class SettingsCubit extends IsolateCubit<SettingsEvent, SettingsState> {
-  SettingsCubit() : super(SettingsState(temperatureUnits: TemperatureUnits.celsius));
+  SettingsCubit()
+      : super(SettingsState(temperatureUnits: TemperatureUnits.celsius));
 
   @override
   void onEventReceived(SettingsEvent event) {

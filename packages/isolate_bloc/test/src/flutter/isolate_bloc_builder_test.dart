@@ -52,7 +52,8 @@ class MyThemeAppState extends State<MyThemeApp> {
                 key: const Key('raised_button_1'),
                 child: const SizedBox(),
                 onPressed: () {
-                  setState(() => _themeCubit = createBloc<DarkThemeCubit, ThemeInfo>());
+                  setState(() =>
+                      _themeCubit = createBloc<DarkThemeCubit, ThemeInfo>());
                 },
               ),
               ElevatedButton(
@@ -82,7 +83,8 @@ class ThemeCubit extends IsolateCubit<ThemeInfo, ThemeInfo> {
 enum ThemeInfo { lightTheme, darkTheme }
 
 extension on ThemeInfo {
-  ThemeData get theme => this == ThemeInfo.lightTheme ? ThemeData.light() : ThemeData.dark();
+  ThemeData get theme =>
+      this == ThemeInfo.lightTheme ? ThemeData.light() : ThemeData.dark();
 }
 
 class DarkThemeCubit extends IsolateCubit<ThemeInfo, ThemeInfo> {
@@ -176,7 +178,8 @@ void main() {
       expect(numBuilds, 1);
     });
 
-    testWidgets('receives events and sends state updates to widget', (tester) async {
+    testWidgets('receives events and sends state updates to widget',
+        (tester) async {
       final themeCubit = createBloc<ThemeCubit, ThemeInfo>();
       var numBuilds = 0;
       await tester.pumpWidget(
@@ -196,7 +199,9 @@ void main() {
       expect(numBuilds, 2);
     });
 
-    testWidgets('infers the cubit from the context if the cubit is not provided', (tester) async {
+    testWidgets(
+        'infers the cubit from the context if the cubit is not provided',
+        (tester) async {
       final themeCubit = createBloc<ThemeCubit, ThemeInfo>();
       var numBuilds = 0;
       await tester.pumpWidget(
@@ -241,12 +246,14 @@ void main() {
       expect(numBuilds, 3);
     });
 
-    testWidgets('updates cubit and performs new lookup when widget is updated', (tester) async {
+    testWidgets('updates cubit and performs new lookup when widget is updated',
+        (tester) async {
       final themeCubit = createBloc<ThemeCubit, ThemeInfo>();
       var numBuilds = 0;
       await tester.pumpWidget(
         StatefulBuilder(
-          builder: (context, setState) => IsolateBlocProvider<ThemeCubit, ThemeInfo>.value(
+          builder: (context, setState) =>
+              IsolateBlocProvider<ThemeCubit, ThemeInfo>.value(
             value: themeCubit,
             child: IsolateBlocBuilder<ThemeCubit, ThemeInfo>(
               builder: (context, theme) {
@@ -359,7 +366,8 @@ void main() {
     });
 
     testWidgets('shows latest state instead of initial state', (tester) async {
-      final themeCubit = createBloc<ThemeCubit, ThemeInfo>()..add(ThemeInfo.darkTheme);
+      final themeCubit = createBloc<ThemeCubit, ThemeInfo>()
+        ..add(ThemeInfo.darkTheme);
       await tester.runAsync(() => themeCubit.stream.first);
       await tester.pumpAndSettle();
 
@@ -378,53 +386,67 @@ void main() {
       expect(numBuilds, 1);
     });
 
-    testWidgets('with buildWhen only rebuilds when buildWhen evaluates to true', (tester) async {
+    testWidgets('with buildWhen only rebuilds when buildWhen evaluates to true',
+        (tester) async {
       await tester.pumpWidget(MyCounterApp());
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('myCounterApp')), findsOneWidget);
 
-      final incrementButtonFinder = find.byKey(const Key('myCounterAppIncrementButton'));
+      final incrementButtonFinder =
+          find.byKey(const Key('myCounterAppIncrementButton'));
       expect(incrementButtonFinder, findsOneWidget);
 
-      final counterText1 = tester.widget<Text>(find.byKey(const Key('myCounterAppText')));
+      final counterText1 =
+          tester.widget<Text>(find.byKey(const Key('myCounterAppText')));
       expect(counterText1.data, '0');
 
-      final conditionalCounterText1 = tester.widget<Text>(find.byKey(const Key('myCounterAppTextCondition')));
+      final conditionalCounterText1 = tester
+          .widget<Text>(find.byKey(const Key('myCounterAppTextCondition')));
       expect(conditionalCounterText1.data, '0');
 
       await tester.tap(incrementButtonFinder);
-      await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 1)));
+      await tester
+          .runAsync(() => Future.delayed(const Duration(milliseconds: 1)));
       await tester.pumpAndSettle();
 
-      final counterText2 = tester.widget<Text>(find.byKey(const Key('myCounterAppText')));
+      final counterText2 =
+          tester.widget<Text>(find.byKey(const Key('myCounterAppText')));
       expect(counterText2.data, '1');
 
-      final conditionalCounterText2 = tester.widget<Text>(find.byKey(const Key('myCounterAppTextCondition')));
+      final conditionalCounterText2 = tester
+          .widget<Text>(find.byKey(const Key('myCounterAppTextCondition')));
       expect(conditionalCounterText2.data, '0');
 
       await tester.tap(incrementButtonFinder);
-      await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 1)));
+      await tester
+          .runAsync(() => Future.delayed(const Duration(milliseconds: 1)));
       await tester.pumpAndSettle();
 
-      final counterText3 = tester.widget<Text>(find.byKey(const Key('myCounterAppText')));
+      final counterText3 =
+          tester.widget<Text>(find.byKey(const Key('myCounterAppText')));
       expect(counterText3.data, '2');
 
-      final conditionalCounterText3 = tester.widget<Text>(find.byKey(const Key('myCounterAppTextCondition')));
+      final conditionalCounterText3 = tester
+          .widget<Text>(find.byKey(const Key('myCounterAppTextCondition')));
       expect(conditionalCounterText3.data, '2');
 
       await tester.tap(incrementButtonFinder);
-      await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 1)));
+      await tester
+          .runAsync(() => Future.delayed(const Duration(milliseconds: 1)));
       await tester.pumpAndSettle();
 
-      final counterText4 = tester.widget<Text>(find.byKey(const Key('myCounterAppText')));
+      final counterText4 =
+          tester.widget<Text>(find.byKey(const Key('myCounterAppText')));
       expect(counterText4.data, '3');
 
-      final conditionalCounterText4 = tester.widget<Text>(find.byKey(const Key('myCounterAppTextCondition')));
+      final conditionalCounterText4 = tester
+          .widget<Text>(find.byKey(const Key('myCounterAppTextCondition')));
       expect(conditionalCounterText4.data, '2');
     });
 
-    testWidgets('calls buildWhen and builder with correct state', (tester) async {
+    testWidgets('calls buildWhen and builder with correct state',
+        (tester) async {
       final buildWhenPreviousState = <int>[];
       final buildWhenCurrentState = <int>[];
       final states = <int>[];
@@ -472,7 +494,8 @@ void main() {
         Directionality(
           textDirection: TextDirection.ltr,
           child: StatefulBuilder(
-            builder: (context, setState) => IsolateBlocBuilder<CounterBloc, int>(
+            builder: (context, setState) =>
+                IsolateBlocBuilder<CounterBloc, int>(
               bloc: counterCubit,
               buildWhen: (previous, state) => state % 2 == 0,
               builder: (_, state) {

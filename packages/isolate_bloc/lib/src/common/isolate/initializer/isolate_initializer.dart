@@ -3,12 +3,20 @@ import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messen
 import 'package:isolate_bloc/src/common/isolate/manager/isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 
+/// {@template isolate_initializer}
+/// Initializer which is used to create Isolate and initialize [UIIsolateManager]
+/// and [IsolateManager].
+/// {@endtemplate}
 class IsolateInitializer {
-  /// Disposes old [UIIsolateManager], creates  new instance of it
+  /// {@macro isolate_initializer}
+  ///
+  /// Takes user [initializer] function which will be launched in Isolate,
+  /// [methodChannels] which is used to mock [MethodChannel] in Isolate
+  /// and [isolateFactory] which is used to create new Isolate and initialize communication between it and UI Isolate
   Future<void> initialize(
     Initializer initializer,
     IIsolateFactory isolateFactory,
-    MethodChannels platformChannels,
+    MethodChannels methodChannels,
   ) async {
     // close current isolate
     await UIIsolateManager.instance?.dispose();
@@ -16,7 +24,7 @@ class IsolateInitializer {
     final createResult = await isolateFactory.create(
       _isolatedBlocRunner,
       initializer,
-      platformChannels,
+      methodChannels,
     );
 
     final uiIsolateManager = UIIsolateManager(
@@ -27,6 +35,7 @@ class IsolateInitializer {
     await uiIsolateManager.initialize();
   }
 
+  /// Runs in isolate to initialize [IsolateManager] and run [userInitializer]
   static Future<void> _isolatedBlocRunner(
     IIsolateMessenger messenger,
     Initializer userInitializer,

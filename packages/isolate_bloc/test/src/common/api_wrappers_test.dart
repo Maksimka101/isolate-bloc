@@ -15,10 +15,11 @@ void main() {
 
   group('test `createBloc`', () {
     test('test with initialized `UIIsolateManager`', () {
-      when(() => uiIsolateManager.createBloc()).thenReturn(MockIsolateBlocWrapper<int>());
+      when(() => uiIsolateManager.createIsolateBloc())
+          .thenReturn(MockIsolateBlocWrapper<int>());
       createBloc<SimpleCubit, int>();
 
-      verify(() => uiIsolateManager.createBloc()).called(1);
+      verify(() => uiIsolateManager.createIsolateBloc()).called(1);
     });
 
     test('test with uninitialized `UIIsolateManager`', () {
@@ -36,16 +37,17 @@ void main() {
     });
   });
 
-  test('test `initialize` function and recreate flag', () async {
-    when(() => uiIsolateManager.dispose()).thenAnswer((invocation) => Future.value());
+  test('test `initialize` function ', () async {
+    when(() => uiIsolateManager.dispose())
+        .thenAnswer((invocation) => Future.value());
 
-    await initialize(_initialize, recreate: true);
+    await initialize(_initialize);
 
     verify(() => uiIsolateManager.dispose()).called(1);
   });
 
-  test('test `initialize` function and recreate flag #2', () async {
-    expect(initialize(_initialize, recreate: false), throwsA(isNotNull));
+  test('test `initialize` function #2', () async {
+    expect(initialize(_initialize), throwsA(isNotNull));
   });
 }
 

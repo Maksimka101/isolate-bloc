@@ -6,13 +6,17 @@ import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messen
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 
-/// Manager which works in Isolate
+/// Manager which works in Isolate, respond on [IsolateBlocEvent]s from UI Isolate,
+/// manages [IsolateBlocBase]s and implements [register] and [getBloc] functions
 class IsolateManager {
   IsolateManager._internal(
     this._messenger,
     this._userInitializer,
   );
 
+  /// Creates isolate manager and set [instance]
+  ///
+  /// Don't forget to call [initialize] to subscribe on messages and call [Initializer]
   factory IsolateManager({
     required IIsolateMessenger messenger,
     required Initializer userInitializer,
@@ -23,6 +27,7 @@ class IsolateManager {
     );
   }
 
+  /// Instance of last created manager
   static IsolateManager? instance;
 
   final IIsolateMessenger _messenger;
@@ -33,13 +38,16 @@ class IsolateManager {
   final _freeBlocs = <Type, IsolateBlocBase>{};
   final _blocCreators = <Type, IsolateBlocCreator>{};
   final _createdBlocsSubscriptions = <String, StreamSubscription>{};
-  final _isolatedBlocWrappersSubscriptions = <IsolateBlocBase, List<StreamSubscription>>{};
+  final _isolatedBlocWrappersSubscriptions =
+      <IsolateBlocBase, List<StreamSubscription>>{};
   final _isolatedBlocWrappers = <IsolateBlocBase, List<IsolateBlocWrapper>>{};
 
   final _initializeCompleter = Completer();
   StreamSubscription<IsolateEvent>? _serviceEventsSubscription;
 
-  /// Finish initialization and send initial states to the [BlocManager].
+  /// Finish initialization by calling [Initializer] and sends initial states to the [UIIsolateManager].
+  ///
+  /// Throws [InitializerException] when some exception is thrown in [Initializer] in debug mode
   Future<void> initialize() async {
     _serviceEventsSubscription = _messenger.messagesStream
         .where((event) => event is IsolateBlocEvent)
@@ -59,13 +67,11 @@ class IsolateManager {
     _messenger.send(IsolateBlocsInitialized(_initialStates));
   }
 
-  /// Register [IsolateCubit].
-  /// You can create [IsolateCubit] and get [IsolateBlocWrapper] from
-  /// [BlocManager].createBloc only if you register this [IsolateCubit].
-  ///
-  /// If [initialState] is not provided bloc will be created immediately.
-  /// So if you don't want to create bloc while initialization please provide [initialState]
-  void register<T extends IsolateBlocBase<Object?, S>, S>(IsolateBlocCreator creator, {S? initialState}) {
+  /// {@macro register}
+  void registerBloc<T extends IsolateBlocBase<Object?, S>, S>(
+    IsolateBlocCreator creator, {
+    S? initialState,
+  }) {
     if (initialState == null) {
       final bloc = creator();
       _initialStates[T] = bloc.state;
@@ -76,18 +82,9 @@ class IsolateManager {
     _blocCreators[T] = creator;
   }
 
-  /// Use this function to get [IsolateBlocBase] in [Isolate].
-  ///
-  /// To get bloc in UI [Isolate] use [IsolateBlocProvider] which returns [IsolateBlocWrapper].
-  ///
-  /// This function works this way: firstly it is wait for user's [Initializer] function
-  /// secondly it is looks for created bloc with type BlocA. If it is finds any, so it
-  /// returns this bloc's [IsolateBlocWrapper]. Else it is creates a new bloc and
-  /// add to the pull of free blocs. So when UI will call `create()`, it will not create a new bloc but
-  /// return free bloc from pull.
-  ///
-  /// [IsolateBlocWrapper] returned by this function won't close it's [IsolateBloc] by [isolateBlocWrapper.close()]
-  IsolateBlocWrapper<S> getBlocWrapper<B extends IsolateBlocBase<Object?, S>, S>() {
+  /// {@macro get_bloc}
+  IsolateBlocWrapper<S>
+      getBlocWrapper<B extends IsolateBlocBase<Object?, S>, S>() {
     late IsolateBlocWrapper<S> wrapper;
     B? isolateBloc;
     _getBloc<B>().then((bloc) {
@@ -95,19 +92,24 @@ class IsolateManager {
       final blocId = bloc.id;
 
       if (blocId != null) {
-        // ignore: invalid_use_of_protected_member
-        _createdBlocsSubscriptions[blocId] = bloc.stream.listen(wrapper.stateReceiver);
+        _createdBlocsSubscriptions[blocId] = bloc.stream.listen(
+          // ignore: invalid_use_of_protected_member
+          wrapper.stateReceiver,
+        );
       } else {
         _isolatedBlocWrappersSubscriptions[bloc] ??= [];
         _isolatedBlocWrappers[bloc] ??= [];
 
-        // ignore: invalid_use_of_protected_member
-        _isolatedBlocWrappersSubscriptions[bloc]!.add(bloc.stream.listen(wrapper.stateReceiver));
+        _isolatedBlocWrappersSubscriptions[bloc]!.add(
+          // ignore: invalid_use_of_protected_member
+          bloc.stream.listen(wrapper.stateReceiver),
+        );
         _isolatedBlocWrappers[bloc]!.add(wrapper);
       }
       // ignore: invalid_use_of_protected_member
       wrapper.onBlocCreated();
     });
+
     void onBLocClose(_) => {};
     void eventReceiver(Object? event) {
       isolateBloc?.add(event);
@@ -122,10 +124,12 @@ class IsolateManager {
     return wrapper;
   }
 
+  /// Disposes resources.
   Future<void> dispose() async {
     await _serviceEventsSubscription?.cancel();
   }
 
+  /// Listens and respond on [IsolateBlocEvent]s from [UIIsolateManager].
   void _listenForMessagesFormUi(IsolateBlocEvent event) {
     switch (event.runtimeType) {
       case IsolateBlocTransitionEvent:
@@ -143,8 +147,8 @@ class IsolateManager {
     }
   }
 
-  /// Receive bloc's [uuid] and [event].
-  /// Find [IsolateBlocBase] by id and add [event] to it.
+  /// Receives bloc's [uuid] and [event].
+  /// Finds [IsolateBlocBase] by id and adds [event] to it.
   void _receiveBlocEvent(String uuid, Object? event) {
     final bloc = _createdBlocs[uuid];
     if (bloc == null) {
@@ -154,7 +158,7 @@ class IsolateManager {
     }
   }
 
-  /// Creates [IsolateBlocBase] and connect it to the [IsolateBlocWrapper].
+  /// Creates [IsolateBlocBase] and connects it to the [IsolateBlocWrapper].
   void _createBloc(Type blocType, String id) {
     final bloc = _getFreeBlocByType(blocType);
     if (bloc != null) {
@@ -170,7 +174,7 @@ class IsolateManager {
     }
   }
 
-  /// Get bloc by [uuid] and close it and it's resources
+  /// Gets bloc by [uuid] and closes it.
   void _closeBloc(String uuid) {
     final bloc = _createdBlocs.remove(uuid);
     if (bloc == null) {
@@ -178,12 +182,16 @@ class IsolateManager {
     } else {
       _createdBlocsSubscriptions[uuid]?.cancel();
 
-      for (final sub in _isolatedBlocWrappersSubscriptions[bloc] ?? <StreamSubscription>[]) {
+      var subscriptions = _isolatedBlocWrappersSubscriptions[bloc] ?? [];
+      for (final sub in subscriptions) {
         sub.cancel();
       }
-      for (final wrapper in _isolatedBlocWrappers[bloc] ?? <IsolateBlocWrapper>[]) {
+
+      var wrappers = _isolatedBlocWrappers[bloc] ?? <IsolateBlocWrapper>[];
+      for (final wrapper in wrappers) {
         wrapper.close();
       }
+
       bloc.close();
     }
   }
@@ -220,31 +228,40 @@ class IsolateManager {
   }
 }
 
-/// Signature for function which creates [IsolateCubit].
+/// Signature for function which creates [IsolateBlocBase].
 typedef IsolateBlocCreator<E, S> = IsolateBlocBase<E, S> Function();
 
+/// This exception indicates that bloc wasn't registered
+///
+/// Ensure that you call `register<Bloc, State>(...) in [Initializer] function
 class BlocUnregisteredException implements Exception {
-  BlocUnregisteredException(this.blocType);
+  BlocUnregisteredException(this._blocType);
 
-  final Type blocType;
+  final Type _blocType;
 
   @override
   String toString() {
-    return 'You trying to create $blocType which is not registered.\n'
-        'Ensure that you call `register<$blocType, ${blocType}State>(...) in Initializer function';
+    return 'You are trying to create $_blocType which is not registered.\n'
+        'Ensure that you call `register<$_blocType, ${_blocType}State>(...) '
+        'in Initializer function';
   }
 }
 
+/// This exception indicates that some exception was thrown in [Initializer] function
+///
+/// Throws only in debug mode
 class InitializerException {
-  InitializerException(this.error, this.stackTrace);
+  InitializerException(this._error, this._stackTrace);
 
-  final dynamic error;
-  final StackTrace stackTrace;
+  final dynamic _error;
+  final StackTrace _stackTrace;
 
   @override
   String toString() {
-    return '''Error in user's Initializer function.
-Error message: ${error.toString()}
-Stacktrace: $stackTrace''';
+    return '''
+           Error in user's Initializer function.
+           Error message: ${_error.toString()}
+           Stacktrace: $_stackTrace
+           ''';
   }
 }

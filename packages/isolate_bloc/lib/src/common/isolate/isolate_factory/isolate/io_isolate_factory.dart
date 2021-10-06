@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'dart:isolate';
+import 'dart:developer' as dev;
+import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+
 import 'package:flutter/widgets.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_binding.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate/io_isolate_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate_messenger/isolate_messenger.dart';
@@ -12,6 +16,8 @@ import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart'
 import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_middleware/isolated_method_channel_middleware.dart';
 import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_middleware/ui_method_channel_middleware.dart';
 import 'package:uuid/uuid.dart';
+
+part 'isolate_binding.dart';
 
 class _IsolateSetup {
   _IsolateSetup(
@@ -27,8 +33,19 @@ class _IsolateSetup {
   final MethodChannels methodChannels;
 }
 
-/// Creates and initializes [Isolate] and [IIsolateMessenger].
+/// {@template io_isolate_factory}
+/// Used to create and initialize [Isolate] and [IIsolateMessenger].
+///
+/// Stages:
+///   1. Create new isolate and setup communication.
+///   * Initialize [UIMethodChannelMiddleware] and return [IIsolateWrapper] and [IIsolateMessenger]
+///   * Initialize [IsolatedMethodChannelMiddleware] and run provided [IsolateRun] function
+///     which will initialize [IsolateManager]
+///
+/// [IsolateRun] and [Initializer] functions must be a `static` or top level (global) functions
+/// {@endtemplate}
 class IOIsolateFactory implements IIsolateFactory {
+  /// {@macro io_isolate_factory}
   @override
   Future<IsolateCreateResult> create(
     IsolateRun isolateRun,
@@ -92,14 +109,14 @@ class IOIsolateFactory implements IIsolateFactory {
     );
 
     // Initialize platform channel in isolate
-    IsolateBinding();
+    _IsolateBinding();
     IsolatedMethodChannelMiddleware(
       methodChannels: setup.methodChannels,
       binaryMessenger: ServicesBinding.instance!.defaultBinaryMessenger,
       idGenerator: const Uuid().v4,
       isolateMessenger: isolateMessenger,
     ).initialize();
-    
+
     await setup.task(isolateMessenger, setup.userInitializer);
   }
 }

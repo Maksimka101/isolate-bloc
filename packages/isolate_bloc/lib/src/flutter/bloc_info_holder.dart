@@ -6,7 +6,8 @@ class BlocInfoHolder {
   final _blocsInfo = <Type, List<IsolateBlocWrapper>>{};
 
   /// Return [IsolateBlocWrapper] associated with given [IsolateCubit]'s Type
-  IsolateBlocWrapper<State>? getWrapperByType<T extends IsolateBlocBase<Object?, State>, State>() {
+  IsolateBlocWrapper<State>?
+      getWrapperByType<T extends IsolateBlocBase<Object?, State>, State>() {
     return _blocsInfo[T]?.last as IsolateBlocWrapper<State>?;
   }
 

@@ -1,12 +1,7 @@
 // ignore_for_file: no-empty-block
-import 'dart:developer';
-import 'dart:ui' as ui;
+part of 'io_isolate_factory.dart';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
-
-mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
+mixin _MockSchedulerBinding on BindingBase implements SchedulerBinding {
   @override
   void initInstances() {
     super.initInstances();
@@ -22,7 +17,9 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   void addPostFrameCallback(callback) {}
 
   @override
-  void addTimingsCallback(void Function(List<ui.FrameTiming> timings) callback) {}
+  void addTimingsCallback(
+    void Function(List<ui.FrameTiming> timings) callback,
+  ) {}
 
   @override
   void cancelFrameCallbackWithId(int id) {}
@@ -71,7 +68,9 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   ui.AppLifecycleState get lifecycleState => ui.AppLifecycleState.resumed;
 
   @override
-  void removeTimingsCallback(void Function(List<ui.FrameTiming> timings) callback) {}
+  void removeTimingsCallback(
+    void Function(List<ui.FrameTiming> timings) callback,
+  ) {}
 
   @override
   void resetEpoch() {}
@@ -92,7 +91,7 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
     TaskCallback<T> task,
     Priority priority, {
     String? debugLabel,
-    Flow? flow,
+    dev.Flow? flow,
   }) {
     throw UnimplementedError();
   }
@@ -107,4 +106,5 @@ mixin MockSchedulerBinding on BindingBase implements SchedulerBinding {
   int get transientCallbackCount => throw UnimplementedError();
 }
 
-class IsolateBinding extends BindingBase with MockSchedulerBinding, ServicesBinding {}
+class _IsolateBinding extends BindingBase
+    with _MockSchedulerBinding, ServicesBinding {}

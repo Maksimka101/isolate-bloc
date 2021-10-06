@@ -3,11 +3,12 @@ import 'package:isolate_bloc/src/common/api_wrappers.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/flutter/bloc_info_holder.dart';
-import 'package:nested/nested.dart';
+import 'package:provider/single_child_widget.dart';
 import 'package:provider/provider.dart';
 
 /// A function that creates a `Bloc` of type [T].
-typedef CreateIsolateBloc<T extends IsolateBlocBase<Object?, Object?>> = T Function(
+typedef CreateIsolateBloc<T extends IsolateBlocBase<Object?, Object?>> = T
+    Function(
   BuildContext context,
 );
 
@@ -31,7 +32,8 @@ mixin IsolateBlocProviderSingleChildWidget on SingleChildWidget {}
 /// );
 /// ```
 /// {@endtemplate}
-class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State> extends SingleChildStatelessWidget
+class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State>
+    extends SingleChildStatelessWidget
     with IsolateBlocProviderSingleChildWidget {
   /// {@macro bloc_provider}
   IsolateBlocProvider({
@@ -84,7 +86,9 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State> exte
   /// ```dart
   /// IsolateBlocProvider.of<BlocA, BlocAState>(context)
   /// ```
-  static IsolateBlocWrapper<State> of<T extends IsolateBlocBase<Object?, State>, State>(BuildContext context) {
+  static IsolateBlocWrapper<State>
+      of<T extends IsolateBlocBase<Object?, State>, State>(
+          BuildContext context) {
     final blocInfoHolder = _getBlocInfoHolder(context);
     final blocWrapper = blocInfoHolder?.getWrapperByType<T, State>();
     if (blocWrapper == null) {
@@ -109,7 +113,8 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State> exte
     if (value != null) {
       return InheritedProvider.value(
         value: () {
-          final blocInfoHolder = _getBlocInfoHolder(context) ?? BlocInfoHolder();
+          final blocInfoHolder =
+              _getBlocInfoHolder(context) ?? BlocInfoHolder();
           blocInfoHolder.addBlocInfo<T>(value);
 
           return blocInfoHolder;
@@ -120,7 +125,8 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State> exte
       return InheritedProvider<BlocInfoHolder>(
         create: (context) {
           final blocWrapper = createBloc<T, State>();
-          final blocInfoHolder = _getBlocInfoHolder(context) ?? BlocInfoHolder();
+          final blocInfoHolder =
+              _getBlocInfoHolder(context) ?? BlocInfoHolder();
           blocInfoHolder.addBlocInfo<T>(blocWrapper);
 
           return blocInfoHolder;
@@ -156,7 +162,8 @@ extension IsolateBlocProviderExtension on BuildContext {
   /// ```dart
   /// IsolateBlocProvider.of<C>(context)
   /// ```
-  IsolateBlocWrapper<State> isolateBloc<C extends IsolateBlocBase<Object?, State>, State>() {
+  IsolateBlocWrapper<State>
+      isolateBloc<C extends IsolateBlocBase<Object?, State>, State>() {
     return IsolateBlocProvider.of<C, State>(this);
   }
 }

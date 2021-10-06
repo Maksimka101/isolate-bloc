@@ -24,10 +24,10 @@ typedef BlocBuilderCondition<S> = bool Function(S previous, S current);
 /// `state` changes such as navigation, showing a dialog, etc...
 ///
 /// If the [bloc] parameter is omitted, [IsolateBlocBuilder] will automatically
-/// perform a lookup using [BlocProvider] and the current [BuildContext].
+/// perform a lookup using [IsolateBlocProvider] and the current [BuildContext].
 ///
 /// ```dart
-/// BlocBuilder<BlocA, BlocAState>(
+/// IsolateBlocBuilder<BlocA, BlocAState>(
 ///   builder: (context, state) {
 ///   // return widget here based on BlocA's state
 ///   }
@@ -35,10 +35,10 @@ typedef BlocBuilderCondition<S> = bool Function(S previous, S current);
 /// ```
 ///
 /// Only specify the [bloc] if you wish to provide a [bloc] that is otherwise
-/// not accessible via [BlocProvider] and the current [BuildContext].
+/// not accessible via [IsolateBlocProvider] and the current [BuildContext].
 ///
 /// ```dart
-/// BlocBuilder<BlocA, BlocAState>(
+/// IsolateBlocBuilder<BlocA, BlocAState>(
 ///   bloc: blocA,
 ///   builder: (context, state) {
 ///   // return widget here based on BlocA's state
@@ -61,7 +61,7 @@ typedef BlocBuilderCondition<S> = bool Function(S previous, S current);
 /// [buildWhen] is optional and if omitted, it will default to `true`.
 ///
 /// ```dart
-/// BlocBuilder<BlocA, BlocAState>(
+/// IsolateBlocBuilder<BlocA, BlocAState>(
 ///   buildWhen: (previous, current) {
 ///     // return true/false to determine whether or not
 ///     // to rebuild the widget with state
@@ -72,7 +72,8 @@ typedef BlocBuilderCondition<S> = bool Function(S previous, S current);
 /// )
 /// ```
 /// {@endtemplate}
-class IsolateBlocBuilder<B extends IsolateBlocBase<Object?, S>, S> extends IsolateBlocBuilderBase<B, S> {
+class IsolateBlocBuilder<B extends IsolateBlocBase<Object?, S>, S>
+    extends IsolateBlocBuilderBase<B, S> {
   /// {@macro bloc_builder}
   /// {@macro bloc_builder_build_when}
   const IsolateBlocBuilder({
@@ -100,13 +101,15 @@ class IsolateBlocBuilder<B extends IsolateBlocBase<Object?, S>, S> extends Isola
 /// so far. The type of the state and how it is updated with each interaction
 /// is defined by sub-classes.
 /// {@endtemplate}
-abstract class IsolateBlocBuilderBase<B extends IsolateBlocBase<Object?, S>, S> extends StatefulWidget {
+abstract class IsolateBlocBuilderBase<B extends IsolateBlocBase<Object?, S>, S>
+    extends StatefulWidget {
   /// {@macro bloc_builder_base}
-  const IsolateBlocBuilderBase({Key? key, this.bloc, this.buildWhen}) : super(key: key);
+  const IsolateBlocBuilderBase({Key? key, this.bloc, this.buildWhen})
+      : super(key: key);
 
   /// The [bloc] that the [IsolateBlocBuilderBase] will interact with.
   /// If omitted, [IsolateBlocBuilderBase] will automatically perform a lookup using
-  /// [BlocProvider] and the current `BuildContext`.
+  /// [IsolateBlocProvider] and the current `BuildContext`.
   final IsolateBlocWrapper? bloc;
 
   /// {@macro bloc_builder_build_when}
@@ -116,7 +119,8 @@ abstract class IsolateBlocBuilderBase<B extends IsolateBlocBase<Object?, S>, S> 
   Widget build(BuildContext context, S state);
 
   @override
-  State<IsolateBlocBuilderBase<B, S>> createState() => _IsolateBlocBuilderBaseState<B, S>();
+  State<IsolateBlocBuilderBase<B, S>> createState() =>
+      _IsolateBlocBuilderBaseState<B, S>();
 }
 
 class _IsolateBlocBuilderBaseState<B extends IsolateBlocBase<Object?, S>, S>

@@ -19,7 +19,8 @@ class WeatherBloc extends IsolateBloc<WeatherEvent, WeatherState> {
     }
   }
 
-  Stream<WeatherState> _weatherRefreshRequested(WeatherRefreshRequested event) async* {
+  Stream<WeatherState> _weatherRefreshRequested(
+      WeatherRefreshRequested event) async* {
     try {
       final Weather weather = await weatherRepository.getWeather(event.city);
       yield WeatherLoadSuccess(weather: weather);

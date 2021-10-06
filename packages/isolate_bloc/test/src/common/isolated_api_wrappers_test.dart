@@ -15,7 +15,7 @@ void main() {
 
   group('Test `register` function', () {
     test('register with initialized `IsolateManager`', () {
-      when(() => isolateManager.register(any())).thenAnswer((invocation) {});
+      when(() => isolateManager.registerBloc(any())).thenAnswer((invocation) {});
 
       register<SimpleCubit, int>(create: () => SimpleCubit());
     });
@@ -37,7 +37,8 @@ void main() {
 
   group('Test `getBloc` function', () {
     test('getBloc with initialized `IsolateManager`', () {
-      when(() => isolateManager.getBlocWrapper()).thenReturn(MockIsolateBlocWrapper<int>());
+      when(() => isolateManager.getBlocWrapper())
+          .thenReturn(MockIsolateBlocWrapper<int>());
       getBloc<SimpleCubit, int>();
     });
 

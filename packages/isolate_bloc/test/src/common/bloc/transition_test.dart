@@ -25,7 +25,9 @@ class CounterEvent extends TransitionEvent {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CounterEvent && runtimeType == other.runtimeType && eventData == other.eventData;
+      other is CounterEvent &&
+          runtimeType == other.runtimeType &&
+          eventData == other.eventData;
 }
 
 class CounterState extends TransitionState {
@@ -38,7 +40,10 @@ class CounterState extends TransitionState {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is CounterState && runtimeType == other.runtimeType && count == other.count;
+      identical(this, other) ||
+      other is CounterState &&
+          runtimeType == other.runtimeType &&
+          count == other.count;
 }
 
 void main() {
@@ -108,7 +113,9 @@ void main() {
         );
       });
 
-      test('should not throw assertion error when initialized with a null event', () {
+      test(
+          'should not throw assertion error when initialized with a null event',
+          () {
         expect(
           () => Transition<TransitionEvent?, TransitionState>(
             currentState: SimpleTransitionState(),
@@ -191,7 +198,9 @@ void main() {
         );
         expect(
           transition.hashCode,
-          transition.currentState.hashCode ^ transition.event.hashCode ^ transition.nextState.hashCode,
+          transition.currentState.hashCode ^
+              transition.event.hashCode ^
+              transition.nextState.hashCode,
         );
       });
     });

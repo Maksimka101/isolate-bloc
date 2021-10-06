@@ -8,10 +8,10 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/method_channel_events.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/mock/mock_isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_middleware/ui_method_channel_middleware.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../../../../mock/mock_isolate_messenger.dart';
 import '../../../../../test_utils/messenger_utils.dart';
 import '../../../../../test_utils/method_channel_utils.dart';
 import 'mock_binary_messenger.dart';
@@ -41,7 +41,8 @@ void main() {
   });
 
   void initializeManager(Stream<IsolateEvent> stream) {
-    initializeMessenger(isolateMessenger: isolateMessenger, eventsStream: stream);
+    initializeMessenger(
+        isolateMessenger: isolateMessenger, eventsStream: stream);
 
     uiMethodChannelMiddleware.initialize();
   }
@@ -56,21 +57,25 @@ void main() {
 
       initializeManager(controller.stream);
 
-      verify(() => binaryMessenger.setMessageHandler(any(), any())).called(methodChannels.length);
+      verify(() => binaryMessenger.setMessageHandler(any(), any()))
+          .called(methodChannels.length);
     });
 
     test('subscribe on messages stream', () async {
       final controller = StreamController<IsolateEvent>();
-      initializeMessenger(isolateMessenger: isolateMessenger, eventsStream: controller.stream);
+      initializeMessenger(
+          isolateMessenger: isolateMessenger, eventsStream: controller.stream);
 
-      controller.add(InvokePlatformChannelEvent(null, methodChannels.first, 'id'));
+      controller
+          .add(InvokePlatformChannelEvent(null, methodChannels.first, 'id'));
       await Future.delayed(const Duration(milliseconds: 1));
 
       verifyNever(() => binaryMessenger.send(methodChannels.first, null));
 
       uiMethodChannelMiddleware.initialize();
 
-      controller.add(InvokePlatformChannelEvent(null, methodChannels.first, 'id'));
+      controller
+          .add(InvokePlatformChannelEvent(null, methodChannels.first, 'id'));
       await Future.delayed(const Duration(milliseconds: 1));
 
       verify(() => binaryMessenger.send(methodChannels.first, null)).called(2);
@@ -80,16 +85,19 @@ void main() {
   group('Test send event to the platform', () {
     test('send event without response', () async {
       final request = byteDataEncode('test');
-      when(() => binaryMessenger.send(methodChannels.first, request)).thenReturn(null);
+      when(() => binaryMessenger.send(methodChannels.first, request))
+          .thenReturn(null);
 
       final controller = StreamController<IsolateEvent>();
 
       initializeManager(controller.stream);
 
-      controller.add(InvokePlatformChannelEvent(request, methodChannels.first, 'id'));
+      controller
+          .add(InvokePlatformChannelEvent(request, methodChannels.first, 'id'));
       await Future.delayed(const Duration(milliseconds: 1));
 
-      verify(() => binaryMessenger.send(methodChannels.first, request)).called(1);
+      verify(() => binaryMessenger.send(methodChannels.first, request))
+          .called(1);
     });
 
     test('send event with response', () async {
@@ -108,7 +116,8 @@ void main() {
       controller.add(InvokePlatformChannelEvent(request, channel, 'id'));
       await Future.delayed(const Duration(milliseconds: 1));
 
-      verify(() => isolateMessenger.send(PlatformChannelResponseEvent(response, 'id'))).called(1);
+      verify(() => isolateMessenger
+          .send(PlatformChannelResponseEvent(response, 'id'))).called(1);
     });
 
     test('send multiple events with response', () async {
@@ -145,8 +154,10 @@ void main() {
 
     test('send multiple events with response with multiple channels', () async {
       methodChannels = ['first', 'second', 'third'];
-      final requests = methodChannels.map((e) => byteDataEncode('request$e')).toList();
-      final responses = methodChannels.map((e) => byteDataEncode('response$e')).toList();
+      final requests =
+          methodChannels.map((e) => byteDataEncode('request$e')).toList();
+      final responses =
+          methodChannels.map((e) => byteDataEncode('response$e')).toList();
 
       for (var i = 0; i < methodChannels.length; i++) {
         when(
@@ -205,7 +216,8 @@ void main() {
 
       ByteData? receivedResponse;
       // ignore: unawaited_futures
-      binaryMessenger.handlePlatformMessage(channel, request, (data) => receivedResponse = data);
+      binaryMessenger.handlePlatformMessage(
+          channel, request, (data) => receivedResponse = data);
 
       controller.add(MethodChannelResponseEvent(response, 'id'));
       await Future.delayed(const Duration(milliseconds: 1));
@@ -215,8 +227,10 @@ void main() {
 
     test('test multiple response handling', () async {
       methodChannels = ['first', 'second', 'third'];
-      final responses = methodChannels.map((e) => byteDataEncode('response$e')).toList();
-      final requests = methodChannels.map((e) => byteDataEncode('request$e')).toList();
+      final responses =
+          methodChannels.map((e) => byteDataEncode('response$e')).toList();
+      final requests =
+          methodChannels.map((e) => byteDataEncode('request$e')).toList();
       final controller = StreamController<IsolateEvent>();
 
       var count = 0;
@@ -256,7 +270,8 @@ void main() {
 
     await uiMethodChannelMiddleware.dispose();
 
-    controller.add(InvokePlatformChannelEvent(null, methodChannels.first, 'id'));
+    controller
+        .add(InvokePlatformChannelEvent(null, methodChannels.first, 'id'));
     await Future.delayed(const Duration(milliseconds: 1));
 
     verifyNever(() => binaryMessenger.send(methodChannels.first, null));
