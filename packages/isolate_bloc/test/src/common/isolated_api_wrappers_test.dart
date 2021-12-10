@@ -15,7 +15,8 @@ void main() {
 
   group('Test `register` function', () {
     test('register with initialized `IsolateManager`', () {
-      when(() => isolateManager.registerBloc(any())).thenAnswer((invocation) {});
+      when(() => isolateManager.registerBloc(any()))
+          .thenAnswer((invocation) {});
 
       register<SimpleCubit, int>(create: () => SimpleCubit());
     });

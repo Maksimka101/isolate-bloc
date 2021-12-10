@@ -33,6 +33,7 @@ class Transition<Event, State> extends Change<State> {
           currentState == other.currentState &&
           event == other.event &&
           nextState == other.nextState;
+
   @override
   String toString() {
     return "Transition { currentState: $currentState, "

@@ -1,3 +1,7 @@
+## [2.0.1] 
+ - Fix analyzer issues.
+ - Add exports of `IOIsolateFactory` and `WebIsolateFactory`
+
 ## [2.0.0]
  - **BREAKING**: update `register` function. 
    - Now it requires registered bloc generic parameters. For example `register(create: () => CounterBloc())` changed to `register<CounterBloc, CounterEvent>(create: () => CounterBloc())`

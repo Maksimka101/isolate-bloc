@@ -1,7 +1,8 @@
-import 'package:isolate_bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
+import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_setup.dart';
 
 /// {@template isolate_initializer}
 /// Initializer which is used to create Isolate and initialize [UIIsolateManager]

@@ -12,10 +12,6 @@ typedef CreateIsolateBloc<T extends IsolateBlocBase<Object?, Object?>> = T
   BuildContext context,
 );
 
-/// Mixin which allows `MultiBlocProvider` to infer the types
-/// of multiple [IsolateBlocProvider]s.
-mixin IsolateBlocProviderSingleChildWidget on SingleChildWidget {}
-
 /// {@template bloc_provider}
 /// Takes a `ValueBuilder` that is responsible for creating the `bloc` and
 /// a [child] which will have access to the `bloc` via
@@ -167,3 +163,7 @@ extension IsolateBlocProviderExtension on BuildContext {
     return IsolateBlocProvider.of<C, State>(this);
   }
 }
+
+/// Mixin which allows `MultiBlocProvider` to infer the types
+/// of multiple [IsolateBlocProvider]s.
+mixin IsolateBlocProviderSingleChildWidget on SingleChildWidget {}

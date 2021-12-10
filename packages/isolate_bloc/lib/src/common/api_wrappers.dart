@@ -1,11 +1,12 @@
 // ignore_for_file: prefer-match-file-name
 import 'package:flutter/foundation.dart';
-import 'package:isolate_bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/initializer/isolate_initializer.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate/io_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/web/web_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
+import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_setup.dart';
 
 /// Initializes [UIIsolateManager] and [IsolateManager] in [Isolate] and runs [userInitializer].
 ///
