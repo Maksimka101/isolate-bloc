@@ -1,6 +1,9 @@
 import 'package:flutter/widgets.dart';
-import 'package:isolate_bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
+import 'package:isolate_bloc/src/flutter/isolate_bloc_builder.dart';
+import 'package:isolate_bloc/src/flutter/isolate_bloc_listener.dart';
+import 'package:isolate_bloc/src/flutter/isolate_bloc_provider.dart';
 
 /// {@template bloc_consumer}
 /// [IsolateBlocConsumer] exposes a [builder] and [listener] in order react to new

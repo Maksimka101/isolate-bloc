@@ -1,4 +1,3 @@
-import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 
 /// {@template isolate_cubit_description}

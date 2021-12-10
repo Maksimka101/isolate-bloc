@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:isolate_bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
+import 'package:isolate_bloc/src/flutter/isolate_bloc_provider.dart';
 import 'package:provider/single_child_widget.dart';
-
 
 /// {@template bloc_listener}
 /// Takes a [BlocWidgetListener] and an optional [bloc] and invokes

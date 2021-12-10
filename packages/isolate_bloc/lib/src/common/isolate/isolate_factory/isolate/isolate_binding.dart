@@ -1,4 +1,5 @@
 // ignore_for_file: no-empty-block
+// ignore_for_file: prefer-match-file-name
 part of 'io_isolate_factory.dart';
 
 mixin _MockSchedulerBinding on BindingBase implements SchedulerBinding {

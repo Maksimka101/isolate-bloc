@@ -1,10 +1,12 @@
 import 'dart:async';
 
-import 'package:isolate_bloc/isolate_bloc.dart';
+import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_wrapper.dart';
 
 /// Manager which is works in UI Isolate, responds on [IsolateBlocEvent]s from Isolate,
 /// manages [IsolateBlocWrapper]s and implements [createBloc] global function.
@@ -15,9 +17,7 @@ class UIIsolateManager {
   );
 
   /// Creates new manager and sets [instance].
-  factory UIIsolateManager(
-    IsolateCreateResult createResult,
-  ) {
+  factory UIIsolateManager(IsolateCreateResult createResult) {
     return instance = UIIsolateManager._internal(
       createResult.isolate,
       createResult.messenger,
