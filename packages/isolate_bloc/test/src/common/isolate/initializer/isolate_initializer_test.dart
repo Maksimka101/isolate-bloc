@@ -38,10 +38,14 @@ void main() {
         eventsStream: eventsController.stream);
     initializeMessenger(isolateMessenger: isolatedMessenger);
 
-    await initializer.initialize(() {
-      isolated();
-      eventsController.add(IsolateBlocsInitialized({CounterBloc: 0}));
-    }, isolateFactory, []);
+    await initializer.initialize(
+      () {
+        isolated();
+        eventsController.add(const IsolateBlocsInitialized({CounterBloc: 0}));
+      },
+      isolateFactory,
+      [],
+    );
     await Future.delayed(const Duration(milliseconds: 1));
   }
 

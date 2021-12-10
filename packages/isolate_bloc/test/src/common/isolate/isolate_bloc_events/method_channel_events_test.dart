@@ -4,26 +4,34 @@ import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/method_chann
 
 void main() {
   test('Events creating', () {
-    InvokePlatformChannelEvent(null, '', '');
+    const InvokePlatformChannelEvent(null, '', '');
 
-    PlatformChannelResponseEvent(null, '');
+    const PlatformChannelResponseEvent(null, '');
 
-    InvokeMethodChannelEvent(null, '', '');
+    const InvokeMethodChannelEvent(null, '', '');
 
-    MethodChannelResponseEvent(null, '');
+    const MethodChannelResponseEvent(null, '');
   });
 
   test('test equality', () {
-    expect(InvokePlatformChannelEvent(null, '', ''),
-        InvokePlatformChannelEvent(null, '', ''));
+    expect(
+      const InvokePlatformChannelEvent(null, '', ''),
+      const InvokePlatformChannelEvent(null, '', ''),
+    );
 
-    expect(PlatformChannelResponseEvent(null, ''),
-        PlatformChannelResponseEvent(null, ''));
+    expect(
+      const PlatformChannelResponseEvent(null, ''),
+      const PlatformChannelResponseEvent(null, ''),
+    );
 
-    expect(InvokeMethodChannelEvent(null, '', ''),
-        InvokeMethodChannelEvent(null, '', ''));
+    expect(
+      const InvokeMethodChannelEvent(null, '', ''),
+      const InvokeMethodChannelEvent(null, '', ''),
+    );
 
-    expect(MethodChannelResponseEvent(null, ''),
-        MethodChannelResponseEvent(null, ''));
+    expect(
+      const MethodChannelResponseEvent(null, ''),
+      const MethodChannelResponseEvent(null, ''),
+    );
   });
 }

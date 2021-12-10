@@ -80,7 +80,7 @@ void main() {
           () async {
         await initializeManager();
 
-        verify(() => isolateMessenger.send(IsolateBlocsInitialized({})))
+        verify(() => isolateMessenger.send(const IsolateBlocsInitialized({})))
             .called(1);
       });
     });
@@ -95,7 +95,7 @@ void main() {
             .registerBloc<SimpleCubit, int>(() => createdCubit = SimpleCubit());
         expect(createdCubit, isNotNull);
 
-        controller.add(CreateIsolateBlocEvent(SimpleCubit, 'id'));
+        controller.add(const CreateIsolateBlocEvent(SimpleCubit, 'id'));
         await Future.delayed(const Duration(milliseconds: 1));
 
         expect(createdCubit!.id, 'id');
@@ -112,7 +112,7 @@ void main() {
         );
         expect(createdCubit, isNull);
 
-        controller.add(CreateIsolateBlocEvent(SimpleCubit, 'id'));
+        controller.add(const CreateIsolateBlocEvent(SimpleCubit, 'id'));
         await Future.delayed(const Duration(milliseconds: 1));
 
         expect(createdCubit, isNotNull);
@@ -130,7 +130,7 @@ void main() {
         await initializeManager(eventsStream: controller.stream);
 
         verify(
-          () => isolateMessenger.send(IsolateBlocsInitialized({
+          () => isolateMessenger.send(const IsolateBlocsInitialized({
             SimpleCubit: 500,
             CounterBloc: 0,
           })),
@@ -143,7 +143,7 @@ void main() {
           final controller = StreamController<IsolateEvent>();
           await initializeManager(eventsStream: controller.stream);
 
-          controller.add(CreateIsolateBlocEvent(SimpleCubit, 'id'));
+          controller.add(const CreateIsolateBlocEvent(SimpleCubit, 'id'));
         }, (error, stack) {
           exception = error;
         });
@@ -175,7 +175,8 @@ void main() {
       simpleCubit.add('');
       await Future.delayed(const Duration(milliseconds: 1));
 
-      verify(() => isolateMessenger.send(IsolateBlocTransitionEvent('id', 1)))
+      verify(() =>
+              isolateMessenger.send(const IsolateBlocTransitionEvent('id', 1)))
           .called(1);
     });
 
@@ -188,7 +189,7 @@ void main() {
         controller: controller,
       );
 
-      controller.add(IsolateBlocTransitionEvent('id', ''));
+      controller.add(const IsolateBlocTransitionEvent('id', ''));
       await Future.delayed(const Duration(milliseconds: 1));
 
       // State updated when event is received
@@ -210,7 +211,7 @@ void main() {
 
       expect(bloc.stream, emitsInOrder([1, 2]));
 
-      controller.add(CreateIsolateBlocEvent(CounterBloc, 'id'));
+      controller.add(const CreateIsolateBlocEvent(CounterBloc, 'id'));
       await Future.delayed(const Duration(milliseconds: 1));
 
       expect(bloc.state, 2);
@@ -225,7 +226,7 @@ void main() {
         controller: controller,
       );
 
-      controller.add(CloseIsolateBlocEvent('id'));
+      controller.add(const CloseIsolateBlocEvent('id'));
       await Future.delayed(const Duration(milliseconds: 1));
 
       expect(simpleCubit.isClosed, isTrue);
@@ -288,8 +289,8 @@ void main() {
         expect(blocsCreated, 1);
 
         // This calls won't create new blocs because they were already created by getBlocWrapper
-        controller.add(CreateIsolateBlocEvent(SimpleCubit, 'c'));
-        controller.add(CreateIsolateBlocEvent(CounterBloc, 'b'));
+        controller.add(const CreateIsolateBlocEvent(SimpleCubit, 'c'));
+        controller.add(const CreateIsolateBlocEvent(CounterBloc, 'b'));
         await Future.delayed(const Duration(milliseconds: 1));
 
         // No new bloc created
@@ -321,7 +322,7 @@ void main() {
         register<SimpleCubit, int>(create: () => SimpleCubit());
 
         final wrapper = isolateManager.getBlocWrapper<SimpleCubit, int>();
-        streamController.add(CreateIsolateBlocEvent(SimpleCubit, ''));
+        streamController.add(const CreateIsolateBlocEvent(SimpleCubit, ''));
         await Future.delayed(const Duration(milliseconds: 1));
         wrapper.add('test');
         await Future.delayed(const Duration(milliseconds: 1));
@@ -336,7 +337,7 @@ void main() {
 
         final wrapper = isolateManager.getBlocWrapper<SimpleCubit, int>();
         wrapper.add('test');
-        streamController.add(CreateIsolateBlocEvent(SimpleCubit, ''));
+        streamController.add(const CreateIsolateBlocEvent(SimpleCubit, ''));
         await Future.delayed(const Duration(milliseconds: 1));
 
         expect(wrapper.state, 1);
@@ -361,8 +362,8 @@ void main() {
         register<SimpleCubit, int>(create: () => SimpleCubit());
 
         final wrapper = isolateManager.getBlocWrapper<SimpleCubit, int>();
-        streamController.add(CreateIsolateBlocEvent(SimpleCubit, ''));
-        streamController.add(IsolateBlocTransitionEvent('', ''));
+        streamController.add(const CreateIsolateBlocEvent(SimpleCubit, ''));
+        streamController.add(const IsolateBlocTransitionEvent('', ''));
         await Future.delayed(const Duration(milliseconds: 1));
 
         expect(wrapper.state, 1);

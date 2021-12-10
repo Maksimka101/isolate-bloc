@@ -4,28 +4,38 @@ import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc
 
 void main() {
   test('Events creating', () {
-    CloseIsolateBlocEvent('');
+    const CloseIsolateBlocEvent('');
 
-    IsolateBlocsInitialized({});
+    const IsolateBlocsInitialized({});
 
-    IsolateBlocCreatedEvent('');
+    const IsolateBlocCreatedEvent('');
 
-    CreateIsolateBlocEvent(Object, '');
+    const CreateIsolateBlocEvent(Object, '');
 
-    IsolateBlocTransitionEvent('', '');
+    const IsolateBlocTransitionEvent('', '');
   });
 
   test('test equality', () {
-    expect(CloseIsolateBlocEvent(''), CloseIsolateBlocEvent(''));
-
-    expect(IsolateBlocsInitialized({}), IsolateBlocsInitialized({}));
-
-    expect(IsolateBlocCreatedEvent(''), IsolateBlocCreatedEvent(''));
+    expect(const CloseIsolateBlocEvent(''), const CloseIsolateBlocEvent(''));
 
     expect(
-        CreateIsolateBlocEvent(Object, ''), CreateIsolateBlocEvent(Object, ''));
+      const IsolateBlocsInitialized({}),
+      const IsolateBlocsInitialized({}),
+    );
 
     expect(
-        IsolateBlocTransitionEvent('', ''), IsolateBlocTransitionEvent('', ''));
+      const IsolateBlocCreatedEvent(''),
+      const IsolateBlocCreatedEvent(''),
+    );
+
+    expect(
+      const CreateIsolateBlocEvent(Object, ''),
+      const CreateIsolateBlocEvent(Object, ''),
+    );
+
+    expect(
+      const IsolateBlocTransitionEvent('', ''),
+      const IsolateBlocTransitionEvent('', ''),
+    );
   });
 }

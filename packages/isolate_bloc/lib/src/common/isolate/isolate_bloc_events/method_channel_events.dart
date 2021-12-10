@@ -1,10 +1,12 @@
 // ignore_for_file: prefer-match-file-name
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 
 /// Event to invoke [MethodChannel] in main isolate.
+@immutable
 class InvokePlatformChannelEvent extends MethodChannelEvent {
-  InvokePlatformChannelEvent(this.data, this.channel, this.id);
+  const InvokePlatformChannelEvent(this.data, this.channel, this.id);
 
   final ByteData? data;
   final String channel;
@@ -15,8 +17,9 @@ class InvokePlatformChannelEvent extends MethodChannelEvent {
 }
 
 /// Event with response from [MethodChannel]
+@immutable
 class PlatformChannelResponseEvent extends MethodChannelEvent {
-  PlatformChannelResponseEvent(this.data, this.id);
+  const PlatformChannelResponseEvent(this.data, this.id);
 
   final ByteData? data;
   final String id;
@@ -26,8 +29,9 @@ class PlatformChannelResponseEvent extends MethodChannelEvent {
 }
 
 /// Event to invoke [MethodChannel.setMethodCallHandler] in [IsolateBloc]'s isolate.
+@immutable
 class InvokeMethodChannelEvent extends MethodChannelEvent {
-  InvokeMethodChannelEvent(this.data, this.channel, this.id);
+  const InvokeMethodChannelEvent(this.data, this.channel, this.id);
 
   final ByteData? data;
   final String channel;
@@ -38,8 +42,9 @@ class InvokeMethodChannelEvent extends MethodChannelEvent {
 }
 
 /// Event with response from [MethodChannel.setMethodCallHandler] in [IsolateBloc]'s isolate.
+@immutable
 class MethodChannelResponseEvent extends MethodChannelEvent {
-  MethodChannelResponseEvent(this.data, this.id);
+  const MethodChannelResponseEvent(this.data, this.id);
 
   final ByteData? data;
   final String id;

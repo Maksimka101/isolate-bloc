@@ -54,7 +54,7 @@ void main() {
     );
 
     isolateCreateResult.messenger
-        .send(IsolateBlocTransitionEvent('', 'test message'));
+        .send(const IsolateBlocTransitionEvent('', 'test message'));
     final answer =
         await isolateCreateResult.messenger.messagesStream.firstWhere(
       (element) => element is IsolateBlocTransitionEvent,
@@ -81,7 +81,7 @@ Future<void> _isolateRun(
 ) async {
   messenger.messagesStream.listen((event) {
     if (event is IsolateBlocTransitionEvent && event.event == 'test message') {
-      messenger.send(IsolateBlocTransitionEvent('isolate', 'answer'));
+      messenger.send(const IsolateBlocTransitionEvent('isolate', 'answer'));
     }
   });
 

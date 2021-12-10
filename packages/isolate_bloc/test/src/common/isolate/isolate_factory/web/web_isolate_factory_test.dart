@@ -49,16 +49,17 @@ void main() {
     isolateMessenger?.messagesStream.listen((event) {
       if (event is IsolateBlocTransitionEvent) {
         isolateMessenger
-            ?.send(IsolateBlocTransitionEvent('from_isolate', 'answer'));
+            ?.send(const IsolateBlocTransitionEvent('from_isolate', 'answer'));
       }
     });
 
     createResult.messenger
-        .send(IsolateBlocTransitionEvent('to_isolate', 'test'));
+        .send(const IsolateBlocTransitionEvent('to_isolate', 'test'));
     var answer = createResult.messenger.messagesStream
         .firstWhere((element) => element is IsolateBlocTransitionEvent);
 
-    expect(await answer, IsolateBlocTransitionEvent('from_isolate', 'answer'));
+    expect(await answer,
+        const IsolateBlocTransitionEvent('from_isolate', 'answer'));
   });
 
   test('test messages from `IIsolateMessenger` are not disappear', () async {

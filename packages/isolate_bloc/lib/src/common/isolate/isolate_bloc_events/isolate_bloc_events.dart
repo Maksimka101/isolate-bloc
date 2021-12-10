@@ -1,10 +1,12 @@
 // ignore_for_file: prefer-match-file-name
+import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 
 /// Event with [IsolateBloc]'s state or or with event from [IsolateBlocWrapper]
+@immutable
 class IsolateBlocTransitionEvent extends IsolateBlocEvent {
-  IsolateBlocTransitionEvent(this.blocId, this.event);
+  const IsolateBlocTransitionEvent(this.blocId, this.event);
 
   final String blocId;
   final Object? event;
@@ -14,8 +16,9 @@ class IsolateBlocTransitionEvent extends IsolateBlocEvent {
 }
 
 /// Request to create new [IsolateBloc]
+@immutable
 class CreateIsolateBlocEvent extends IsolateBlocEvent {
-  CreateIsolateBlocEvent(this.blocType, this.blocId);
+  const CreateIsolateBlocEvent(this.blocType, this.blocId);
 
   final Type blocType;
   final String blocId;
@@ -25,8 +28,9 @@ class CreateIsolateBlocEvent extends IsolateBlocEvent {
 }
 
 /// Event to bind [IsolateBlocWrapper] to the [IsolateBloc] when second one is created
+@immutable
 class IsolateBlocCreatedEvent extends IsolateBlocEvent {
-  IsolateBlocCreatedEvent(this.blocId);
+  const IsolateBlocCreatedEvent(this.blocId);
 
   final String blocId;
 
@@ -35,8 +39,9 @@ class IsolateBlocCreatedEvent extends IsolateBlocEvent {
 }
 
 /// When every [IsolateBloc]s are initialized
+@immutable
 class IsolateBlocsInitialized extends IsolateBlocEvent {
-  IsolateBlocsInitialized(this.initialStates);
+  const IsolateBlocsInitialized(this.initialStates);
 
   final InitialStates initialStates;
 
@@ -44,9 +49,10 @@ class IsolateBlocsInitialized extends IsolateBlocEvent {
   List<Object?> get props => [initialStates];
 }
 
+@immutable
 /// Event to close IsolateBloc. Called by [IsolateBlocWrapper.close()]
 class CloseIsolateBlocEvent extends IsolateBlocEvent {
-  CloseIsolateBlocEvent(this.blocId);
+  const CloseIsolateBlocEvent(this.blocId);
 
   final String blocId;
 

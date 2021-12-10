@@ -123,14 +123,13 @@ void main() {
       await setDefaultInitialStates(eventsStream: streamController.stream);
 
       final wrapper = uiIsolateManager.createIsolateBloc<SimpleCubit, int>();
-      streamController.add(IsolateBlocCreatedEvent(''));
+      streamController.add(const IsolateBlocCreatedEvent(''));
       await Future.delayed(const Duration(milliseconds: 1));
       wrapper.add('test');
       await Future.delayed(const Duration(milliseconds: 1));
 
-      verify(() =>
-              isolateMessenger.send(IsolateBlocTransitionEvent('', 'test')))
-          .called(1);
+      verify(() => isolateMessenger
+          .send(const IsolateBlocTransitionEvent('', 'test'))).called(1);
     });
 
     test('send unsent events', () async {
@@ -139,12 +138,11 @@ void main() {
 
       final wrapper = uiIsolateManager.createIsolateBloc<SimpleCubit, int>();
       wrapper.add('test');
-      streamController.add(IsolateBlocCreatedEvent(''));
+      streamController.add(const IsolateBlocCreatedEvent(''));
       await Future.delayed(const Duration(milliseconds: 1));
 
-      verify(() =>
-              isolateMessenger.send(IsolateBlocTransitionEvent('', 'test')))
-          .called(1);
+      verify(() => isolateMessenger
+          .send(const IsolateBlocTransitionEvent('', 'test'))).called(1);
     });
 
     test('close IsolateBlocWrapper closes IsolateBlocBase', () async {
@@ -154,7 +152,8 @@ void main() {
       await wrapper.close();
       await Future.delayed(const Duration(milliseconds: 1));
 
-      verify(() => isolateMessenger.send(CloseIsolateBlocEvent(''))).called(1);
+      verify(() => isolateMessenger.send(const CloseIsolateBlocEvent('')))
+          .called(1);
     });
 
     test('receive state from IsolateBlocBase', () async {
@@ -162,7 +161,7 @@ void main() {
       await setDefaultInitialStates(eventsStream: streamController.stream);
 
       final wrapper = uiIsolateManager.createIsolateBloc<SimpleCubit, int>();
-      streamController.add(IsolateBlocTransitionEvent('', 100));
+      streamController.add(const IsolateBlocTransitionEvent('', 100));
       await Future.delayed(const Duration(milliseconds: 1));
 
       expect(wrapper.state, 100);
