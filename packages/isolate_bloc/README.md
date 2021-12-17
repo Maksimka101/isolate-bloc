@@ -23,14 +23,19 @@ This package works on all flutter platforms.
 You can read about BLoC pattern [here](https://www.didierboelens.com/2018/08/reactive-programming-streams-bloc/).
 
 # Attention
-Before using this package, I recommend reading the article about [performance of Isolate](https://cretezy.com/2020/flutter-fast-json).
+I recommend you to read about Isolates to figure out about their weakness and strengths.
+- [performance of Isolate](https://cretezy.com/2020/flutter-fast-json) (before flutter 2.8) 
+- [lightweight isolates](https://github.com/dart-lang/sdk/issues/36097) (since flutter 2.8) 
+- [new objects that can be sent to the isolate](https://github.com/dart-lang/sdk/issues/46623) (since flutter 2.8) 
 
-When moving data between isolates, they are copied, wasting memory and cpu time. 
+In short, isolates share memory, so immutable objects are not copied when transferred to the isolate.
+You can no longer be afraid to use them in the application, but do not forget that there are
+still some limitations and overhead costs.
 
-Now Dart team is working on [new Isolates](https://github.com/dart-lang/sdk/issues/36097) which can start quickly and move immutable data faster and without coping. I hope they will be able to sufficiently improve the interaction between the isolates. This will allow more people to use this package
+## Bloc and Cubit<p align="center">
+<img src="https://github.com/Maksimka101/isolate-bloc/blob/master/docs/assets/isolate_bloc_scheme.svg?raw=true" height="200" alt="Data flow scheme" />
+</p>
 
-
-## Bloc and Cubit
 In Bloc, events are processed strictly in turn. It gets an event and responds to it with a stream of states in `mapEventToState`. Until the stream ends, the processing of a new event will not begin. 
 
 In Cubit, events are received in `onEventReceived` and processed asynchronously, and the state is returned by the `emit` function.
