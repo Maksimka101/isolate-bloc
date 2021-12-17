@@ -1,6 +1,7 @@
 ## [2.0.1] 
  - Fix analyzer issues.
- - Add exports of `IOIsolateFactory` and `WebIsolateFactory`
+ - Fix web support.
+ - Add exports of `IOIsolateFactory` and `WebIsolateFactory`.
 
 ## [2.0.0]
  - **BREAKING**: update `register` function. 
