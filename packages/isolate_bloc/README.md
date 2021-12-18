@@ -32,7 +32,8 @@ In short, isolates share memory, so immutable objects are not copied when transf
 You can no longer be afraid to use them in the application, but do not forget that there are
 still some limitations and overhead costs.
 
-## Bloc and Cubit<p align="center">
+## Bloc and Cubit
+<p align="center">
 <img src="https://github.com/Maksimka101/isolate-bloc/blob/master/docs/assets/isolate_bloc_scheme.svg?raw=true" height="200" alt="Data flow scheme" />
 </p>
 

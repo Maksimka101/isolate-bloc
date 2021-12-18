@@ -49,8 +49,8 @@ class IsolateBlocsInitialized extends IsolateBlocEvent {
   List<Object?> get props => [initialStates];
 }
 
-@immutable
 /// Event to close IsolateBloc. Called by [IsolateBlocWrapper.close()]
+@immutable
 class CloseIsolateBlocEvent extends IsolateBlocEvent {
   const CloseIsolateBlocEvent(this.blocId);
 
