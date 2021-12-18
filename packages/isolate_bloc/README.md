@@ -23,14 +23,14 @@ This package works on all flutter platforms.
 You can read about BLoC pattern [here](https://www.didierboelens.com/2018/08/reactive-programming-streams-bloc/).
 
 # Attention
-I recommend you to read about Isolates to figure out about their weakness and strengths.
-- [performance of Isolate](https://cretezy.com/2020/flutter-fast-json) (before flutter 2.8) 
-- [lightweight isolates](https://github.com/dart-lang/sdk/issues/36097) (since flutter 2.8) 
-- [new objects that can be sent to the isolate](https://github.com/dart-lang/sdk/issues/46623) (since flutter 2.8) 
+I recommend you to read about Isolates to get to know their weaknesses and strengths.
+- [Performance of isolates](https://cretezy.com/2020/flutter-fast-json) (before Flutter 2.8) 
+- [Lightweight isolates](https://github.com/dart-lang/sdk/issues/36097) (since Flutter 2.8) 
+- [New kinds of objects that can be sent between isolates](https://github.com/dart-lang/sdk/issues/46623) (since Flutter 2.8) 
 
-In short, isolates share memory, so immutable objects are not copied when transferred to the isolate.
-You can no longer be afraid to use them in the application, but do not forget that there are
-still some limitations and overhead costs.
+In brief, isolates share memory, so immutable objects are not copied when transferred to another isolate.
+You can now use them without being afraid but you shouldn't forget that there are still 
+some limitations and overhead costs.
 
 ## Bloc and Cubit
 <p align="center">
