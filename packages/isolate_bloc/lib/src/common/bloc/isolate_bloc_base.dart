@@ -2,15 +2,14 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
+import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/bloc/change.dart';
-import 'package:isolate_bloc/src/common/bloc/isolate_bloc.dart';
-import 'package:isolate_bloc/src/common/bloc/isolate_cubit.dart';
 
 /// {@template bloc_stream}
 /// An interface for the core functionality implemented by
 /// both [IsolateCubit] and [IsolateBloc].
 /// {@endtemplate}
-abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
+abstract class IsolateBlocBase<Event, State> {
   // todo(maksim): maybe we should move initial state to the `register` function
   /// {@macro bloc_stream}
   IsolateBlocBase(this._state) {
@@ -20,7 +19,7 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
 
   final _unsentStates = Queue<State>();
 
-  StreamController<State>? __stateController;
+  late final _stateController = StreamController<State>.broadcast();
 
   State _state;
 
@@ -60,12 +59,7 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
     }
   }
 
-  StreamController<State> get _stateController {
-    return __stateController ??= StreamController<State>.broadcast();
-  }
-
   /// Notifies the [IsolateBlocBase] of a new event and calls [onEventReceived].
-  @override
   void add(Event event) {
     try {
       onEvent(event);
@@ -105,8 +99,8 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
     _emitted = true;
   }
 
-  /// Called whenever an [event] is [add]ed to the [Bloc].
-  /// A great spot to add logging/analytics at the individual [Bloc] level.
+  /// Called whenever an [event] is [add]ed to the [IsolateBloc].
+  /// A great spot to add logging/analytics at the individual [IsolateBloc] level.
   ///
   /// **Note: `super.onEvent` should always be called first.**
   /// ```dart
@@ -148,7 +142,7 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
   ///
   /// See also:
   ///
-  /// * [IsolateBlocObserver] for observing [Cubit] behavior globally.
+  /// * [IsolateBlocObserver] for observing [IsolateCubit] behavior globally.
   @mustCallSuper
   void onChange(Change<State> change) {
     // ignore: invalid_use_of_protected_member
@@ -184,19 +178,22 @@ abstract class IsolateBlocBase<Event, State> implements Sink<Event> {
   void onError(Object error, StackTrace stackTrace) {
     // ignore: invalid_use_of_protected_member
     IsolateBloc.observer.onError(this, error, stackTrace);
-    assert(() {
-      throw BlocUnhandledErrorException(this, error, stackTrace);
-    }());
+    assert(
+      () {
+        throw BlocUnhandledErrorException(this, error, stackTrace);
+      }(),
+      "Bloc Unhandled Error",
+    );
   }
 
   /// Free all resources. This method should be called when instance is no
   /// longer needed. Once close is called, events that are added will not be
   /// processed.
-  @override
   @mustCallSuper
   Future<void> close() async {
     // ignore: invalid_use_of_protected_member
     IsolateBloc.observer.onClose(this);
+
     await _stateController.close();
   }
 }
