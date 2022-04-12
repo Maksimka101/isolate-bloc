@@ -18,7 +18,7 @@ void main() {
       when(() => isolateManager.registerBloc(any()))
           .thenAnswer((invocation) {});
 
-      register<SimpleCubit, int>(create: () => SimpleCubit());
+      register<SimpleCubit, int>(create: SimpleCubit.new);
     });
 
     test('register with uninitialized `IsolateManager`', () {
@@ -26,7 +26,7 @@ void main() {
 
       dynamic error;
       try {
-        register<SimpleCubit, int>(create: () => SimpleCubit());
+        register<SimpleCubit, int>(create: SimpleCubit.new);
       } catch (e) {
         error = e;
       }

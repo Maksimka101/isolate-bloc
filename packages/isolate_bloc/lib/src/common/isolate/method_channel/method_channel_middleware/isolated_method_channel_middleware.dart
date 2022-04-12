@@ -51,15 +51,15 @@ class IsolatedMethodChannelMiddleware {
   void _listenForMethodChannelEvents(MethodChannelEvent event) {
     switch (event.runtimeType) {
       case PlatformChannelResponseEvent:
-        event = event as PlatformChannelResponseEvent;
-        _platformChannelResponse(event.id, event.data);
+        final responseEvent = event as PlatformChannelResponseEvent;
+        _platformChannelResponse(responseEvent.id, responseEvent.data);
         break;
       case InvokeMethodChannelEvent:
-        event = event as InvokeMethodChannelEvent;
+        final invokeEvent = event as InvokeMethodChannelEvent;
         _handlePlatformMessage(
-          event.channel,
-          event.id,
-          event.data,
+          invokeEvent.channel,
+          invokeEvent.id,
+          invokeEvent.data,
         );
         break;
     }

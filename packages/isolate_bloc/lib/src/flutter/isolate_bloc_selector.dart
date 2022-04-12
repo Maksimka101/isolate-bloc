@@ -6,7 +6,7 @@ import 'package:isolate_bloc/src/flutter/isolate_bloc_listener.dart';
 import 'package:isolate_bloc/src/flutter/isolate_bloc_provider.dart';
 
 /// {@template bloc_selector}
-/// [IsolateBlocSelector] is analogous to [BlocBuilder] but allows developers to
+/// [IsolateBlocSelector] is analogous to [IsolateBlocBuilder] but allows developers to
 /// filter updates by selecting a new value based on the bloc state.
 /// Unnecessary builds are prevented if the selected value does not change.
 ///
@@ -36,14 +36,14 @@ class IsolateBlocSelector<B extends IsolateBlocBase<Object?, S>, S, T>
 
   /// The [bloc] that the [IsolateBlocSelector] will interact with.
   /// If omitted, [IsolateBlocSelector] will automatically perform a lookup using
-  /// [BlocProvider] and the current [BuildContext].
+  /// [IsolateBlocProvider] and the current [BuildContext].
   final IsolateBlocWrapper? bloc;
 
   /// The [builder] function which will be invoked
   /// when the selected state changes.
   /// The [builder] takes the [BuildContext] and selected `state` and
   /// must return a widget.
-  /// This is analogous to the [builder] function in [BlocBuilder].
+  /// This is analogous to the [builder] function in [IsolateBlocBuilder].
   final BlocWidgetBuilder<T> builder;
 
   /// The [selector] function which will be invoked on each widget build
@@ -97,7 +97,9 @@ class _IsolateBlocSelectorState<B extends IsolateBlocBase<Object?, S>, S, T>
       bloc: _bloc,
       listener: (context, state) {
         final selectedState = widget.selector(state);
-        if (_state != selectedState) setState(() => _state = selectedState);
+        if (_state != selectedState) {
+          setState(() => _state = selectedState);
+        }
       },
       child: widget.builder(context, _state),
     );

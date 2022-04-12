@@ -6,7 +6,7 @@ import '../../blocs/counter_bloc.dart';
 import '../../test_utils/initialize.dart';
 
 void _initializer() {
-  register<CounterBloc, int>(create: () => CounterBloc());
+  register<CounterBloc, int>(create: CounterBloc.new);
 }
 
 void main() {
@@ -341,7 +341,7 @@ void main() {
             listenStates.add(state);
           },
           buildWhen: (previous, current) {
-            if (current % 2 == 0) {
+            if (current.isEven) {
               buildWhenPreviousState.add(previous);
               buildWhenCurrentState.add(current);
 

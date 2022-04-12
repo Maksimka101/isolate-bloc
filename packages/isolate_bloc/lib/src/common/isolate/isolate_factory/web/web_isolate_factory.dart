@@ -10,17 +10,20 @@ import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart'
 import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_setup.dart';
 
 /// Web [IIsolateFactory]'s implementation.
-/// Used in web environment because it doesn't create [Isolate]
+/// Used in web environment because it doesn't create [Isolate].
 class WebIsolateFactory implements IIsolateFactory {
   /// Simply creates two [IsolateMessenger]s, runs [isolateRun]
-  /// and returns [WebIsolateWrapper]
+  /// and returns [WebIsolateWrapper].
   @override
   Future<IsolateCreateResult> create(
     IsolateRun isolateRun,
     Initializer initializer,
     MethodChannels methodChannels,
   ) async {
+    // Will be closed by [WebIsolateWrapper.kill].
+    // ignore: close_sinks
     final fromIsolate = StreamController.broadcast();
+    // ignore: close_sinks
     final toIsolate = StreamController.broadcast();
     final sendFromIsolate = fromIsolate.add;
     final sendToIsolate = toIsolate.add;
@@ -29,7 +32,7 @@ class WebIsolateFactory implements IIsolateFactory {
 
     final isolateMessenger = IsolateMessenger(fromIsolateStream, sendToIsolate);
 
-    // this function run isolated function (IsolateRun)
+    // This function run isolated function (IsolateRun).
     // ignore: unawaited_futures
     _isolateRun(
       IsolateMessenger(toIsolateStream, sendFromIsolate),
@@ -38,14 +41,17 @@ class WebIsolateFactory implements IIsolateFactory {
     );
 
     return IsolateCreateResult(
-      WebIsolateWrapper(),
+      WebIsolateWrapper(
+        fromIsolate: fromIsolate,
+        toIsolate: toIsolate,
+      ),
       isolateMessenger,
     );
   }
 
-  /// Schedules [isolateRun] to run after [UIIsolateManager] is created
+  /// Schedules [isolateRun] to run after [UIIsolateManager] is created.
   ///
-  /// Otherwise [IsolateBlocsInitialized] event won't be handled by [UIIsolateManager]
+  /// Otherwise [IsolateBlocsInitialized] event won't be handled by [UIIsolateManager].
   Future<void> _isolateRun(
     IIsolateMessenger isolateMessenger,
     IsolateRun isolateRun,

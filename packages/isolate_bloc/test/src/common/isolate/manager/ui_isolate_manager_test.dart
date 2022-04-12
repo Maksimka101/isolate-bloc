@@ -1,15 +1,17 @@
+// ignore_for_file: close_sinks
+
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
-import '../../../../mock/mock_isolate_bloc_events.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../blocs/simple_cubit.dart';
+import '../../../../mock/mock_isolate_bloc_events.dart';
 import '../../../../mock/mock_isolate_messenger.dart';
 import '../../../../mock/mock_isolate_wrapper.dart';
 
@@ -115,7 +117,7 @@ void main() {
 
       await Future.delayed(const Duration(milliseconds: 1));
       verifyNever(
-          () => isolateMessenger.send(MockIsolateBlocTransitionEvent()));
+          () => isolateMessenger.send(MockIsolateBlocTransitionEvent()),);
     });
 
     test('send event when IsolateBlocBase is created', () async {
@@ -129,7 +131,7 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 1));
 
       verify(() => isolateMessenger
-          .send(const IsolateBlocTransitionEvent('', 'test'))).called(1);
+          .send(const IsolateBlocTransitionEvent('', 'test')),).called(1);
     });
 
     test('send unsent events', () async {
@@ -142,7 +144,7 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 1));
 
       verify(() => isolateMessenger
-          .send(const IsolateBlocTransitionEvent('', 'test'))).called(1);
+          .send(const IsolateBlocTransitionEvent('', 'test')),).called(1);
     });
 
     test('close IsolateBlocWrapper closes IsolateBlocBase', () async {

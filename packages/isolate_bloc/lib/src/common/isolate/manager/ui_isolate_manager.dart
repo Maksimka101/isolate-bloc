@@ -3,19 +3,14 @@ import 'dart:async';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_wrapper.dart';
 
 /// Manager which is works in UI Isolate, responds on [IsolateBlocEvent]s from Isolate,
 /// manages [IsolateBlocWrapper]s and implements [createBloc] global function.
 class UIIsolateManager {
-  UIIsolateManager._internal(
-    this._isolate,
-    this._isolateMessenger,
-  );
-
   /// Creates new manager and sets [instance].
   factory UIIsolateManager(IsolateCreateResult createResult) {
     return instance = UIIsolateManager._internal(
@@ -23,6 +18,11 @@ class UIIsolateManager {
       createResult.messenger,
     );
   }
+
+  UIIsolateManager._internal(
+    this._isolate,
+    this._isolateMessenger,
+  );
 
   /// Instance of the last created manager.
   static UIIsolateManager? instance;
@@ -92,18 +92,19 @@ class UIIsolateManager {
         );
         break;
       case IsolateBlocCreatedEvent:
-        event = event as IsolateBlocCreatedEvent;
-        _onBlocCreated(event.blocId);
+        final createdEvent = event as IsolateBlocCreatedEvent;
+        _onBlocCreated(createdEvent.blocId);
         break;
       case IsolateBlocTransitionEvent:
-        event = event as IsolateBlocTransitionEvent;
-        _receiveBlocState(event.blocId, event.event);
+        final transitionEvent = event as IsolateBlocTransitionEvent;
+        _receiveBlocState(transitionEvent.blocId, transitionEvent.event);
         break;
 
       default:
         throw Exception(
-            'This is internal error. If you face it please create issue\n'
-            'Unknown `ServiceEvent` with type ${event.runtimeType}');
+          'This is internal error. If you face it please create issue\n'
+          'Unknown `ServiceEvent` with type ${event.runtimeType}',
+        );
     }
   }
 

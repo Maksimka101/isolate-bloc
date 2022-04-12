@@ -50,12 +50,12 @@ class UIMethodChannelMiddleware {
   void _listenForMethodChannelEvents(MethodChannelEvent event) {
     switch (event.runtimeType) {
       case InvokePlatformChannelEvent:
-        event = event as InvokePlatformChannelEvent;
-        _send(event.channel, event.data, event.id);
+        final invokeEvent = event as InvokePlatformChannelEvent;
+        _send(invokeEvent.channel, invokeEvent.data, invokeEvent.id);
         break;
       case MethodChannelResponseEvent:
-        event = event as MethodChannelResponseEvent;
-        _methodChannelResponse(event.id, event.data);
+        final responseEvent = event as MethodChannelResponseEvent;
+        _methodChannelResponse(responseEvent.id, responseEvent.data);
         break;
     }
   }
@@ -73,8 +73,10 @@ class UIMethodChannelMiddleware {
 
   /// Send event to the platform and send response to the IsolateBloc's Isolate.
   void _send(String channel, ByteData? message, String id) {
-    _binaryMessenger.send(channel, message)?.then((response) =>
-        _isolateMessenger.send(PlatformChannelResponseEvent(response, id)));
+    _binaryMessenger.send(channel, message)?.then(
+          (response) => _isolateMessenger
+              .send(PlatformChannelResponseEvent(response, id)),
+        );
   }
 
   void _bindPlatformMessageHandlers() {

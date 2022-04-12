@@ -1,3 +1,5 @@
+// ignore_for_file: close_sinks
+
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -35,7 +37,7 @@ void main() {
   }) async {
     initializeMessenger(
         isolateMessenger: uiIsolateMessenger,
-        eventsStream: eventsController.stream);
+        eventsStream: eventsController.stream,);
     initializeMessenger(isolateMessenger: isolatedMessenger);
 
     await initializer.initialize(

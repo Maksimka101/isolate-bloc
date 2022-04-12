@@ -3,21 +3,16 @@ import 'dart:async';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 
 /// Manager which works in Isolate, respond on [IsolateBlocEvent]s from UI Isolate,
-/// manages [IsolateBlocBase]s and implements [register] and [getBloc] functions
+/// manages [IsolateBlocBase]s and implements [register] and [getBloc] functions.
 class IsolateManager {
-  IsolateManager._internal(
-    this._messenger,
-    this._userInitializer,
-  );
-
-  /// Creates isolate manager and set [instance]
+  /// Creates isolate manager and set [instance].
   ///
-  /// Don't forget to call [initialize] to subscribe on messages and call [Initializer]
+  /// Don't forget to call [initialize] to subscribe on messages and call [Initializer].
   factory IsolateManager({
     required IIsolateMessenger messenger,
     required Initializer userInitializer,
@@ -28,7 +23,12 @@ class IsolateManager {
     );
   }
 
-  /// Instance of last created manager
+  IsolateManager._internal(
+    this._messenger,
+    this._userInitializer,
+  );
+
+  /// Instance of last created manager.
   static IsolateManager? instance;
 
   final IIsolateMessenger _messenger;
@@ -58,10 +58,13 @@ class IsolateManager {
     try {
       await _userInitializer();
     } catch (e, stackTrace) {
-      // Throw exception only in debug mode
-      assert(() {
-        throw InitializerException(e, stackTrace);
-      }());
+      // Throw exception only in debug mode.
+      assert(
+        () {
+          throw InitializerException(e, stackTrace);
+        }(),
+        "Exception in initializer",
+      );
     }
 
     _initializeCompleter.complete();
@@ -116,13 +119,11 @@ class IsolateManager {
       isolateBloc?.add(event);
     }
 
-    wrapper = IsolateBlocWrapper.isolate(
+    return wrapper = IsolateBlocWrapper.isolate(
       eventReceiver,
       onBLocClose,
       _initialStates[B] as S?,
     );
-
-    return wrapper;
   }
 
   /// Disposes resources.
@@ -134,16 +135,16 @@ class IsolateManager {
   void _listenForMessagesFormUi(IsolateBlocEvent event) {
     switch (event.runtimeType) {
       case IsolateBlocTransitionEvent:
-        event = event as IsolateBlocTransitionEvent;
-        _receiveBlocEvent(event.blocId, event.event);
+        final transitionEvent = event as IsolateBlocTransitionEvent;
+        _receiveBlocEvent(transitionEvent.blocId, transitionEvent.event);
         break;
       case CreateIsolateBlocEvent:
-        event = event as CreateIsolateBlocEvent;
-        _createBloc(event.blocType, event.blocId);
+        final createEvent = event as CreateIsolateBlocEvent;
+        _createBloc(createEvent.blocType, createEvent.blocId);
         break;
       case CloseIsolateBlocEvent:
-        event = event as CloseIsolateBlocEvent;
-        _closeBloc(event.blocId);
+        final closeEvent = event as CloseIsolateBlocEvent;
+        _closeBloc(closeEvent.blocId);
         break;
     }
   }
@@ -183,12 +184,12 @@ class IsolateManager {
     } else {
       _createdBlocsSubscriptions[uuid]?.cancel();
 
-      var subscriptions = _isolatedBlocWrappersSubscriptions[bloc] ?? [];
+      final subscriptions = _isolatedBlocWrappersSubscriptions[bloc] ?? [];
       for (final sub in subscriptions) {
         sub.cancel();
       }
 
-      var wrappers = _isolatedBlocWrappers[bloc] ?? <IsolateBlocWrapper>[];
+      final wrappers = _isolatedBlocWrappers[bloc] ?? <IsolateBlocWrapper>[];
       for (final wrapper in wrappers) {
         wrapper.close();
       }
@@ -217,7 +218,7 @@ class IsolateManager {
     if (blocsT.isNotEmpty) {
       return blocsT.first;
     } else if (_freeBlocs.containsKey(T)) {
-      return _freeBlocs[T] as T;
+      return _freeBlocs[T] !as T;
     } else {
       final blocCreator = _blocCreators[T];
       if (blocCreator == null) {
