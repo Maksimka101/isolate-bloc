@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/web/web_isolate_wrapper.dart';
+
+import 'absent_isolate_wrapper.dart';
 
 class MockIsolateFactory implements IIsolateFactory {
   MockIsolateFactory({
@@ -21,7 +22,7 @@ class MockIsolateFactory implements IIsolateFactory {
     isolateRun(isolatedMessenger, initializer);
 
     return IsolateCreateResult(
-      WebIsolateWrapper(),
+      AbsentIsolateWrapper(),
       uiIsolateMessenger,
     );
   }

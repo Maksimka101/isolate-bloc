@@ -1,4 +1,4 @@
-// ignore_for_file: no-equal-arguments
+// ignore_for_file: no-equal-arguments, close_sinks
 import 'dart:async';
 
 import 'package:flutter/services.dart';
@@ -43,7 +43,7 @@ void main() {
 
   void initializeManager(Stream<IsolateEvent> stream) {
     initializeMessenger(
-        isolateMessenger: isolateMessenger, eventsStream: stream);
+        isolateMessenger: isolateMessenger, eventsStream: stream,);
 
     methodChannelMiddleware.initialize();
   }
@@ -65,7 +65,7 @@ void main() {
     test('subscribe on messages stream', () async {
       final controller = StreamController<IsolateEvent>();
       initializeMessenger(
-          isolateMessenger: isolateMessenger, eventsStream: controller.stream);
+          isolateMessenger: isolateMessenger, eventsStream: controller.stream,);
 
       controller
           .add(InvokeMethodChannelEvent(null, methodChannels.first, 'id'));
@@ -73,7 +73,7 @@ void main() {
 
       verifyNever(
         () => binaryMessenger.handlePlatformMessage(
-            methodChannels.first, null, any()),
+            methodChannels.first, null, any(),),
       );
 
       methodChannelMiddleware.initialize();
@@ -85,7 +85,7 @@ void main() {
       verify(
         () => binaryMessenger.handlePlatformMessage('test', null, any()),
       ).called(2);
-    }, skip: true);
+    }, skip: true,);
   });
 
   test('test `dispose` method', () async {

@@ -3,8 +3,8 @@ import 'package:isolate_bloc/src/common/api_wrappers.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/flutter/bloc_info_holder.dart';
-import 'package:provider/single_child_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 
 /// A function that creates a `Bloc` of type [T].
 typedef CreateIsolateBloc<T extends IsolateBlocBase<Object?, Object?>> = T
@@ -84,7 +84,8 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State>
   /// ```
   static IsolateBlocWrapper<State>
       of<T extends IsolateBlocBase<Object?, State>, State>(
-          BuildContext context) {
+    BuildContext context,
+  ) {
     final blocInfoHolder = _getBlocInfoHolder(context);
     final blocWrapper = blocInfoHolder?.getWrapperByType<T, State>();
     if (blocWrapper == null) {
@@ -128,8 +129,8 @@ class IsolateBlocProvider<T extends IsolateBlocBase<Object?, State>, State>
           return blocInfoHolder;
         },
         dispose: (context, infoHolder) {
-          var blocWrapper = infoHolder.removeBloc<T>();
-          assert(blocWrapper != null);
+          final blocWrapper = infoHolder.removeBloc<T>();
+          assert(blocWrapper != null, "`blocWrapper` expected to not nullable");
           blocWrapper?.close();
         },
         lazy: lazy,

@@ -171,7 +171,9 @@ abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
       ),
     ).listen(
       (transition) {
-        if (transition.nextState == state && emitted) return;
+        if (transition.nextState == state && emitted) {
+          return;
+        }
         try {
           onTransition(transition);
           emit(transition.nextState);

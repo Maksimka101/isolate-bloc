@@ -10,7 +10,7 @@ typedef MethodChannels = List<String>;
 /// Settings for [UIMethodChannelMiddleware] and [IsolatedMethodChannelMiddleware].
 class MethodChannelSetup {
   const MethodChannelSetup({
-    final MethodChannels methodChannelNames = const [],
+    MethodChannels methodChannelNames = const [],
   }) : _methodChannelNames = methodChannelNames;
 
   /// List of user defined method channel names.

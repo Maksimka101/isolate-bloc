@@ -28,7 +28,7 @@ typedef IsolateBlocKiller = void Function(String uuid);
 ///     and connects it to the [IsolateBlocBase]
 ///
 /// Don't create this manually!
-class IsolateBlocWrapper<State> implements Sink<Object?> {
+class IsolateBlocWrapper<State> {
   /// Takes initialState ([state]), function which receives events
   /// and sends them to the [IsolateBlocBase]
   /// and function which called on [close] and closes [IsolateBlocBase]
@@ -50,8 +50,8 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
   IsolateBlocWrapper.isolate(
     this._eventReceiver,
     this._onBlocClose, [
-    this._state,
-  ]) {
+    State? state,
+  ]) : _state = state {
     _bindEventsListener();
   }
 
@@ -88,16 +88,14 @@ class IsolateBlocWrapper<State> implements Sink<Object?> {
   Stream<Object?> get _eventStream => _eventController.stream;
 
   /// As a result, call original [IsolateBloc]'s add function.
-  @override
   void add(Object? event) {
     _eventController.add(event);
   }
 
   /// Closes the `event` stream and requests to close connected [IsolateBlocBase]
-  @override
   @mustCallSuper
   Future<void> close() async {
-    var id = isolateBlocId;
+    final id = isolateBlocId;
     if (id != null) {
       _onBlocClose(id);
     }

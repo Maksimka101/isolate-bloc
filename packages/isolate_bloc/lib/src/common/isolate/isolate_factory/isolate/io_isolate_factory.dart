@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:isolate';
 import 'dart:developer' as dev;
+import 'dart:isolate';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter/widgets.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate/io_isolate_wrapper.dart';

@@ -39,7 +39,7 @@ void main() {
     await isolateFactory.create(isolateRun, initializer, methodChannels);
 
     await Future.delayed(const Duration(seconds: 1));
-    var map = await _readSyncFile();
+    final map = await _readSyncFile();
 
     expect(map['isolate_run'], isTrue);
     expect(map['method_channel_initialized'], isTrue);
@@ -47,7 +47,7 @@ void main() {
   });
 
   test('test isolate communication', () async {
-    var isolateCreateResult = await isolateFactory.create(
+    final isolateCreateResult = await isolateFactory.create(
       isolateRun,
       initializer,
       methodChannels,
@@ -68,7 +68,7 @@ void main() {
     initializer = () {};
     await expectLater(
         isolateFactory.create(isolateRun, initializer, methodChannels),
-        throwsA(isNotNull));
+        throwsA(isNotNull),);
   });
 }
 
@@ -85,7 +85,7 @@ Future<void> _isolateRun(
     }
   });
 
-  var map = await _readSyncFile();
+  final map = await _readSyncFile();
   map['isolate_run'] = true;
   map['method_channel_initialized'] =
       IsolatedMethodChannelMiddleware.instance != null;

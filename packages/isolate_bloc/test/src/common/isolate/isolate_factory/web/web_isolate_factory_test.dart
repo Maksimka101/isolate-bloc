@@ -41,7 +41,7 @@ void main() {
     IIsolateMessenger? isolateMessenger;
     isolateRun = (messenger, _) => isolateMessenger = messenger;
 
-    var createResult =
+    final createResult =
         await isolateFactory.create(isolateRun, initializer, methodChannels);
     await Future.delayed(Duration.zero);
     expect(isolateMessenger, isNotNull);
@@ -55,11 +55,11 @@ void main() {
 
     createResult.messenger
         .send(const IsolateBlocTransitionEvent('to_isolate', 'test'));
-    var answer = createResult.messenger.messagesStream
+    final answer = createResult.messenger.messagesStream
         .firstWhere((element) => element is IsolateBlocTransitionEvent);
 
     expect(await answer,
-        const IsolateBlocTransitionEvent('from_isolate', 'answer'));
+        const IsolateBlocTransitionEvent('from_isolate', 'answer'),);
   });
 
   test('test messages from `IIsolateMessenger` are not disappear', () async {
@@ -70,6 +70,6 @@ void main() {
     final createResult =
         await isolateFactory.create(isolateRun, initializer, methodChannels);
     expect(await createResult.messenger.messagesStream.first,
-        IsolateBlocsInitialized(initialStates));
+        IsolateBlocsInitialized(initialStates),);
   });
 }

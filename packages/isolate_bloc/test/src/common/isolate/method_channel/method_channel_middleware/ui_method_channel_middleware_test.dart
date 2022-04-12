@@ -1,4 +1,4 @@
-// ignore_for_file: no-equal-arguments
+// ignore_for_file: no-equal-arguments, close_sinks
 import 'dart:async';
 import 'dart:ui';
 
@@ -42,7 +42,7 @@ void main() {
 
   void initializeManager(Stream<IsolateEvent> stream) {
     initializeMessenger(
-        isolateMessenger: isolateMessenger, eventsStream: stream);
+        isolateMessenger: isolateMessenger, eventsStream: stream,);
 
     uiMethodChannelMiddleware.initialize();
   }
@@ -64,7 +64,7 @@ void main() {
     test('subscribe on messages stream', () async {
       final controller = StreamController<IsolateEvent>();
       initializeMessenger(
-          isolateMessenger: isolateMessenger, eventsStream: controller.stream);
+          isolateMessenger: isolateMessenger, eventsStream: controller.stream,);
 
       controller
           .add(InvokePlatformChannelEvent(null, methodChannels.first, 'id'));
@@ -117,7 +117,7 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 1));
 
       verify(() => isolateMessenger
-          .send(PlatformChannelResponseEvent(response, 'id'))).called(1);
+          .send(PlatformChannelResponseEvent(response, 'id')),).called(1);
     });
 
     test('send multiple events with response', () async {
@@ -137,7 +137,7 @@ void main() {
           request,
           channel,
           j.toString(),
-        ));
+        ),);
       }
 
       await Future.delayed(const Duration(milliseconds: 1));
@@ -147,7 +147,7 @@ void main() {
           () => isolateMessenger.send(PlatformChannelResponseEvent(
             response,
             j.toString(),
-          )),
+          ),),
         ).called(1);
       }
     });
@@ -174,7 +174,7 @@ void main() {
             requests[i],
             methodChannels[i],
             '${methodChannels[i]}$j',
-          ));
+          ),);
         }
       }
 
@@ -186,7 +186,7 @@ void main() {
             () => isolateMessenger.send(PlatformChannelResponseEvent(
               responses[i],
               '${methodChannels[i]}$j',
-            )),
+            ),),
           ).called(1);
         }
       }
@@ -217,7 +217,7 @@ void main() {
       ByteData? receivedResponse;
       // ignore: unawaited_futures
       binaryMessenger.handlePlatformMessage(
-          channel, request, (data) => receivedResponse = data);
+          channel, request, (data) => receivedResponse = data,);
 
       controller.add(MethodChannelResponseEvent(response, 'id'));
       await Future.delayed(const Duration(milliseconds: 1));
@@ -250,7 +250,7 @@ void main() {
         binaryMessenger.handlePlatformMessage(
           methodChannels[i],
           requests[i],
-          (data) => receiverResponses.add(data),
+          receiverResponses.add,
         );
 
         controller.add(MethodChannelResponseEvent(responses[i], 'id$i'));

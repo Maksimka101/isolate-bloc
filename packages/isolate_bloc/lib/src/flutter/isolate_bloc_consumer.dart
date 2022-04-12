@@ -119,14 +119,18 @@ class _IsolateBlocConsumerState<B extends IsolateBlocBase<Object?, S>, S>
     super.didUpdateWidget(oldWidget);
     final oldBloc = oldWidget.bloc ?? context.isolateBloc<B, S>();
     final currentBloc = widget.bloc ?? oldBloc;
-    if (oldBloc != currentBloc) _bloc = currentBloc;
+    if (oldBloc != currentBloc) {
+      _bloc = currentBloc;
+    }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final bloc = widget.bloc ?? context.isolateBloc<B, S>();
-    if (_bloc != bloc) _bloc = bloc;
+    if (_bloc != bloc) {
+      _bloc = bloc;
+    }
   }
 
   @override
