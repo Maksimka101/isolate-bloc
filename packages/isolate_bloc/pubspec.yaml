@@ -9,6 +9,7 @@ environment:
   flutter: ">=2.0.0"
 
 dependencies:
+  combine: ^0.1.1
   equatable: ^2.0.3
   flutter:
     sdk: flutter
@@ -20,6 +21,5 @@ dev_dependencies:
   dart_code_metrics: ^4.3.1
   flutter_test:
     sdk: flutter
-  mocktail: ^0.1.4
+  mocktail: ^0.3.0
   path: ^1.8.0
-  
