@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
+import 'package:isolate_bloc/src/common/isolated_api_wrappers.dart';
 
 /// Manager which works in Isolate, respond on [IsolateBlocEvent]s from UI Isolate,
 /// manages [IsolateBlocBase]s and implements [register] and [getBloc] functions.
@@ -15,24 +17,16 @@ class IsolateManager {
   /// Don't forget to call [initialize] to subscribe on messages and call [Initializer].
   factory IsolateManager({
     required IIsolateMessenger messenger,
-    required Initializer userInitializer,
   }) {
-    return instance = IsolateManager._internal(
-      messenger,
-      userInitializer,
-    );
+    return instance = IsolateManager._internal(messenger);
   }
 
-  IsolateManager._internal(
-    this._messenger,
-    this._userInitializer,
-  );
+  IsolateManager._internal(this._messenger);
 
   /// Instance of last created manager.
   static IsolateManager? instance;
 
   final IIsolateMessenger _messenger;
-  final Initializer _userInitializer;
 
   final InitialStates _initialStates = {};
   final _createdBlocs = <String, IsolateBlocBase>{};
@@ -48,23 +42,20 @@ class IsolateManager {
 
   /// Finish initialization by calling [Initializer] and sends initial states to the [UIIsolateManager].
   ///
-  /// Throws [InitializerException] when some exception is thrown in [Initializer] in debug mode
-  Future<void> initialize() async {
+  /// Throws [InitializerException] when some exception is thrown in [Initializer] in debug mode.
+  Future<void> initialize(Initializer userInitializer) async {
     _serviceEventsSubscription = _messenger.messagesStream
         .where((event) => event is IsolateBlocEvent)
         .cast<IsolateBlocEvent>()
         .listen(_listenForMessagesFormUi);
 
     try {
-      await _userInitializer();
+      await userInitializer();
     } catch (e, stackTrace) {
       // Throw exception only in debug mode.
-      assert(
-        () {
-          throw InitializerException(e, stackTrace);
-        }(),
-        "Exception in initializer",
-      );
+      if (kDebugMode) {
+        throw InitializerException(e, stackTrace);
+      }
     }
 
     _initializeCompleter.complete();
@@ -207,18 +198,18 @@ class IsolateManager {
       if (blocCreator == null) {
         throw BlocUnregisteredException(type);
       } else {
-        return blocCreator.call();
+        return blocCreator();
       }
     }
   }
 
   Future<T> _getBloc<T extends IsolateBlocBase>() async {
     await _initializeCompleter.future;
-    final blocsT = _createdBlocs.values.whereType<T>();
+    final blocsT = _createdBlocs.values.whereType<T>().toList();
     if (blocsT.isNotEmpty) {
       return blocsT.first;
     } else if (_freeBlocs.containsKey(T)) {
-      return _freeBlocs[T] !as T;
+      return _freeBlocs[T]! as T;
     } else {
       final blocCreator = _blocCreators[T];
       if (blocCreator == null) {
@@ -233,9 +224,9 @@ class IsolateManager {
 /// Signature for function which creates [IsolateBlocBase].
 typedef IsolateBlocCreator<E, S> = IsolateBlocBase<E, S> Function();
 
-/// This exception indicates that bloc wasn't registered
+/// This exception indicates that bloc wasn't registered.
 ///
-/// Ensure that you call `register<Bloc, State>(...) in [Initializer] function
+/// Ensure that you call `register<Bloc, State>(...) in [Initializer] function.
 class BlocUnregisteredException implements Exception {
   BlocUnregisteredException(this._blocType);
 
@@ -249,9 +240,9 @@ class BlocUnregisteredException implements Exception {
   }
 }
 
-/// This exception indicates that some exception was thrown in [Initializer] function
+/// This exception indicates that some exception was thrown in [Initializer] function.
 ///
-/// Throws only in debug mode
+/// Throws only in debug mode.
 class InitializerException {
   InitializerException(this._error, this._stackTrace);
 

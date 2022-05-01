@@ -1,8 +1,5 @@
-/// Abstract layer for [Isolate]
-///
-/// For example [WebIsolateWrapper] do nothing
-/// however [IOIsolateWrapper] maintains a real [Isolate]
+/// Abstract layer for `Isolate`.
 abstract class IIsolateWrapper {
-  /// Kills [Isolate]
+  /// Kills `Isolate`.
   void kill();
 }

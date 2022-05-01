@@ -1,3 +1,8 @@
+## [2.1.0]
+ - Delegate Isolate creating to the `combine` package. 
+   Also this package makes it possible to work with 
+   method channels in Isolate
+
 ## [2.0.1] 
  - Fix analyzer issues.
  - Fix web support.

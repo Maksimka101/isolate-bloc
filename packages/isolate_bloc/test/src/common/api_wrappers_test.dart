@@ -1,25 +1,31 @@
+import 'package:combine/combine.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../blocs/simple_cubit.dart';
+import '../../mock/mock_isolate_bloc_wrapper.dart';
 
 void main() {
   late UIIsolateManager uiIsolateManager;
 
   setUp(() {
+    setTestIsolateFactory(WebIsolateFactory());
     uiIsolateManager = _MockUIIsolateManager();
 
     UIIsolateManager.instance = uiIsolateManager;
   });
+  tearDownAll(cleanTestIsolateFactory);
 
   group('test `createBloc`', () {
     test('test with initialized `UIIsolateManager`', () {
-      when(() => uiIsolateManager.createIsolateBloc())
+      when(() => uiIsolateManager.createIsolateBloc<SimpleCubit, int>())
           .thenReturn(MockIsolateBlocWrapper<int>());
       createBloc<SimpleCubit, int>();
 
-      verify(() => uiIsolateManager.createIsolateBloc()).called(1);
+      verify(
+        () => uiIsolateManager.createIsolateBloc<SimpleCubit, int>(),
+      ).called(1);
     });
 
     test('test with uninitialized `UIIsolateManager`', () {
@@ -37,9 +43,8 @@ void main() {
     });
   });
 
-  test('test `initialize` function ', () async {
-    when(() => uiIsolateManager.dispose())
-        .thenAnswer((invocation) => Future.value());
+  test("'initialize' function disposes previous 'UIIsolateManager'", () async {
+    when(() => uiIsolateManager.dispose()).thenAnswer((invocation) async {});
 
     await initialize(_initialize);
 
@@ -52,7 +57,5 @@ void main() {
 }
 
 void _initialize() {}
-
-class MockIsolateBlocWrapper<T> extends Mock implements IsolateBlocWrapper<T> {}
 
 class _MockUIIsolateManager extends Mock implements UIIsolateManager {}

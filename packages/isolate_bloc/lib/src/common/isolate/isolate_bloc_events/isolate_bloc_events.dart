@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 
-/// Event with [IsolateBloc]'s state or or with event from [IsolateBlocWrapper]
+/// Event with [IsolateBloc]'s state or or with event from [IsolateBlocWrapper].
 @immutable
 class IsolateBlocTransitionEvent extends IsolateBlocEvent {
   const IsolateBlocTransitionEvent(this.blocId, this.event);
@@ -15,7 +15,7 @@ class IsolateBlocTransitionEvent extends IsolateBlocEvent {
   List<Object?> get props => [blocId, event];
 }
 
-/// Request to create new [IsolateBloc]
+/// Request to create new [IsolateBloc].
 @immutable
 class CreateIsolateBlocEvent extends IsolateBlocEvent {
   const CreateIsolateBlocEvent(this.blocType, this.blocId);
@@ -27,7 +27,7 @@ class CreateIsolateBlocEvent extends IsolateBlocEvent {
   List<Object?> get props => [blocType, blocId];
 }
 
-/// Event to bind [IsolateBlocWrapper] to the [IsolateBloc] when second one is created
+/// Event to bind [IsolateBlocWrapper] to the [IsolateBloc] when second one is created.
 @immutable
 class IsolateBlocCreatedEvent extends IsolateBlocEvent {
   const IsolateBlocCreatedEvent(this.blocId);
@@ -38,7 +38,7 @@ class IsolateBlocCreatedEvent extends IsolateBlocEvent {
   List<Object?> get props => [blocId];
 }
 
-/// When every [IsolateBloc]s are initialized
+/// When every [IsolateBloc]s are initialized.
 @immutable
 class IsolateBlocsInitialized extends IsolateBlocEvent {
   const IsolateBlocsInitialized(this.initialStates);
@@ -49,7 +49,7 @@ class IsolateBlocsInitialized extends IsolateBlocEvent {
   List<Object?> get props => [initialStates];
 }
 
-/// Event to close IsolateBloc. Called by [IsolateBlocWrapper.close()]
+/// Event to close IsolateBloc. Called by [IsolateBlocWrapper.close].
 @immutable
 class CloseIsolateBlocEvent extends IsolateBlocEvent {
   const CloseIsolateBlocEvent(this.blocId);

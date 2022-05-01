@@ -3,7 +3,7 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../blocs/simple_cubit.dart';
-import 'api_wrappers_test.dart';
+import '../../mock/mock_isolate_bloc_wrapper.dart';
 
 void main() {
   late IsolateManager isolateManager;
@@ -13,15 +13,15 @@ void main() {
     IsolateManager.instance = isolateManager;
   });
 
-  group('Test `register` function', () {
-    test('register with initialized `IsolateManager`', () {
+  group("Test 'register' function", () {
+    test("register with initialized 'IsolateManager'", () {
       when(() => isolateManager.registerBloc(any()))
           .thenAnswer((invocation) {});
 
       register<SimpleCubit, int>(create: SimpleCubit.new);
     });
 
-    test('register with uninitialized `IsolateManager`', () {
+    test("register with uninitialized 'IsolateManager'", () {
       IsolateManager.instance = null;
 
       dynamic error;
@@ -36,14 +36,15 @@ void main() {
     });
   });
 
-  group('Test `getBloc` function', () {
-    test('getBloc with initialized `IsolateManager`', () {
-      when(() => isolateManager.getBlocWrapper())
-          .thenReturn(MockIsolateBlocWrapper<int>());
+  group("Test 'getBloc' function", () {
+    test("getBloc with initialized 'IsolateManager'", () {
+      when(
+        () => isolateManager.getBlocWrapper<SimpleCubit, int>(),
+      ).thenReturn(MockIsolateBlocWrapper<int>());
       getBloc<SimpleCubit, int>();
     });
 
-    test('getBloc with uninitialized `IsolateManager`', () {
+    test("getBloc with uninitialized 'IsolateManager'", () {
       IsolateManager.instance = null;
 
       dynamic error;

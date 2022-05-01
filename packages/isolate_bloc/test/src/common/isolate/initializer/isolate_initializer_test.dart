@@ -46,7 +46,6 @@ void main() {
         eventsController.add(const IsolateBlocsInitialized({CounterBloc: 0}));
       },
       isolateFactory,
-      [],
     );
     await Future.delayed(const Duration(milliseconds: 1));
   }

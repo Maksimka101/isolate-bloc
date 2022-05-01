@@ -1,7 +1,7 @@
+import 'package:combine/combine.dart';
 import 'package:isolate_bloc/src/common/isolate/initializer/isolate_initializer.dart';
+import 'package:isolate_bloc/src/common/isolate/isolate_factory/combine_isolate_factory/combine_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_factory.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/isolate/io_isolate_factory.dart';
-import 'package:isolate_bloc/src/common/isolate/isolate_factory/web/web_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 
 TestInitializePlatform _testInitializePlatform = TestInitializePlatform.native;
@@ -14,16 +14,15 @@ Future<void> testInitialize(Initializer userInitializer) async {
   return IsolateInitializer().initialize(
     userInitializer,
     _testFactory,
-    [],
   );
 }
 
 IIsolateFactory get _testFactory {
   switch (_testInitializePlatform) {
     case TestInitializePlatform.web:
-      return WebIsolateFactory();
+      return CombineIsolateFactory(WebIsolateFactory());
     case TestInitializePlatform.native:
-      return IOIsolateFactory();
+      return CombineIsolateFactory(NativeIsolateFactory());
   }
 }
 

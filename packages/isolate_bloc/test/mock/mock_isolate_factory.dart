@@ -17,7 +17,6 @@ class MockIsolateFactory implements IIsolateFactory {
   Future<IsolateCreateResult> create(
     IsolateRun isolateRun,
     Initializer initializer,
-    MethodChannels methodChannels,
   ) async {
     isolateRun(isolatedMessenger, initializer);
 

@@ -22,7 +22,25 @@ This package works on all flutter platforms.
 
 You can read about BLoC pattern [here](https://www.didierboelens.com/2018/08/reactive-programming-streams-bloc/).
 
-# Attention
+# Index
+- [Attention](#attention)
+- [Bloc and Cubit](#bloc-and-cubit)
+- [Creating](#creating)
+  - [IsolateCubit](#isolatecubit)
+  - [IsolateBloc](#isolatebloc)
+- [Registering a Bloc or Cubit](#registering-a-bloc-or-cubit)
+- [Using Bloc or Cubit in UI](#using-bloc-or-cubit-in-ui)
+- [All Api](#all-api)
+  - [IsolateBlocWrapper](#isolateblocwrapper)
+  - [Initialization](#initialization)
+  - [Create new Bloc instance](#create-new-bloc-instance)
+  - [Consume Bloc](#consume-bloc)
+  - [Blocs Observer](#blocs-observer)
+  - [Use Bloc in another Bloc](#use-bloc-in-another-bloc)
+  - [Use platform channels](#use-platform-channels)
+- [Examples](#examples)
+
+## Attention
 I recommend you to read about Isolates to get to know their weaknesses and strengths.
 - [Performance of isolates](https://cretezy.com/2020/flutter-fast-json) (before Flutter 2.8) 
 - [Lightweight isolates](https://github.com/dart-lang/sdk/issues/36097) (since Flutter 2.8) 
@@ -151,8 +169,8 @@ class CounterScreen extends StatelessWidget {
 }
 ```
 
-# All Api
-# IsolateBlocWrapper
+## All Api
+### IsolateBlocWrapper
 IsolateBlocWrapper works like a client for IsolateBloc. It receives IsolateBloc's 
 states and sends events added by `wrapperInstance.add(YourEvent())`. So you can 
 listen for origin bloc's state with `wrapperInstance.listen((state) { })` and add 
@@ -172,7 +190,7 @@ wrapper.add(CounterEvent.increment);
 wrapper.listen((state) => print('CounterBloc state: $state'));
 ```
 
-## Initialization
+### Initialization
 To create Isolate and register Blocs you need to call `initialize` and provide initialization (isolated) function. This function will be executed in Isolate and it MUST be a GLOBAL or STATIC. 
 
 ```dart
@@ -189,7 +207,7 @@ void isolatedFunc() {
 }
 ```
 
-## Create new Bloc instance
+### Create new Bloc instance
 To create a new instance of bloc you can use Widget or function.
 ```dart
 /// Create with Widget
@@ -211,7 +229,7 @@ MultiIsolateBlocProvider(
 final blocA = createBloc<BlocA, BlocAState>();
 ```
 
-## Use a Bloc
+### Consume Bloc
 ```dart
 IsolateBlocBuilder<CounterBloc, int>(
   buildWhen: (state, newState) {
@@ -251,7 +269,7 @@ IsolateBlocConsumer<CounterHistoryBloc, List<int>>(
 )
 ```
 
-## Observer Blocs
+### Blocs Observer 
 To observe single bloc or cubit you can override `onError`, `onEvent`, `onChange` and `onTransition` methods.
 
 ```dart
@@ -316,7 +334,7 @@ class SimpleBlocObserver extends IsolateBlocObserver {
 }
 ```
 
-## Use Bloc in another Bloc
+### Use Bloc in another Bloc
 You can use Bloc in another Bloc. To do this you need to use `getBloc<BlocA, BlocAState>()` 
 function which returns `IsolateBlocWrapper<BlocAState>` .
 
@@ -357,40 +375,11 @@ class CounterHistoryBloc extends IsolateBloc<int, List<int>> {
 }
 ```
 
-## Use platform channels
-If you want to use platform channels (MethodChannels) or libraries which use them in your Blocs or repositories you must provide `PlatformChannelSetup` with MethodChannel names in `initialize`.
+### Use platform channels
+You can just use platform (Method) channels in your blocs.
+About some limitations you can read [here](https://pub.dev/packages/combine#limitations).
 
-Below you can see example of how to add `url_launcher` library support.
-```dart
-await initialize(
-  isolatedFunc,
-  methodChannelSetup: MethodChannelSetup(
-    methodChannelNames: [
-      'plugins.flutter.io/url_launcher',
-    ],
-  ),
-);
-```
-
-By default, channels have already been added for flutter fire, flutter developers libraries 
-and popular community libraries. All out of box supported libraries you can see [here](https://github.com/Maksimka101/isolate-bloc/blob/master/packages/isolate_bloc/lib/src/common/isolate/method_channel/libraries.dart)
-(look at `Library.name`).
-
-# Limitations
-If you will try to send one of the following objects you will get 
-`Illegal argument in isolate message` runtime exception.
-
-## Lambda functions
-Your event/state cannot contain anonymous functions (something like this `final callback = () {}`).
-Because of it you can't send `BuildContext` or `ThemeData`.
-
-## StackTrace
-If you will try to send exception with StackTrace you will also get runtime exception. 
-
-## ReceivePort
-Just don't send this object.
-
-# Examples
+## Examples
  - [Counter](https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc/example)
  - [Weather](https://github.com/Maksimka101/isolate-bloc/tree/master/examples/weather_app)
  

@@ -18,7 +18,7 @@ abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
   }
 
   /// The current [IsolateBlocObserver] instance.
-  static IsolateBlocObserver observer = IsolateBlocObserver();
+  static IsolateBlocObserver? observer;
 
   StreamSubscription<Transition<Event, State>>? _transitionSubscription;
 
@@ -75,9 +75,9 @@ abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
   @override
   void emit(State state) => super.emit(state);
 
-  /// Called whenever new [event] received
+  /// Called whenever new [event] received.
   ///
-  /// Can't be overridden because must add [event] to the [_eventController]
+  /// Can't be overridden because must add [event] to the [_eventController].
   @protected
   @override
   void onEventReceived(Event event) {
@@ -117,7 +117,7 @@ abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
   @mustCallSuper
   void onTransition(Transition<Event, State> transition) {
     // ignore: invalid_use_of_protected_member
-    IsolateBloc.observer.onTransition(this, transition);
+    IsolateBloc.observer?.onTransition(this, transition);
   }
 
   /// Transforms the `Stream<Transition>` into a new `Stream<Transition>`.
