@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_bloc_events/isolate_bloc_events.dart';
@@ -52,12 +53,9 @@ class IsolateManager {
       await userInitializer();
     } catch (e, stackTrace) {
       // Throw exception only in debug mode.
-      assert(
-        () {
-          throw InitializerException(e, stackTrace);
-        }(),
-        "Exception in initializer",
-      );
+      if (kDebugMode) {
+        throw InitializerException(e, stackTrace);
+      }
     }
 
     _initializeCompleter.complete();

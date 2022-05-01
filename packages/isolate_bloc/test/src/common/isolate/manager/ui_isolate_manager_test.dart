@@ -117,7 +117,8 @@ void main() {
 
       await Future.delayed(const Duration(milliseconds: 1));
       verifyNever(
-          () => isolateMessenger.send(MockIsolateBlocTransitionEvent()),);
+        () => isolateMessenger.send(MockIsolateBlocTransitionEvent()),
+      );
     });
 
     test('send event when IsolateBlocBase is created', () async {
@@ -130,8 +131,10 @@ void main() {
       wrapper.add('test');
       await Future.delayed(const Duration(milliseconds: 1));
 
-      verify(() => isolateMessenger
-          .send(const IsolateBlocTransitionEvent('', 'test')),).called(1);
+      verify(
+        () =>
+            isolateMessenger.send(const IsolateBlocTransitionEvent('', 'test')),
+      ).called(1);
     });
 
     test('send unsent events', () async {
@@ -143,8 +146,10 @@ void main() {
       streamController.add(const IsolateBlocCreatedEvent(''));
       await Future.delayed(const Duration(milliseconds: 1));
 
-      verify(() => isolateMessenger
-          .send(const IsolateBlocTransitionEvent('', 'test')),).called(1);
+      verify(
+        () =>
+            isolateMessenger.send(const IsolateBlocTransitionEvent('', 'test')),
+      ).called(1);
     });
 
     test('close IsolateBlocWrapper closes IsolateBlocBase', () async {
@@ -187,4 +192,7 @@ void main() {
   });
 }
 
-class _UnknownIsolateBlocEvent extends IsolateBlocEvent {}
+class _UnknownIsolateBlocEvent extends IsolateBlocEvent {
+  @override
+  List<Object?> get props => [];
+}

@@ -3,7 +3,7 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../blocs/simple_cubit.dart';
-import 'api_wrappers_test.dart';
+import '../../mock/mock_isolate_bloc_wrapper.dart';
 
 void main() {
   late IsolateManager isolateManager;

@@ -4,6 +4,7 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../blocs/simple_cubit.dart';
+import '../../mock/mock_isolate_bloc_wrapper.dart';
 
 void main() {
   late UIIsolateManager uiIsolateManager;
@@ -56,7 +57,5 @@ void main() {
 }
 
 void _initialize() {}
-
-class MockIsolateBlocWrapper<T> extends Mock implements IsolateBlocWrapper<T> {}
 
 class _MockUIIsolateManager extends Mock implements UIIsolateManager {}

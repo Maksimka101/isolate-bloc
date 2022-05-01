@@ -6,9 +6,6 @@ import 'package:isolate_bloc/isolate_bloc.dart';
 @immutable
 abstract class IsolateEvent extends Equatable {
   const IsolateEvent();
-
-  @override
-  List<Object?> get props => [];
 }
 
 /// Events for communication between [UIIsolateManager] and [IsolateManager].

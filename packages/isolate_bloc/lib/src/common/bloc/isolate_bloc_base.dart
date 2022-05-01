@@ -14,7 +14,7 @@ abstract class IsolateBlocBase<Event, State> {
   /// {@macro bloc_stream}
   IsolateBlocBase(this._state) {
     // ignore: invalid_use_of_protected_member
-    IsolateBloc.observer.onCreate(this);
+    IsolateBloc.observer?.onCreate(this);
   }
 
   final _unsentStates = Queue<State>();
@@ -121,7 +121,7 @@ abstract class IsolateBlocBase<Event, State> {
   @mustCallSuper
   void onEvent(Event event) {
     // ignore: invalid_use_of_protected_member
-    IsolateBloc.observer.onEvent(this, event);
+    IsolateBloc.observer?.onEvent(this, event);
   }
 
   /// Called whenever a [change] occurs with the given [change].
@@ -146,7 +146,7 @@ abstract class IsolateBlocBase<Event, State> {
   @mustCallSuper
   void onChange(Change<State> change) {
     // ignore: invalid_use_of_protected_member
-    IsolateBloc.observer.onChange(this, change);
+    IsolateBloc.observer?.onChange(this, change);
   }
 
   /// Reports an [error] which triggers [onError] with an optional [StackTrace].
@@ -177,13 +177,10 @@ abstract class IsolateBlocBase<Event, State> {
   @mustCallSuper
   void onError(Object error, StackTrace stackTrace) {
     // ignore: invalid_use_of_protected_member
-    IsolateBloc.observer.onError(this, error, stackTrace);
-    assert(
-      () {
-        throw BlocUnhandledErrorException(this, error, stackTrace);
-      }(),
-      "Bloc Unhandled Error",
-    );
+    IsolateBloc.observer?.onError(this, error, stackTrace);
+    if (kDebugMode) {
+      throw BlocUnhandledErrorException(this, error, stackTrace);
+    }
   }
 
   /// Free all resources. This method should be called when instance is no
@@ -192,7 +189,7 @@ abstract class IsolateBlocBase<Event, State> {
   @mustCallSuper
   Future<void> close() async {
     // ignore: invalid_use_of_protected_member
-    IsolateBloc.observer.onClose(this);
+    IsolateBloc.observer?.onClose(this);
 
     await _stateController.close();
   }
@@ -200,7 +197,7 @@ abstract class IsolateBlocBase<Event, State> {
 
 /// This is an exception which is thrown on exception in `add` function in debug mode
 class BlocUnhandledErrorException implements Exception {
-  BlocUnhandledErrorException(this.bloc, this.error, [this.stackTrace]);
+  BlocUnhandledErrorException(this.bloc, this.error, this.stackTrace);
 
   /// The [bloc] in which the unhandled error occurred.
   final IsolateBlocBase bloc;
@@ -209,11 +206,11 @@ class BlocUnhandledErrorException implements Exception {
   final Object error;
 
   /// An optional [stackTrace] which accompanied the error.
-  final StackTrace? stackTrace;
+  final StackTrace stackTrace;
 
   @override
   String toString() {
     return 'Unhandled error $error occurred in bloc $bloc.\n'
-        '${stackTrace ?? ''}';
+        '$stackTrace';
   }
 }
