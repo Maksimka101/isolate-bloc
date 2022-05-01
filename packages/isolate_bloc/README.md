@@ -358,37 +358,8 @@ class CounterHistoryBloc extends IsolateBloc<int, List<int>> {
 ```
 
 ## Use platform channels
-If you want to use platform channels (MethodChannels) or libraries which use them in your Blocs or repositories you must provide `PlatformChannelSetup` with MethodChannel names in `initialize`.
-
-Below you can see example of how to add `url_launcher` library support.
-```dart
-await initialize(
-  isolatedFunc,
-  methodChannelSetup: MethodChannelSetup(
-    methodChannelNames: [
-      'plugins.flutter.io/url_launcher',
-    ],
-  ),
-);
-```
-
-By default, channels have already been added for flutter fire, flutter developers libraries 
-and popular community libraries. All out of box supported libraries you can see [here](https://github.com/Maksimka101/isolate-bloc/blob/master/packages/isolate_bloc/lib/src/common/isolate/method_channel/libraries.dart)
-(look at `Library.name`).
-
-# Limitations
-If you will try to send one of the following objects you will get 
-`Illegal argument in isolate message` runtime exception.
-
-## Lambda functions
-Your event/state cannot contain anonymous functions (something like this `final callback = () {}`).
-Because of it you can't send `BuildContext` or `ThemeData`.
-
-## StackTrace
-If you will try to send exception with StackTrace you will also get runtime exception. 
-
-## ReceivePort
-Just don't send this object.
+You can just use platform (Method) channels in your blocs.
+About some limitations you can read [here](https://pub.dev/packages/combine#limitations).
 
 # Examples
  - [Counter](https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc/example)
