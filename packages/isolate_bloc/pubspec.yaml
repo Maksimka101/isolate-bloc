@@ -9,7 +9,7 @@ environment:
   flutter: ">=2.0.0"
 
 dependencies:
-  combine: ^0.1.1
+  combine: 0.1.2
   equatable: ^2.0.3
   flutter:
     sdk: flutter

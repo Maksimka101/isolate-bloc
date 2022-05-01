@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
-import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_setup.dart';
 
 /// Abstract factory which is used to create and initialize [IIsolateWrapper], [IIsolateMessenger]
 /// and optionally [UIMethodChannelMiddleware] and [IsolatedMethodChannelMiddleware].
@@ -17,7 +16,6 @@ abstract class IIsolateFactory {
   Future<IsolateCreateResult> create(
     IsolateRun isolateRun,
     Initializer initializer,
-    MethodChannels methodChannels,
   );
 }
 
