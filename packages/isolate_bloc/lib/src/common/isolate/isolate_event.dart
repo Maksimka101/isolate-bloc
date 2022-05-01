@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isolate_bloc/isolate_bloc.dart';
 
-/// Class for isolate events
+/// Class for isolate events.
 @immutable
 abstract class IsolateEvent extends Equatable {
   const IsolateEvent();
@@ -11,14 +11,8 @@ abstract class IsolateEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Events for communication between [UIIsolateManager] and [IsolateManager]
+/// Events for communication between [UIIsolateManager] and [IsolateManager].
 @immutable
 abstract class IsolateBlocEvent extends IsolateEvent {
   const IsolateBlocEvent();
-}
-
-/// Events for communication between [UIMethodChannelMiddleware] and [IsolatedMethodChannelMiddleware]
-@immutable
-abstract class MethodChannelEvent extends IsolateEvent {
-  const MethodChannelEvent();
 }

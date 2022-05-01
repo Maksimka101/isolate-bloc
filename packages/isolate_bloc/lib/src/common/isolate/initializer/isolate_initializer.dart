@@ -12,7 +12,7 @@ class IsolateInitializer {
   ///
   /// Takes user [initializer] function which will be launched in Isolate
   /// and [isolateFactory] which is used to create new Isolate
-  /// and initialize communication between it and UI Isolate
+  /// and initialize communication between it and UI Isolate.
   Future<void> initialize(
     Initializer initializer,
     IIsolateFactory isolateFactory,
@@ -40,9 +40,8 @@ class IsolateInitializer {
   ) async {
     final isolateManager = IsolateManager(
       messenger: messenger,
-      userInitializer: userInitializer,
     );
 
-    await isolateManager.initialize();
+    await isolateManager.initialize(userInitializer);
   }
 }

@@ -7,6 +7,7 @@ import 'package:isolate_bloc/src/common/isolate/isolate_event.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_factory.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_messenger.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/i_isolate_wrapper.dart';
+import 'package:isolate_bloc/src/common/isolate/manager/isolate_manager.dart';
 
 /// Manager which is works in UI Isolate, responds on [IsolateBlocEvent]s from Isolate,
 /// manages [IsolateBlocWrapper]s and implements [createBloc] global function.
@@ -77,7 +78,7 @@ class UIIsolateManager {
     return blocWrapper;
   }
 
-  /// Free all resources and kills [Isolate].
+  /// Free all resources and kills `Isolate`.
   Future<void> dispose() async {
     _isolate.kill();
     await _serviceEventsSubscription?.cancel();

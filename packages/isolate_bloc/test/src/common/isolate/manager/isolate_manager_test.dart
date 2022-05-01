@@ -28,7 +28,7 @@ void main() {
       eventsStream: eventsStream,
     );
 
-    await isolateManager.initialize();
+    await isolateManager.initialize(userInitializer);
   }
 
   Future<B> createBloc<B extends IsolateBlocBase<Object?, S>, S>({
@@ -51,7 +51,6 @@ void main() {
 
     isolateManager = IsolateManager(
       messenger: isolateMessenger,
-      userInitializer: () => userInitializer(),
     );
   });
 

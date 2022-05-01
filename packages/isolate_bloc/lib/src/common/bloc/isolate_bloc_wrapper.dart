@@ -22,7 +22,7 @@ typedef IsolateBlocKiller = void Function(String uuid);
 /// events as shown above.
 ///
 /// It may be created:
-///   * by [createBloc] function which creates [IsolateBlocBase] in [Isolate]
+///   * by [createBloc] function which creates [IsolateBlocBase] in `Isolate`
 ///     and returns the instance of this class.
 ///   * by [getBloc] function which creates the instance of this class
 ///     and connects it to the [IsolateBlocBase]
@@ -57,7 +57,7 @@ class IsolateBlocWrapper<State> {
 
   /// Id of IsolateBloc. It's needed to find bloc in isolate.
   ///
-  /// This id may be changed
+  /// This id may be changed.
   @protected
   String? isolateBlocId;
 
@@ -66,25 +66,25 @@ class IsolateBlocWrapper<State> {
 
   State? _state;
 
-  /// Used to sync unsent events
+  /// Used to sync unsent events.
   var _blocCreated = false;
   final _unsentEvents = Queue<Object?>();
   final IsolateBlocKiller _onBlocClose;
   late StreamSubscription<Object?> _eventReceiverSubscription;
 
-  /// Callback which receives events and sends them to the IsolateBloc
+  /// Callback which receives events and sends them to the IsolateBloc.
   final EventReceiver _eventReceiver;
 
   /// Returns the current [state] of the [bloc].
   ///
-  /// It may be null only in wrapper provided by `getBlocWrapperFunction`
-  /// Can't be null in UI isolate
+  /// It may be null only in wrapper provided by `getBlocWrapperFunction`.
+  /// Can't be null in UI isolate.
   State? get state => _state;
 
-  /// Returns the stream of states
+  /// Returns the stream of states.
   Stream<State> get stream => _stateController.stream;
 
-  /// Returns stream of `event`
+  /// Returns stream of `event`.
   Stream<Object?> get _eventStream => _eventController.stream;
 
   /// As a result, call original [IsolateBloc]'s add function.
@@ -92,7 +92,7 @@ class IsolateBlocWrapper<State> {
     _eventController.add(event);
   }
 
-  /// Closes the `event` stream and requests to close connected [IsolateBlocBase]
+  /// Closes the `event` stream and requests to close connected [IsolateBlocBase].
   @mustCallSuper
   Future<void> close() async {
     final id = isolateBlocId;
@@ -105,7 +105,7 @@ class IsolateBlocWrapper<State> {
   }
 
   /// Connects this wrapper to the [IsolateBlocBase] and sends all unsent events.
-  // todo(maksim): maybe move unsent events synchronization to the [IsolateManager]
+  // TODO(Maksim): Maybe move unsent events synchronization to the [IsolateManager]
   @protected
   void onBlocCreated() {
     _blocCreated = true;
@@ -123,7 +123,7 @@ class IsolateBlocWrapper<State> {
     }
   }
 
-  /// Starts listening for new `events`
+  /// Starts listening for new `events`.
   void _bindEventsListener() {
     _eventReceiverSubscription = _eventStream.listen((event) {
       if (_blocCreated) {
@@ -135,10 +135,10 @@ class IsolateBlocWrapper<State> {
   }
 }
 
-/// Signature for [IsolateBlocWrapper] id generator
+/// Signature for [IsolateBlocWrapper] id generator.
 typedef IdGenerator = String Function();
 
-/// This function is used to generate id for [IsolateBlocWrapper]
+/// This function is used to generate id for [IsolateBlocWrapper].
 ///
-/// By default uses `uuid v4` generator
+/// By default uses `uuid v4` generator.
 IdGenerator isolateBlocIdGenerator = const Uuid().v4;

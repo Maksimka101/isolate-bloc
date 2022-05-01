@@ -3,12 +3,13 @@ import 'package:isolate_bloc/src/common/bloc/isolate_bloc_base.dart';
 import 'package:isolate_bloc/src/common/bloc/isolate_bloc_wrapper.dart';
 import 'package:isolate_bloc/src/common/isolate/initializer/isolate_initializer.dart';
 import 'package:isolate_bloc/src/common/isolate/isolate_factory/combine_isolate_factory/combine_isolate_factory.dart';
+import 'package:isolate_bloc/src/common/isolate/manager/isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/manager/ui_isolate_manager.dart';
 import 'package:isolate_bloc/src/common/isolate/method_channel/method_channel_setup.dart';
 
-/// Initializes [UIIsolateManager] and [IsolateManager] in [Isolate] and runs [userInitializer].
+/// Initializes [UIIsolateManager] and [IsolateManager] in `Isolate` and runs [userInitializer].
 ///
-/// If already initialized kills previous [Isolate] and creates new one.
+/// If already initialized kills previous `Isolate` and creates new one.
 ///
 /// Simply call this function at the start of main:
 /// ```
@@ -40,7 +41,7 @@ Future<void> initialize(
 /// Starts creating [IsolateBlocBase] and returns [IsolateBlocWrapper].
 ///
 /// Throws [UIIsolateManagerUnInitialized] if [UIIsolateManager] is null or in another words if you
-/// didn't call [initialize] function before
+/// didn't call [initialize] function before.
 ///
 /// How to use:
 /// ```
@@ -61,7 +62,7 @@ IsolateBlocWrapper<S> createBloc<B extends IsolateBlocBase<Object?, S>, S>() {
   }
 }
 
-/// This exception indicates that [initialize] function wasn't called
+/// This exception indicates that [initialize] function wasn't called.
 class UIIsolateManagerUnInitialized implements Exception {
   @override
   String toString() {

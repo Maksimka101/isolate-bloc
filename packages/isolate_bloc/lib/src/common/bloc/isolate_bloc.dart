@@ -75,9 +75,9 @@ abstract class IsolateBloc<Event, State> extends IsolateBlocBase<Event, State> {
   @override
   void emit(State state) => super.emit(state);
 
-  /// Called whenever new [event] received
+  /// Called whenever new [event] received.
   ///
-  /// Can't be overridden because must add [event] to the [_eventController]
+  /// Can't be overridden because must add [event] to the [_eventController].
   @protected
   @override
   void onEventReceived(Event event) {

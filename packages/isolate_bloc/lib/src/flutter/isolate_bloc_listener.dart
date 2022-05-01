@@ -16,10 +16,10 @@ import 'package:provider/single_child_widget.dart';
 /// unlike the `builder` in `BlocBuilder`.
 ///
 /// If the [bloc] parameter is omitted, [IsolateBlocListener] will automatically
-/// perform a lookup using [BlocProvider] and the current `BuildContext`.
+/// perform a lookup using [IsolateBlocProvider] and the current `BuildContext`.
 ///
 /// ```dart
-/// BlocListener<BlocA, BlocAState>(
+/// IsolateBlocListener<BlocA, BlocAState>(
 ///   listener: (context, state) {
 ///     // do stuff here based on BlocA's state
 ///   },
@@ -30,7 +30,7 @@ import 'package:provider/single_child_widget.dart';
 /// not accessible via [BlocProvider] and the current `BuildContext`.
 ///
 /// ```dart
-/// BlocListener<BlocA, BlocAState>(
+/// IsolateBlocListener<BlocA, BlocAState>(
 ///   value: blocA,
 ///   listener: (context, state) {
 ///     // do stuff here based on BlocA's state
@@ -52,7 +52,7 @@ import 'package:provider/single_child_widget.dart';
 /// [listenWhen] is optional and if omitted, it will default to `true`.
 ///
 /// ```dart
-/// BlocListener<BlocA, BlocAState>(
+/// IsolateBlocListener<BlocA, BlocAState>(
 ///   listenWhen: (previous, current) {
 ///     // return true/false to determine whether or not
 ///     // to invoke listener with state
@@ -65,14 +65,15 @@ import 'package:provider/single_child_widget.dart';
 /// ```
 /// {@endtemplate}
 class IsolateBlocListener<B extends IsolateBlocBase<Object?, S>, S>
-    extends IsolateBlocListenerBase<B, S> with BlocListenerSingleChildWidget {
+    extends IsolateBlocListenerBase<B, S>
+    with IsolateBlocListenerSingleChildWidget {
   /// {@macro bloc_listener}
   /// {@macro bloc_listener_listen_when}
   const IsolateBlocListener({
     Key? key,
     required BlocWidgetListener<S> listener,
     IsolateBlocWrapper? bloc,
-    BlocListenerCondition<S>? listenWhen,
+    IsolateBlocListenerCondition<S>? listenWhen,
     Widget? child,
   }) : super(
           key: key,
@@ -115,7 +116,7 @@ abstract class IsolateBlocListenerBase<B extends IsolateBlocBase<Object?, S>, S>
   final BlocWidgetListener<S> listener;
 
   /// {@macro bloc_listener_listen_when}
-  final BlocListenerCondition<S>? listenWhen;
+  final IsolateBlocListenerCondition<S>? listenWhen;
 
   @override
   SingleChildState<IsolateBlocListenerBase<B, S>> createState() =>
@@ -193,9 +194,9 @@ class _BlocListenerBaseState<B extends IsolateBlocBase<Object?, S>, S>
   }
 }
 
-/// Mixin which allows `MultiBlocListener` to infer the types
+/// Mixin which allows `MultiIsolateBlocListener` to infer the types
 /// of multiple [IsolateBlocListener]s.
-mixin BlocListenerSingleChildWidget on SingleChildWidget {}
+mixin IsolateBlocListenerSingleChildWidget on SingleChildWidget {}
 
 /// Signature for the `listener` function which takes the `BuildContext` along
 /// with the `state` and is responsible for executing in response to
@@ -206,4 +207,4 @@ typedef BlocWidgetListener<S> = void Function(BuildContext context, S state);
 /// and the current `state` and is responsible for returning a [bool] which
 /// determines whether or not to call [BlocWidgetListener] of [IsolateBlocListener]
 /// with the current `state`.
-typedef BlocListenerCondition<S> = bool Function(S previous, S current);
+typedef IsolateBlocListenerCondition<S> = bool Function(S previous, S current);

@@ -97,7 +97,7 @@ class IsolateBlocConsumer<B extends IsolateBlocBase<Object?, S>, S>
   /// Takes the previous `state` and the current `state` and is responsible for
   /// returning a [bool] which determines whether or not to call [listener] of
   /// [IsolateBlocConsumer] with the current `state`.
-  final BlocListenerCondition<S>? listenWhen;
+  final IsolateBlocListenerCondition<S>? listenWhen;
 
   @override
   State<IsolateBlocConsumer<B, S>> createState() =>
