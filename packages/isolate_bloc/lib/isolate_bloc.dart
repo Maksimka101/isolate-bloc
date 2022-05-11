@@ -18,4 +18,5 @@ export 'src/flutter/isolate_bloc_builder.dart';
 export 'src/flutter/isolate_bloc_consumer.dart';
 export 'src/flutter/isolate_bloc_listener.dart';
 export 'src/flutter/isolate_bloc_provider.dart';
+export 'src/flutter/isolate_bloc_selector.dart';
 export 'src/flutter/multi_isolate_bloc_provider.dart';
