@@ -24,8 +24,7 @@ import 'package:isolate_bloc/src/flutter/isolate_bloc_provider.dart';
 /// )
 /// ```
 /// {@endtemplate}
-class IsolateBlocSelector<B extends IsolateBlocBase<Object?, S>, S, T>
-    extends StatefulWidget {
+class IsolateBlocSelector<B extends IsolateBlocBase<Object?, S>, S, T> extends StatefulWidget {
   /// {@macro bloc_selector}
   const IsolateBlocSelector({
     Key? key,
@@ -52,8 +51,7 @@ class IsolateBlocSelector<B extends IsolateBlocBase<Object?, S>, S, T>
   final BlocWidgetSelector<S, T> selector;
 
   @override
-  State<IsolateBlocSelector<B, S, T>> createState() =>
-      _IsolateBlocSelectorState<B, S, T>();
+  State<IsolateBlocSelector<B, S, T>> createState() => _IsolateBlocSelectorState<B, S, T>();
 }
 
 class _IsolateBlocSelectorState<B extends IsolateBlocBase<Object?, S>, S, T>
