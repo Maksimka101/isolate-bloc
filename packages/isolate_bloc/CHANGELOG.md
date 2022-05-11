@@ -1,3 +1,6 @@
+## [2.0.1+1]
+- Show `IsolateSelector` on the package import
+
 ## [2.0.1] 
  - Fix analyzer issues.
  - Fix web support.
