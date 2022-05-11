@@ -249,10 +249,25 @@ IsolateBlocConsumer<CounterHistoryBloc, List<int>>(
     /// return widget here based on BlocA's state
   },
 )
+  
+IsolateBlocSelector<BlocA, BlocAState, SelectedState>(
+  selector: (state) {
+    // return selected state based on the provided state.
+  },
+  builder: (context, state) {
+    // return widget here based on the selected state.
+  },
+  bloc:blocA
+  // or 
+  /// The [bloc] that the [IsolateBlocSelector] will interact with.
+  /// If omitted, [IsolateBlocSelector] will automatically perform a             lookup using [IsolateBlocProvider] and the current [BuildContext].
+)  
+  
 ```
 
 ## Observer Blocs
-To observe single bloc or cubit you can override `onError`, `onEvent`, `onChange` and `onTransition` methods.
+
+To observe a single bloc or cubit you can override `onError`, `onEvent`, `onChange,` and `onTransition` methods.
 
 ```dart
 class CounterBloc extends IsolateBloc<CountEvent, int> {
@@ -393,12 +408,12 @@ Just don't send this object.
 # Examples
  - [Counter](https://github.com/Maksimka101/isolate-bloc/tree/master/packages/isolate_bloc/example)
  - [Weather](https://github.com/Maksimka101/isolate-bloc/tree/master/examples/weather_app)
- 
+
 # Articles
  - [Flutter. Как прокачать ваш BLoC](https://habr.com/ru/post/516764/) (ru)
 
 # Helpers
  - [Live templates](https://github.com/Maksimka101/isolate-bloc/tree/master/docs/intellij_idea_live_template.md)
- 
+
 # Gratitude
 Special thanks to [Felix Angelov](https://github.com/felangel) for the reference in the form of [bloc](https://github.com/felangel/bloc) package
