@@ -1,3 +1,7 @@
+## [2.1.1]
+ - Add `IsolateBlocSelector` widget. Actually it has been added in pervious
+   version but it wasn't exported :)
+
 ## [2.1.0]
  - Delegate Isolate creating to the `combine` package. 
    Also this package makes it possible to work with 
